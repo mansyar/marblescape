@@ -10,14 +10,15 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 
 - **Fixed-camera 3D diorama**: tilted tabletop view; the camera never moves. All interaction is designed as if 2D (raycast onto board plane, grid snapping).
 - **Interaction loop**: drag piece from palette → snap to grid slot → press Play → marbles run → collect → play again. Child-driven, no gestures to learn beyond drag and tap.
+- **Tilted table**: gravity leans ~8° toward the player — every surface drains south and ramps accelerate. Marbles never sit still; the board itself is the first toy.
 - **Sound-first**: every marble event has a satisfying sampled sound, pitch-shifted by marble speed. Prominent, persistent mute toggle.
-- **Marbles**: 2-5 colorful glass-look marbles with random candy colors per run.
+- **Marbles**: 1 marble per run, glass-look with a random candy color. Calm cause-and-effect: one press, one marble, one story.
 
 ## v1 Scope
 
 - 1 sandbox scene (Play → run → settle → collect → Play again)
 - 6 tiny "complete the track" puzzle levels, each introducing one piece (start chute + gap + goal cup; kid bridges the route)
-- 4-piece palette: straight ramp, curved ramp, funnel, goal cup
+- 4-piece palette: straight ramp (sloped), curved ramp, trap (channel with center drop hole), goal hole
 - All levels open from the start; subtle ✓ badges on solved levels (nothing locked)
 
 ## Non-Goals (v1)
