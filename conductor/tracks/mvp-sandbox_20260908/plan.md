@@ -96,3 +96,6 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - 20 consecutive scripted runs: 0 escapes / 0 stuck marbles
     - Coverage ≥ 80% verified
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Phase: Review Fixes
+- [~] Task: Apply review suggestions

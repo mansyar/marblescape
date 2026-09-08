@@ -80,6 +80,12 @@ export class Game {
     const loaded = loadBoard(localStorage);
     if (loaded) {
       this.board = loaded;
+      // Resume the id counter past every restored id so new pieces never
+      // collide with them (renderer meshes and physics bodies are keyed by id).
+      this.nextId = this.board.pieces.reduce(
+        (max, p) => Math.max(max, Number(p.id.slice(1)) + 1 || 1),
+        1,
+      );
     }
   }
 
