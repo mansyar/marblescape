@@ -9,6 +9,9 @@ import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./
  * on viewport resize so the board always fits.
  */
 export function startRenderer(container: HTMLElement): {
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  getAspect: () => number;
   dispose: () => void;
   onFrame: (cb: (elapsed: number) => void) => void;
 } {
@@ -53,6 +56,9 @@ export function startRenderer(container: HTMLElement): {
   });
 
   return {
+    scene,
+    camera,
+    getAspect: () => camera.aspect,
     dispose: () => {
       observer.disconnect();
       renderer.setAnimationLoop(null);
