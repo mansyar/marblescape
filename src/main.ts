@@ -89,6 +89,9 @@ if (app) {
         game.hideHighlight();
         if (cell) {
           game.move(draggingFrom.x, draggingFrom.y, cell.x, cell.y);
+        } else {
+          // Released off the board: the piece pops back to the palette.
+          game.popOut(draggingFrom.x, draggingFrom.y);
         }
         draggingFrom = null;
       }

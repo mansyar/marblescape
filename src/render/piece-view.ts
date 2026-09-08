@@ -21,6 +21,11 @@ export class PieceRenderer {
   private readonly root: THREE.Group;
   private readonly loader: { loadAsync: (url: string) => Promise<unknown> };
 
+  /** Direct access to a placed piece's scene object (for pop animations). */
+  meshFor(id: string): THREE.Object3D | null {
+    return this.meshes.get(id) ?? null;
+  }
+
   constructor(root: THREE.Group, loader: { loadAsync: (url: string) => Promise<unknown> }) {
     this.root = root;
     this.loader = loader;

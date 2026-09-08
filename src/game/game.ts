@@ -30,9 +30,11 @@ export class Game {
   private pieceRenderer: PieceRenderer | null = null;
   private pieceBodies = new Map<string, PieceBodyEntry>();
   private marbleMeshes = new Map<object, THREE.Mesh>();
+  private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private board: BoardState;
   private nextId = 1;
+  private lastElapsed = -1;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -73,6 +75,7 @@ export class Game {
       }
       this.marbles?.reap();
       this.syncMarbleMeshes();
+      this.stepPopTweens(elapsed);
     });
   }
 
@@ -123,6 +126,26 @@ export class Game {
     this.board = removeTypedPiece(this.board, cellX, cellY);
     this.syncPieces();
     return piece.type;
+  }
+
+  /**
+   * Drag-off-board delete: removes the piece and plays a quick shrink
+   * "pop-back" before it returns home to the palette.
+   */
+  popOut(cellX: number, cellY: number): PieceType | null {
+    const piece = this.pieceAt(cellX, cellY);
+    if (!piece) {
+      return null;
+    }
+    const mesh = this.pieceRenderer?.meshFor(piece.id);
+    const removed = this.remove(cellX, cellY);
+    if (mesh && this.rendererHandle) {
+      // sync() detached the mesh; re-attach for a short shrink animation.
+      const parent = this.rendererHandle.scene;
+      parent.add(mesh);
+      this.popTweens.push({ mesh, t: 0 });
+    }
+    return removed;
   }
 
   /** Hold-drag-to-move: relocates a piece, keeping its id/type/rotation. */
@@ -209,6 +232,25 @@ export class Game {
       mesh.parent?.remove(mesh);
       mesh.geometry.dispose();
       this.marbleMeshes.delete(body);
+    }
+  }
+
+  private stepPopTweens(elapsed: number): void {
+    const dt = this.lastElapsed >= 0 ? Math.min(elapsed - this.lastElapsed, 0.1) : 0;
+    this.lastElapsed = elapsed;
+    const done: Array<{ mesh: THREE.Object3D; t: number }> = [];
+    for (const tween of this.popTweens) {
+      tween.t += dt / 0.25;
+      if (tween.t >= 1) {
+        tween.mesh.parent?.remove(tween.mesh);
+        done.push(tween);
+      } else {
+        const s = Math.max(1 - tween.t, 0.01);
+        tween.mesh.scale.set(s, s, s);
+      }
+    }
+    for (const tween of done) {
+      this.popTweens = this.popTweens.filter((t) => t !== tween);
     }
   }
 }
