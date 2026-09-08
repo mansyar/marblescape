@@ -88,7 +88,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - HUD placement, palette ergonomics in portrait and landscape
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 8 — Reliability Gate & Track Completion
+## Phase 8 — Reliability Gate & Track Completion [checkpoint: 30c4881]
 
 - [x] Task: Playwright smoke test (1558c86)
     - App boots; scripted scene marble reaches cup (touch-emulated viewport)
