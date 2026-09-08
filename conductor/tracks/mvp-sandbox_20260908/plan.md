@@ -90,7 +90,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 8 — Reliability Gate & Track Completion
 
-- [~] Task: Playwright smoke test
+- [x] Task: Playwright smoke test (1558c86)
     - App boots; scripted scene marble reaches cup (touch-emulated viewport)
 - [ ] Task: Reliability gate run
     - 20 consecutive scripted runs: 0 escapes / 0 stuck marbles
