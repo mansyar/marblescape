@@ -82,7 +82,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 7 — Persistence & Responsive Polish
 
-- [ ] Task: Auto-save/resume sandbox layout
+- [~] Task: Auto-save/resume sandbox layout
     - Green: debounced writes; restore on boot; wire tested Phase 2 serializer
 - [ ] Task: Dual-orientation layout polish
     - HUD placement, palette ergonomics in portrait and landscape

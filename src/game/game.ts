@@ -7,8 +7,10 @@ import { SoundManager } from "../audio/sound-manager";
 import {
   createBoard,
   type BoardState,
+  loadBoard,
   placeTypedPiece,
   removeTypedPiece,
+  saveBoard,
   type PlacedPiece,
 } from "../domain/board";
 import type { PieceType, Rotation } from "../domain/pieces";
@@ -44,10 +46,34 @@ export class Game {
   private audioCtx: AudioContext | null = null;
   private eventQueue: RAPIER.EventQueue | null = null;
   private lastImpactAt = 0;
+  private saveTimer: number | null = null;
 
   constructor(container: HTMLElement) {
     this.container = container;
     this.board = createBoard(BOARD_COLS, BOARD_ROWS);
+  }
+
+  /**
+   * Auto-save: persists the board after every change (debounced). Uses the
+   * Phase 2 serializer; corrupt storage is forgiven with a fresh board.
+   */
+  private scheduleSave(): void {
+    if (this.saveTimer !== null) {
+      clearTimeout(this.saveTimer);
+    }
+    this.saveTimer = setTimeout(() => {
+      this.saveTimer = null;
+      if (this.board) {
+        saveBoard(localStorage, this.board);
+      }
+    }, 400) as unknown as number;
+  }
+
+  private restore(): void {
+    const loaded = loadBoard(localStorage);
+    if (loaded) {
+      this.board = loaded;
+    }
   }
 
   async start(): Promise<void> {
@@ -79,6 +105,10 @@ export class Game {
     handle.scene.add(pieceGroup);
     this.pieceRenderer = new PieceRenderer(pieceGroup, new GLTFLoader());
     await this.pieceRenderer.loadTemplates();
+
+    // Resume the saved sandbox layout (corrupt storage → fresh board).
+    this.restore();
+    this.syncPieces();
 
     this.highlight = new THREE.Mesh(
       new THREE.PlaneGeometry(0.96, 0.96),
@@ -232,6 +262,7 @@ export class Game {
     if (this.world) {
       this.pieceBodies = syncPieceBodies(this.world, this.pieceBodies, this.board.pieces);
     }
+    this.scheduleSave();
   }
 
   /** Lazily creates the audio graph; safe to call on every user interaction. */
