@@ -48,7 +48,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: implement stepping decoupled from render
 - [x] Task: Piece collision bodies (d17a030)
     - Hand-authored simplified colliders for the 4 piece types, synced from grid state
-- [~] Task: Marble spawner, cup detection & collection
+- [x] Task: Marble spawner, cup detection & collection (2d8faaa)
     - Red: settle/collection logic tests
     - Green: drop 2-5 marbles, detect goal, collect on settle
 - [ ] Task: Containment & rescue system
