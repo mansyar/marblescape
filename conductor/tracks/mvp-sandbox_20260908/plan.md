@@ -51,7 +51,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Marble spawner, cup detection & collection (2d8faaa)
     - Red: settle/collection logic tests
     - Green: drop 2-5 marbles, detect goal, collect on settle
-- [~] Task: Containment & rescue system
+- [x] Task: Containment & rescue system (ee5a5fd)
     - Red: rescue-trigger tests
     - Green: board-edge colliders + velocity≈0 timeout rescue
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
