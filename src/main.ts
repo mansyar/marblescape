@@ -5,6 +5,12 @@ import { computeCameraFraming } from "./render/framing";
 import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
 
+declare global {
+  interface Window {
+    __marblescape?: Game;
+  }
+}
+
 const app = document.querySelector<HTMLDivElement>("#app");
 if (app) {
   app.style.position = "fixed";
@@ -37,6 +43,9 @@ if (app) {
     );
     document.body.appendChild(palette);
     createHud(game, document.body);
+
+    // Test hook for Playwright smoke/reliability runs.
+    window.__marblescape = game;
 
     // Play surface: tap rotates, hold-drag moves a placed piece.
     const gestures = createGestureTracker();

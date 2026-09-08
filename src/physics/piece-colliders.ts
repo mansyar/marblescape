@@ -35,10 +35,11 @@ function curved(): ColliderDesc[] {
 }
 
 function goalWithHole(): ColliderDesc[] {
-  // End-hole piece: floor ring around a central hole (half-size 0.36) that a
-  // 0.3-radius marble falls through.
-  const ring = 0.07;
-  const center = 0.43;
+  // End-hole piece: floor ring around a central hole. Hole half-size 0.43
+  // gives a 0.3-radius marble 0.13 clearance on each axis — wider than the
+  // ±0.1 spawn jitter so every dropped marble falls through, not on the rim.
+  const ring = 0.035;
+  const center = 0.465;
   return [
     { hx: ring, hy: FLOOR_H, hz: 0.48, offset: [-center, FLOOR_Y, 0] },
     { hx: ring, hy: FLOOR_H, hz: 0.48, offset: [center, FLOOR_Y, 0] },

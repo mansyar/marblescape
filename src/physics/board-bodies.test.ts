@@ -20,6 +20,35 @@ describe("buildBoardBodies", () => {
     await initPhysics();
   });
 
+  it("opens a hole in the floor under the goal cell so marbles fall through", () => {
+    const world = createPhysicsWorld();
+    buildBoardBodies(world, { x: 4, z: 0 });
+    const marbles = new MarbleManager(world);
+    marbles.setGoalCell(4, 0);
+    // Drop a marble straight above the goal cell.
+    marbles.spawnAt(4.5, 2, 0.5);
+    for (let i = 0; i < 240; i += 1) {
+      stepWorld(world);
+    }
+    // It must fall below the board (collected by reap), not rest on the floor.
+    marbles.reap();
+    expect(marbles.getCollected().length).toBe(1);
+  });
+
+  it("keeps marbles supported on cells outside the goal", () => {
+    const world = createPhysicsWorld();
+    buildBoardBodies(world, { x: 4, z: 0 });
+    const marbles = new MarbleManager(world);
+    marbles.setGoalCell(4, 0);
+    marbles.spawnAt(1.5, 2, 1.5);
+    for (let i = 0; i < 240; i += 1) {
+      stepWorld(world);
+    }
+    expect(marbles.getCollected().length).toBe(0);
+    expect(marbles.getRescued().length).toBe(0);
+    expect(marbles.all()[0].translation().y).toBeGreaterThan(0.2);
+  });
+
   it("contains a marble rolling across an empty board", () => {
     const world = createPhysicsWorld();
     buildBoardBodies(world);

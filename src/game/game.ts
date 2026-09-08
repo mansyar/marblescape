@@ -15,7 +15,12 @@ import {
 } from "../domain/board";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { rotate } from "../domain/pieces";
-import { buildBoardBodies, syncPieceBodies, type PieceBodyEntry } from "../physics/board-bodies";
+import {
+  buildBoardBodies,
+  syncFloorBodies,
+  syncPieceBodies,
+  type PieceBodyEntry,
+} from "../physics/board-bodies";
 import { MarbleManager } from "../physics/marbles";
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
@@ -46,6 +51,8 @@ export class Game {
   private audioCtx: AudioContext | null = null;
   private eventQueue: RAPIER.EventQueue | null = null;
   private lastImpactAt = 0;
+  private floorBodies: RAPIER.RigidBody[] = [];
+  private floorGoal: string | null = "init";
   private saveTimer: number | null = null;
 
   constructor(container: HTMLElement) {
@@ -92,7 +99,7 @@ export class Game {
       },
       PHYSICS.maxSubSteps,
     );
-    buildBoardBodies(world);
+    this.floorBodies = buildBoardBodies(world);
     this.marbles = new MarbleManager(world, {
       onCollected: (body) => {
         this.removeMarbleMesh(body);
@@ -246,6 +253,19 @@ export class Game {
     this.showHighlight(null, false);
   }
 
+  /** Marble bookkeeping for the Playwright reliability gate. */
+  marbleCount(): number {
+    return this.marbles?.count ?? 0;
+  }
+
+  collectedCount(): number {
+    return this.marbles?.getCollected().length ?? 0;
+  }
+
+  rescuedCount(): number {
+    return this.marbles?.getRescued().length ?? 0;
+  }
+
   isPlaceable(cellX: number, cellY: number): boolean {
     if (cellX < 0 || cellX >= this.board.width || cellY < 0 || cellY >= this.board.height) {
       return false;
@@ -262,7 +282,32 @@ export class Game {
     if (this.world) {
       this.pieceBodies = syncPieceBodies(this.world, this.pieceBodies, this.board.pieces);
     }
+    this.updateGoalCell();
     this.scheduleSave();
+  }
+
+  /** Tells the marble manager where the goal hole is (collection footprint). */
+  private updateGoalCell(): void {
+    const goal = this.board.pieces.find((p) => p.type === "goal");
+    const key = goal ? `${goal.x},${goal.y}` : null;
+    if (key !== this.floorGoal) {
+      this.floorGoal = key;
+      if (this.world) {
+        this.floorBodies = syncFloorBodies(
+          this.world,
+          this.floorBodies,
+          goal ? { x: goal.x, z: goal.y } : null,
+        );
+      }
+    }
+    if (!this.marbles) {
+      return;
+    }
+    if (goal) {
+      this.marbles.setGoalCell(goal.x, goal.y);
+    } else {
+      this.marbles.setGoalCell(null);
+    }
   }
 
   /** Lazily creates the audio graph; safe to call on every user interaction. */
