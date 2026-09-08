@@ -84,7 +84,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 - [x] Task: Auto-save/resume sandbox layout (bf58c70)
     - Green: debounced writes; restore on boot; wire tested Phase 2 serializer
-- [~] Task: Dual-orientation layout polish
+- [x] Task: Dual-orientation layout polish (5271439)
     - HUD placement, palette ergonomics in portrait and landscape
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
