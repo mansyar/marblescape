@@ -92,7 +92,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 - [x] Task: Playwright smoke test (1558c86)
     - App boots; scripted scene marble reaches cup (touch-emulated viewport)
-- [~] Task: Reliability gate run
+- [x] Task: Reliability gate (40ab8dd) run
     - 20 consecutive scripted runs: 0 escapes / 0 stuck marbles
     - Coverage ≥ 80% verified
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
