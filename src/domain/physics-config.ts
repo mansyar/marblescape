@@ -9,8 +9,12 @@ export const PHYSICS = Object.freeze({
   /** Cap on catch-up steps per frame to avoid spiral-of-death stalls. */
   maxSubSteps: 3,
 
-  /** World gravity along the vertical axis (units: cell-size based world). */
-  gravity: [0, -18, 0] as const,
+  /**
+   * World gravity, tilted ~8° toward the player (south, +z) — the board
+   * reads as a table leaning toward you: marbles always drift south on any
+   * surface, while ramps (extra pitch) accelerate them further.
+   */
+  gravity: [0, -17.8, 2.5] as const,
 
   /** Marbles roll, then settle — damping keeps runaway energy in check. */
   linearDamping: 0.5,
@@ -26,11 +30,11 @@ export const PHYSICS = Object.freeze({
   /** Grid cell size in world units — 1 world unit per board cell. */
   cellSize: 1,
 
-  /** Height above the board surface where marbles spawn. */
-  spawnHeight: 2.5,
+  /** Drop height above the board surface (low: landing must not scatter). */
+  spawnHeight: 0.4,
 
-  /** Marbles dropped per Play press (spec: few at a time, 2-5). */
-  maxMarblesPerDrop: 3,
+  /** Marbles dropped per Play press (user preference: one at a time). */
+  maxMarblesPerDrop: 1,
 
   /** Extra clearance used by guard rails / edge walls. */
   wallHeight: 0.75,

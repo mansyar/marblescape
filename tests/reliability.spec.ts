@@ -7,7 +7,7 @@ declare global {
 }
 
 const RUNS = 20;
-const MARBLES_PER_RUN = 3;
+const MARBLES_PER_RUN = 1; // PHYSICS.maxMarblesPerDrop (user preference)
 
 test("reliability gate: 20 consecutive drops, every marble collected, zero escapes", async ({
   page,

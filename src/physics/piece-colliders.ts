@@ -1,4 +1,4 @@
-import type { PieceType, Rotation } from "../domain/pieces";
+import { CONNECTIONS, type PieceType, type Rotation } from "../domain/pieces";
 
 export interface ColliderDesc {
   /** Half-extents of the box collider in local piece space. */
@@ -9,6 +9,8 @@ export interface ColliderDesc {
   offset: [number, number, number];
   /** Optional yaw (radians about Y) for diagonal deflectors. */
   yaw?: number;
+  /** Optional pitch (radians about the piece-local X axis) for ramps. */
+  pitch?: number;
 }
 
 const RAIL = 0.06; // rail half-thickness
@@ -18,11 +20,16 @@ const FLOOR_H = 0.08; // floor slab half-height
 const FLOOR_Y = FLOOR_H; // top of floor sits at board surface
 
 function straight(): ColliderDesc[] {
-  // Channel runs north-south: floor + rails on either side along z.
+  // Channel runs north-south: floor + rails pitched as one downhill ramp
+  // (high end north, low end south — the whole body tilts together), then
+  // LIFTED so the low (south) exit sits flush with neighboring piece
+  // floors (0.16) — otherwise chained ramps wedge the marble in a valley.
+  const pitch = CONNECTIONS.straight.slope ?? 0;
+  const lift = 0.48 * Math.sin(pitch);
   return [
-    { hx: 0.48, hy: FLOOR_H, hz: 0.48, offset: [0, FLOOR_Y, 0] },
-    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [-RAIL_INSET, RAIL_H, 0] },
-    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [RAIL_INSET, RAIL_H, 0] },
+    { hx: 0.48, hy: FLOOR_H, hz: 0.48, offset: [0, FLOOR_Y + lift, 0], pitch },
+    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [-RAIL_INSET, RAIL_H + lift, 0], pitch },
+    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [RAIL_INSET, RAIL_H + lift, 0], pitch },
   ];
 }
 
@@ -103,7 +110,14 @@ export function colliderDescriptors(type: PieceType, rotation: Rotation): Collid
       }
     }
     return d.yaw === undefined
-      ? { hx, hy: d.hy, hz, offset: [x, y, z] as [number, number, number] }
-      : { hx: d.hx, hy: d.hy, hz: d.hz, offset: [x, y, z] as [number, number, number], yaw };
+      ? { hx, hy: d.hy, hz, offset: [x, y, z] as [number, number, number], pitch: d.pitch }
+      : {
+          hx: d.hx,
+          hy: d.hy,
+          hz: d.hz,
+          offset: [x, y, z] as [number, number, number],
+          yaw,
+          pitch: d.pitch,
+        };
   });
 }

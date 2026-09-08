@@ -32,9 +32,8 @@ describe("PHYSICS tuning config", () => {
     expect(PHYSICS.spawnHeight).toBeGreaterThan(0);
   });
 
-  it("limits simultaneous marbles to the spec range (2-5)", () => {
-    expect(PHYSICS.maxMarblesPerDrop).toBeGreaterThanOrEqual(2);
-    expect(PHYSICS.maxMarblesPerDrop).toBeLessThanOrEqual(5);
+  it("drops a single marble per Play press (user preference)", () => {
+    expect(PHYSICS.maxMarblesPerDrop).toBe(1);
   });
 
   it("is frozen against accidental runtime mutation", () => {

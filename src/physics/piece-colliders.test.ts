@@ -93,11 +93,14 @@ describe("piece collider integration", () => {
       );
     }
 
-    for (let i = 0; i < 240; i += 1) {
+    // With tilted gravity the marble rolls south through the channel —
+    // step only while it is still over this cell.
+    let p = body.translation();
+    for (let i = 0; i < 240 && p.z < 1.0; i += 1) {
       stepWorld(world);
+      p = body.translation();
     }
-    const p = body.translation();
-    expect(p.y).toBeGreaterThan(0); // resting on the channel floor, not through it
+    expect(p.y).toBeGreaterThan(0); // supported by the channel floor, not through it
     expect(Math.abs(p.x - 0.5)).toBeLessThan(0.45); // stayed between the rails
     world.free();
   });

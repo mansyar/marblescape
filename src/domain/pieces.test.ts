@@ -34,6 +34,14 @@ describe("piece catalog", () => {
     expect(CONNECTIONS.straight.modelYawOffset).toBe(0);
     expect(CONNECTIONS.goal.modelYawOffset).toBe(0);
   });
+
+  it("gives the straight piece a downhill slope (ramp), others flat", () => {
+    // ~5°: high end north, low end south — marbles must roll, not sit.
+    expect(CONNECTIONS.straight.slope).toBeCloseTo(0.09, 2);
+    expect(CONNECTIONS.curved.slope ?? 0).toBe(0);
+    expect(CONNECTIONS.funnel.slope ?? 0).toBe(0);
+    expect(CONNECTIONS.goal.slope ?? 0).toBe(0);
+  });
 });
 
 describe("rotation state machine", () => {

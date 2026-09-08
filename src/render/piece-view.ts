@@ -80,7 +80,14 @@ export class PieceRenderer {
         this.meshes.set(piece.id, mesh);
       }
       mesh.position.set(...cellToWorld(piece.x, piece.y));
+      mesh.rotation.order = "YXZ";
       mesh.rotation.y = rotationYaw(piece.rotation) + CONNECTIONS[piece.type].modelYawOffset;
+      // Ramp tilt: pitch about the piece-local X axis (YXZ order applies yaw
+      // first), matching the pitched physics body — plus the same lift so
+      // the low end stays flush with neighboring piece floors.
+      const slope = CONNECTIONS[piece.type].slope ?? 0;
+      mesh.rotation.x = slope;
+      mesh.position.y += slope > 0 ? 0.48 * Math.sin(slope) : 0;
     }
   }
 

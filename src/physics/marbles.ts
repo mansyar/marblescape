@@ -60,9 +60,16 @@ export class MarbleManager {
   /** Spawns one Play-button drop at the given cell. */
   spawnDrop(cellX: number, cellZ: number): void {
     for (let i = 0; i < PHYSICS.maxMarblesPerDrop; i += 1) {
-      // Tiny scatter so marbles don't stack perfectly and explode apart
+      // Tiny scatter so marbles don't stack perfectly and explode apart.
       const jitter = (Math.random() - 0.5) * 0.2;
-      this.spawnAt(cellX + 0.5 + jitter, PHYSICS.spawnHeight + i * 0.8, cellZ + 0.5 + jitter);
+      // Spawn near the cell's north (high) end and drop from low height:
+      // tilted gravity drifts marbles south while falling, and landing at
+      // the top of a ramp gives them the full tile to build hop speed.
+      this.spawnAt(
+        cellX + 0.5 + jitter,
+        PHYSICS.spawnHeight + i * 0.8,
+        cellZ + 0.12 + jitter * 0.8,
+      );
     }
   }
 

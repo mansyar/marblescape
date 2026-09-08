@@ -103,13 +103,25 @@ export function syncPieceBodies(
     }
     const [wx, , wz] = cellToWorld(piece.x, piece.y);
     const bodies = colliderDescriptors(piece.type, piece.rotation).map((d) => {
-      // Offsets arrive fully rotated from colliderDescriptors; a yawed
-      // descriptor (diagonal deflector) needs its own body quaternion.
+      // Offsets arrive fully rotated from colliderDescriptors. Body
+      // orientation = yaw (about Y, from piece rotation + deflector) then
+      // pitch (about the piece-local X axis, for ramps): q = qYaw ⊗ qPitch.
       const yaw = d.yaw ?? 0;
+      const pitch = d.pitch ?? 0;
+      const hw = Math.cos(yaw / 2);
+      const hy = Math.sin(yaw / 2);
+      const hx = Math.sin(pitch / 2);
+      const hpx = Math.cos(pitch / 2);
+      const q = {
+        w: hw * hpx,
+        x: hw * hx,
+        y: hy * hpx,
+        z: -hy * hx,
+      };
       const body = world.createRigidBody(
         RAPIER.RigidBodyDesc.fixed()
           .setTranslation(wx + d.offset[0], d.offset[1], wz + d.offset[2])
-          .setRotation({ w: Math.cos(yaw / 2), x: 0, y: Math.sin(yaw / 2), z: 0 }),
+          .setRotation(q),
       );
       world.createCollider(
         RAPIER.ColliderDesc.cuboid(d.hx, d.hy, d.hz).setRestitution(PHYSICS.boardRestitution),

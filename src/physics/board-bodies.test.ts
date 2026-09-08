@@ -27,11 +27,13 @@ describe("buildBoardBodies", () => {
     marbles.setGoalCell(4, 0);
     // Drop a marble straight above the goal cell.
     marbles.spawnAt(4.5, 2, 0.5);
+    // Reap every step like the real game loop — tilted gravity carries the
+    // marble south fast, so a single end-of-run reap would miss the window.
     for (let i = 0; i < 240; i += 1) {
       stepWorld(world);
+      marbles.reap();
     }
-    // It must fall below the board (collected by reap), not rest on the floor.
-    marbles.reap();
+    // It must fall through the hole (collected), not rest on the floor.
     expect(marbles.getCollected().length).toBe(1);
   });
 
