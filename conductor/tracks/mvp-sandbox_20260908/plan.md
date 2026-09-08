@@ -41,7 +41,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - glTF loading, grid-slot preview highlights (valid/invalid)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 4 — Physics & Marble Run
+## Phase 4 — Physics & Marble Run [checkpoint: d27aa1d]
 
 - [x] Task: Rapier integration with fixed-timestep loop (57379ed)
     - Red: fixed-step determinism unit test
