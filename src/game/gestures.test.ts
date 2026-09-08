@@ -49,6 +49,24 @@ describe("createGestureTracker", () => {
     t.down(50, 50, 1000);
     expect(t.up(52, 51, 1100)).toEqual({ type: "tap", x: 50, y: 50 });
   });
+
+  it("cancel() aborts the current gesture so the next one starts clean", () => {
+    const t = createGestureTracker();
+    // Mid-drag: browser fires pointercancel (e.g. scroll takeover).
+    t.down(10, 10, 0);
+    t.move(40, 10, 50); // drag-start
+    expect(t.cancel()).toBeNull();
+    // No stray drag-end afterwards.
+    expect(t.up(60, 20, 100)).toBeNull();
+    // A fresh press produces a clean gesture.
+    t.down(100, 100, 500);
+    expect(t.up(101, 101, 560)).toEqual({ type: "tap", x: 100, y: 100 });
+  });
+
+  it("cancel() with no active press is a harmless no-op", () => {
+    const t = createGestureTracker();
+    expect(t.cancel()).toBeNull();
+  });
 });
 
 // Type-level guard: the union covers the interaction vocabulary.

@@ -19,6 +19,10 @@ export function startRenderer(container: HTMLElement): {
   canvas.style.display = "block";
   canvas.style.width = "100%";
   canvas.style.height = "100%";
+  // Touch devices: the browser must not claim drags for page scrolling —
+  // that fires pointercancel and kills piece drags mid-gesture.
+  canvas.style.touchAction = "none";
+  canvas.style.userSelect = "none";
   container.appendChild(canvas);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });

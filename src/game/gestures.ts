@@ -52,5 +52,13 @@ export function createGestureTracker() {
       dragging = false;
       return wasDragging ? { type: "drag-end", x, y } : { type: "tap", x: origin.x, y: origin.y };
     },
+    cancel(): null {
+      // The browser took the pointer away (scroll takeover, pointercancel):
+      // abort silently so no stray tap/drag-end fires and the next press
+      // starts clean.
+      press = null;
+      dragging = false;
+      return null;
+    },
   };
 }

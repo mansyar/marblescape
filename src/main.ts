@@ -107,5 +107,12 @@ if (app) {
         draggingFrom = null;
       }
     });
+    // Touch devices: scroll/zoom takeover fires pointercancel mid-gesture —
+    // abort cleanly so no stray tap/drag-end lands after the cancel.
+    app.addEventListener("pointercancel", () => {
+      gestures.cancel();
+      draggingFrom = null;
+      game.hideHighlight();
+    });
   });
 }
