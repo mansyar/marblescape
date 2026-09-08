@@ -80,7 +80,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: implement
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 7 — Persistence & Responsive Polish
+## Phase 7 — Persistence & Responsive Polish [checkpoint: bf58c70]
 
 - [x] Task: Auto-save/resume sandbox layout (bf58c70)
     - Green: debounced writes; restore on boot; wire tested Phase 2 serializer
