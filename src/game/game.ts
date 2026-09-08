@@ -125,6 +125,20 @@ export class Game {
     return piece.type;
   }
 
+  /** Hold-drag-to-move: relocates a piece, keeping its id/type/rotation. */
+  move(fromX: number, fromY: number, toX: number, toY: number): boolean {
+    const piece = this.pieceAt(fromX, fromY);
+    if (!piece || (fromX === toX && fromY === toY)) {
+      return false;
+    }
+    if (!this.isPlaceable(toX, toY)) {
+      return false;
+    }
+    this.board = placeTypedPiece(removeTypedPiece(this.board, fromX, fromY), piece);
+    this.syncPieces();
+    return true;
+  }
+
   /** Big Play button: drops a batch of marbles above the spawn cell. */
   play(): void {
     this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0);
