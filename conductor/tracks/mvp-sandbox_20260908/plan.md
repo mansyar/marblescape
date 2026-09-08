@@ -43,7 +43,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 4 — Physics & Marble Run
 
-- [~] Task: Rapier integration with fixed-timestep loop
+- [x] Task: Rapier integration with fixed-timestep loop (57379ed)
     - Red: fixed-step determinism unit test
     - Green: implement stepping decoupled from render
 - [ ] Task: Piece collision bodies
