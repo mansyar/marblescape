@@ -56,7 +56,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: board-edge colliders + velocity≈0 timeout rescue
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 5 — Touch Interaction & Edit UX
+## Phase 5 — Touch Interaction & Edit UX [checkpoint: 7d297e5]
 
 - [x] Task: Drag-from-palette placement (f9c37de)
     - Red: pointer→grid-slot mapping tests
