@@ -64,7 +64,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Tap-to-rotate & hold-drag-to-move (0d212e7)
     - Red: interaction state transition tests
     - Green: implement (≥64px effective touch targets)
-- [~] Task: Drag-off-board delete
+- [x] Task: Drag-off-board delete (e177c80)
     - Green: pop-back-to-palette animation
 - [ ] Task: HUD (Play, mute, reset)
     - Green: Play drops marbles; child-driven run loop
