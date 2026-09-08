@@ -10,15 +10,15 @@ export const PHYSICS = Object.freeze({
   maxSubSteps: 3,
 
   /** World gravity along the vertical axis (units: cell-size based world). */
-  gravity: [0, -25, 0] as const,
+  gravity: [0, -18, 0] as const,
 
   /** Marbles roll, then settle — damping keeps runaway energy in check. */
-  linearDamping: 0.12,
-  angularDamping: 0.25,
+  linearDamping: 0.5,
+  angularDamping: 0.6,
 
   /** Bounciness. Kept < 1 so impacts always lose energy (reliability gate). */
-  marbleRestitution: 0.35,
-  boardRestitution: 0.2,
+  marbleRestitution: 0.15,
+  boardRestitution: 0.08,
 
   /** Ball-sphere collision shape radius, in world units (1 unit = 1 cell). */
   marbleRadius: 0.3,
