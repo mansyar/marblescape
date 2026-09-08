@@ -37,7 +37,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: render board diorama, adaptive framing
 - [x] Task: Board, raised edges & lighting (bbced54)
     - Wooden tabletop, containment edges, soft shadows
-- [~] Task: Piece rendering
+- [x] Task: Piece rendering (b5187f9)
     - glTF loading, grid-slot preview highlights (valid/invalid)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
