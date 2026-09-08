@@ -17,7 +17,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 2 — Core Domain Logic (pure TypeScript, no Three.js)
 
-- [ ] Task: Grid model & placement validation
+- [~] Task: Grid model & placement validation
     - Red: tests for occupancy, valid/invalid slots, bounds checking
     - Green: implement grid + placement API
 - [ ] Task: Piece definitions & rotation state machine
