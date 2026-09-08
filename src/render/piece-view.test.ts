@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { cellToWorld, rotationYaw } from "./piece-view";
+import * as THREE from "three";
+import { cellToWorld, PieceRenderer, rotationYaw } from "./piece-view";
 
 describe("cellToWorld", () => {
   it("maps cell (0,0) to the center of its cell", () => {
@@ -33,5 +34,60 @@ describe("rotationYaw", () => {
     // turn viewed from +Y is a negative rotation around Y.
     expect(rotationYaw(1)).toBeLessThan(0);
     expect(rotationYaw(3)).toBeLessThan(0);
+  });
+});
+
+describe("PieceRenderer", () => {
+  function makeRenderer() {
+    const root = new THREE.Group();
+    const renderer = new PieceRenderer(root, {
+      loadAsync: async () => ({ scene: new THREE.Object3D() }),
+    });
+    return { root, renderer };
+  }
+
+  it("adds a named mesh per placed piece after templates load", async () => {
+    const { root, renderer } = makeRenderer();
+    await renderer.loadTemplates();
+    renderer.sync([{ id: "p1", type: "straight", rotation: 0 as const, x: 2, y: 3 }]);
+    expect(root.children).toHaveLength(1);
+    expect(root.children[0].name).toBe("piece-p1");
+  });
+
+  it("positions and orients the mesh at the cell center", async () => {
+    const { root, renderer } = makeRenderer();
+    await renderer.loadTemplates();
+    renderer.sync([{ id: "p1", type: "curved", rotation: 2 as const, x: 0, y: 0 }]);
+    const mesh = root.children[0];
+    expect(mesh.position.x).toBeCloseTo(0.5);
+    expect(mesh.position.z).toBeCloseTo(0.5);
+    expect(mesh.rotation.y).toBeCloseTo(-Math.PI);
+  });
+
+  it("removes meshes for pieces that leave the board", async () => {
+    const { root, renderer } = makeRenderer();
+    await renderer.loadTemplates();
+    const piece = { id: "p1", type: "straight" as const, rotation: 0 as const, x: 1, y: 1 };
+    renderer.sync([piece]);
+    renderer.sync([]);
+    expect(root.children).toHaveLength(0);
+  });
+
+  it("skips pieces when templates have not loaded yet", () => {
+    const { root, renderer } = makeRenderer();
+    renderer.sync([{ id: "p1", type: "straight", rotation: 0, x: 0, y: 0 }]);
+    expect(root.children).toHaveLength(0);
+  });
+
+  it("falls back to a placeholder when a model fails to load", async () => {
+    const root = new THREE.Group();
+    const renderer = new PieceRenderer(root, {
+      loadAsync: async () => {
+        throw new Error("offline");
+      },
+    });
+    await renderer.loadTemplates();
+    renderer.sync([{ id: "p1", type: "straight", rotation: 0, x: 0, y: 0 }]);
+    expect(root.children).toHaveLength(1);
   });
 });
