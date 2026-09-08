@@ -70,7 +70,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: Play drops marbles; child-driven run loop
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 6 — Sound
+## Phase 6 — Sound [checkpoint: cd8247d]
 
 - [x] Task: Web Audio manager (630c2a2)
     - Red: pitch-mapping & event-wiring tests (audio graph mocked)
