@@ -3,7 +3,7 @@
 Follows the TDD lifecycle and task/phase protocols defined in [conductor/workflow.md](../../workflow.md).
 Every task: mark `[~]` in progress → Red (failing tests) → Green (implement) → Refactor → coverage check → commit → attach git-note task summary → mark `[x]` with commit SHA.
 
-## Phase 1 — Project Bootstrap
+## Phase 1 — Project Bootstrap [checkpoint: 1d7c3f0]
 
 - [x] Task: Scaffold Vite + TypeScript project (5b4ac2c)
     - `npm create vite` (TypeScript, strict mode per code styleguides)
@@ -13,7 +13,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Download & structure Kenney Marble Kit assets (1d7c3f0)
     - Import 4 pieces (straight ramp, curved ramp, funnel, goal cup) + marbles + board materials as glTF
     - Verify assets load in the dev build
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 2 — Core Domain Logic (pure TypeScript, no Three.js)
 
@@ -28,7 +28,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: implement serializer
 - [ ] Task: Physics tuning config module
     - Centralized constants: gravity scale, damping, restitution, marble count range, rescue timeout — no magic numbers elsewhere
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 3 — 3D Diorama Rendering
 
@@ -39,7 +39,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Wooden tabletop, containment edges, soft shadows
 - [ ] Task: Piece rendering
     - glTF loading, grid-slot preview highlights (valid/invalid)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 4 — Physics & Marble Run
 
@@ -54,7 +54,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [ ] Task: Containment & rescue system
     - Red: rescue-trigger tests
     - Green: board-edge colliders + velocity≈0 timeout rescue
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 5 — Touch Interaction & Edit UX
 
@@ -68,7 +68,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: pop-back-to-palette animation
 - [ ] Task: HUD (Play, mute, reset)
     - Green: Play drops marbles; child-driven run loop
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 6 — Sound
 
@@ -78,7 +78,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [ ] Task: Mute toggle with persistence
     - Red: preference round-trip test
     - Green: implement
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 7 — Persistence & Responsive Polish
 
@@ -86,7 +86,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: debounced writes; restore on boot; wire tested Phase 2 serializer
 - [ ] Task: Dual-orientation layout polish
     - HUD placement, palette ergonomics in portrait and landscape
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
 
 ## Phase 8 — Reliability Gate & Track Completion
 
@@ -95,4 +95,4 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [ ] Task: Reliability gate run
     - 20 consecutive scripted runs: 0 escapes / 0 stuck marbles
     - Coverage ≥ 80% verified
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1d7c3f0]
