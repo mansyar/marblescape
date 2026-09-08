@@ -46,7 +46,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Rapier integration with fixed-timestep loop (57379ed)
     - Red: fixed-step determinism unit test
     - Green: implement stepping decoupled from render
-- [~] Task: Piece collision bodies
+- [x] Task: Piece collision bodies (d17a030)
     - Hand-authored simplified colliders for the 4 piece types, synced from grid state
 - [ ] Task: Marble spawner, cup detection & collection
     - Red: settle/collection logic tests
