@@ -6,13 +6,16 @@ Version-checked against npm registry on 2026-09-08.
 
 | Component | Choice | Version |
 |---|---|---|
-| Language | TypeScript (strict mode) | 7.0.2 |
+| Language | TypeScript (strict mode) | 6.0.3 |
 | Build tool / Dev server | Vite | 8.2.2 |
 | 3D Rendering | Three.js | 0.185.1 |
 | Physics | @dimforge/rapier3d-compat (WASM, async-init build) | 0.20.0 |
 | PWA / Offline | vite-plugin-pwa (Workbox 7.4.1) | 1.3.0 |
 
-> Note: TypeScript 7 is the new native-compiler line. If any tooling incompatibility appears with Vite 8 or Vitest 5, fall back to the latest 5.x release — no code changes expected.
+> **Deviations from the original version check (2026-09-08, during MVP bootstrap):**
+> - **Package manager:** pnpm 11.24.0 (user directive) — not npm.
+> - **Lint & format:** Biome 2.5.12 (user directive) — replaces ESLint/Prettier.
+> - **TypeScript:** 6.0.3 instead of 7.0.2. At scaffold time, TS 7's release postdates several lint toolchain peer ranges; pinned to 6.0.3 for toolchain compatibility. Revisit upgrade when the lint toolchain ecosystem fully supports TS 7.
 
 ## Art & Audio
 
@@ -35,6 +38,8 @@ Version-checked against npm registry on 2026-09-08.
 |---|---|---|
 | Unit tests | Vitest | 5.0.0 |
 | E2E / smoke tests | Playwright | 1.63.0 |
+| Lint & format | Biome | 2.5.12 |
+| Package manager | pnpm | 11.24.0 |
 
 ## Deployment
 

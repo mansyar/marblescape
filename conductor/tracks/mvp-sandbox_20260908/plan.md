@@ -5,7 +5,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 1 — Project Bootstrap
 
-- [ ] Task: Scaffold Vite + TypeScript project
+- [~] Task: Scaffold Vite + TypeScript project
     - `npm create vite` (TypeScript, strict mode per code styleguides)
     - Configure Vitest, Playwright, ESLint + Prettier per `conductor/code_styleguides/`
     - Verify `CI=true npm test` runs green on the empty suite
