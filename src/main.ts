@@ -50,24 +50,21 @@ if (app) {
     // Play surface: tap rotates, hold-drag moves a placed piece.
     const gestures = createGestureTracker();
     let draggingFrom: { x: number; y: number } | null = null;
-    const ndcFromPointer = (e: PointerEvent): [number, number | null] => {
+    const clientToNdc = (cx: number, cy: number): [number, number | null] => {
       const canvas = app.querySelector("canvas");
       if (!canvas) {
         return [0, null];
       }
       const rect = canvas.getBoundingClientRect();
-      const inside =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
+      const inside = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
       if (!inside) {
         return [0, null];
       }
-      return [
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        -(((e.clientY - rect.top) / rect.height) * 2 - 1),
-      ];
+      return [((cx - rect.left) / rect.width) * 2 - 1, -(((cy - rect.top) / rect.height) * 2 - 1)];
+    };
+    const clientToCell = (cx: number, cy: number) => {
+      const [ndcX, ndcY] = clientToNdc(cx, cy);
+      return cellFromNdc(ndcX, ndcY);
     };
 
     app.addEventListener("pointerdown", (e) => {
@@ -78,12 +75,13 @@ if (app) {
       if (!g) {
         return;
       }
-      const [ndcX, ndcY] = ndcFromPointer(e);
-      const cell = cellFromNdc(ndcX, ndcY);
       if (g.type === "drag-start") {
-        const origin = cellFromNdc(ndcX, ndcY) ?? null;
+        // The gesture reports the PRESS origin — a fast finger may already be
+        // a cell away by the time the threshold is crossed.
+        const origin = clientToCell(g.x, g.y);
         draggingFrom = origin && game.pieceAt(origin.x, origin.y) ? origin : null;
       } else if (g.type === "drag-move" && draggingFrom) {
+        const cell = clientToCell(g.x, g.y);
         game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y) : false);
       }
     });
@@ -92,12 +90,14 @@ if (app) {
       if (!g) {
         return;
       }
-      const [ndcX, ndcY] = ndcFromPointer(e);
-      const cell = cellFromNdc(ndcX, ndcY);
-      if (g.type === "tap" && cell) {
-        game.rotate(cell.x, cell.y);
+      if (g.type === "tap") {
+        const cell = clientToCell(g.x, g.y);
+        if (cell) {
+          game.rotate(cell.x, cell.y);
+        }
       } else if (g.type === "drag-end" && draggingFrom) {
         game.hideHighlight();
+        const cell = clientToCell(g.x, g.y);
         if (cell) {
           game.move(draggingFrom.x, draggingFrom.y, cell.x, cell.y);
         } else {
