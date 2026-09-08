@@ -2,6 +2,7 @@ import { Game } from "./game/game";
 import { createGestureTracker } from "./game/gestures";
 import { screenToCell } from "./game/picking";
 import { computeCameraFraming } from "./render/framing";
+import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -35,6 +36,7 @@ if (app) {
       },
     );
     document.body.appendChild(palette);
+    createHud(game, document.body);
 
     // Play surface: tap rotates, hold-drag moves a placed piece.
     const gestures = createGestureTracker();

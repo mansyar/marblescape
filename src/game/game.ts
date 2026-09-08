@@ -167,6 +167,15 @@ export class Game {
     this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0);
   }
 
+  /** Reset: clears all placed pieces (marbles finish their run naturally). */
+  reset(): void {
+    const pieces = [...this.board.pieces];
+    for (const piece of pieces) {
+      this.board = removeTypedPiece(this.board, piece.x, piece.y);
+    }
+    this.syncPieces();
+  }
+
   /** Live drag feedback: shows the highlight at a cell, tinted by validity. */
   showHighlight(cell: { x: number; y: number } | null, valid: boolean): void {
     if (!this.highlight) {

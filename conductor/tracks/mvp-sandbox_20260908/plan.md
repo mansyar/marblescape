@@ -66,7 +66,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: implement (≥64px effective touch targets)
 - [x] Task: Drag-off-board delete (e177c80)
     - Green: pop-back-to-palette animation
-- [ ] Task: HUD (Play, mute, reset)
+- [~] Task: HUD (Play, mute, reset)
     - Green: Play drops marbles; child-driven run loop
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
