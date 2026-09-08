@@ -14,9 +14,13 @@ function button(label: string, bg: string): HTMLButtonElement {
  */
 export function createHud(game: Game, container: HTMLElement): HTMLElement {
   const bar = document.createElement("div");
-  bar.style.cssText = "position:fixed;top:10px;right:10px;display:flex;gap:10px;z-index:10;";
+  bar.style.cssText = [
+    "position:fixed;top:10px;right:max(10px, env(safe-area-inset-right))",
+    "display:flex;gap:10px;z-index:10",
+  ].join(";");
 
   const play = button("▶", "#06d6a0");
+  play.style.flex = "0 0 auto";
   play.addEventListener("click", () => {
     void game.initAudio();
     game.play();

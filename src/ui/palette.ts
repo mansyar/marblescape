@@ -18,15 +18,24 @@ export function createPalette(
   onDrop: (type: PieceType, ndcX: number, ndcY: number | null) => void,
 ): HTMLElement {
   const bar = document.createElement("div");
-  bar.style.cssText =
-    "position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:16px;padding:12px;";
+  bar.style.cssText = [
+    "position:fixed;left:0;right:0;bottom:0",
+    "display:flex;justify-content:center;align-items:center",
+    "gap:10px;padding:10px",
+    "padding-bottom:max(10px, env(safe-area-inset-bottom))",
+    "flex-wrap:wrap",
+  ].join(";");
 
   for (const type of types) {
     const btn = document.createElement("button");
     btn.textContent = LABELS[type];
     btn.dataset.pieceType = type;
-    btn.style.cssText =
-      "min-width:88px;min-height:72px;font-size:20px;font-weight:700;border-radius:14px;border:3px solid #2c3e50;background:#fff;touch-action:none;";
+    btn.style.cssText = [
+      "flex:1 1 72px;max-width:110px;min-height:72px",
+      "font-size:19px;font-weight:700",
+      "border-radius:14px;border:3px solid #2c3e50;background:#fff",
+      "touch-action:none",
+    ].join(";");
 
     const ndcFromEvent = (e: PointerEvent): [number, number | null] => {
       const canvas = root.querySelector("canvas");
