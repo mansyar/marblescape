@@ -58,7 +58,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 5 — Touch Interaction & Edit UX
 
-- [~] Task: Drag-from-palette placement
+- [x] Task: Drag-from-palette placement (f9c37de)
     - Red: pointer→grid-slot mapping tests
     - Green: raycast to board plane, grid snap, valid-slot highlight, reject wiggle
 - [ ] Task: Tap-to-rotate & hold-drag-to-move
