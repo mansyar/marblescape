@@ -61,7 +61,8 @@ describe("PieceRenderer", () => {
     const mesh = root.children[0];
     expect(mesh.position.x).toBeCloseTo(0.5);
     expect(mesh.position.z).toBeCloseTo(0.5);
-    expect(mesh.rotation.y).toBeCloseTo(-Math.PI);
+    // rotation 2 yaw (-π) + curved's modelYawOffset (-π/2)
+    expect(mesh.rotation.y).toBeCloseTo((-3 * Math.PI) / 2);
   });
 
   it("removes meshes for pieces that leave the board", async () => {

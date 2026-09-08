@@ -80,7 +80,7 @@ export class PieceRenderer {
         this.meshes.set(piece.id, mesh);
       }
       mesh.position.set(...cellToWorld(piece.x, piece.y));
-      mesh.rotation.y = rotationYaw(piece.rotation);
+      mesh.rotation.y = rotationYaw(piece.rotation) + CONNECTIONS[piece.type].modelYawOffset;
     }
   }
 

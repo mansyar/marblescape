@@ -12,6 +12,11 @@ const BASE = "/models/pieces";
 export interface PieceDef {
   /** Kenney Marble Kit glTF model served from /models/pieces. */
   model: string;
+  /**
+   * Extra yaw (radians) applied to the model so its authored mouths align
+   * with the domain sides at rotation 0.
+   */
+  modelYawOffset: number;
   /** Whether tap-to-rotate cycles this piece through 4 orientations. */
   rotatable: boolean;
   /** Open connection sides for a given rotation. */
@@ -25,24 +30,33 @@ function shiftSides(sides: Side[], rotation: Rotation): Side[] {
 export const CONNECTIONS: Record<PieceType, PieceDef> = {
   straight: {
     model: `${BASE}/straight.glb`,
+    modelYawOffset: 0,
     rotatable: true,
     // A straight channel: enters one side, exits the opposite.
     sides: (r) => shiftSides(["north", "south"], r),
   },
   curved: {
-    model: `${BASE}/bend.glb`,
+    model: `${BASE}/corner.glb`,
+    // corner.glb's authored mouths face north+west (pixel-verified); -90°
+    // yaw realigns them to the domain's north+east. (bend.glb is 1x2 — overhangs.)
+    modelYawOffset: -Math.PI / 2,
     rotatable: true,
     // A quarter bend: enters one side, exits the adjacent side.
     sides: (r) => shiftSides(["north", "east"], r),
   },
   funnel: {
-    model: `${BASE}/funnel.glb`,
-    rotatable: false,
-    // Marble drops in from above; orientation-independent.
-    sides: () => ["north"],
+    model: `${BASE}/straight-hole.glb`,
+    // straight-hole.glb's channel already runs north+south as authored
+    // (pixel-verified). (funnel.glb is 1.7 cells wide — overhangs.)
+    modelYawOffset: 0,
+    rotatable: true,
+    // A straight channel with a hole in the middle: marbles roll through
+    // and drop out the center.
+    sides: (r) => shiftSides(["north", "south"], r),
   },
   goal: {
     model: `${BASE}/end-hole-square.glb`,
+    modelYawOffset: 0,
     rotatable: false,
     // Marble falls through the hole; orientation-independent.
     sides: () => ["north"],

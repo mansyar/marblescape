@@ -25,15 +25,37 @@ describe("colliderDescriptors", () => {
     }
   });
 
-  it("gives a curved piece two rail segments and a floor", () => {
+  it("gives a curved piece a floor, rails and a 45° deflector", () => {
     const desc = colliderDescriptors("curved", 0);
-    expect(desc).toHaveLength(3);
+    // Floor + 2 rails + 1 diagonal deflector
+    expect(desc).toHaveLength(4);
+    const deflector = desc.find((d) => d.yaw !== undefined);
+    expect(deflector?.yaw).toBeCloseTo(-Math.PI / 4);
   });
 
-  it("gives the funnel a simple slab and the goal a hole ring", () => {
-    expect(colliderDescriptors("funnel", 0)).toHaveLength(1);
+  it("gives the funnel a railed channel with a center drop hole", () => {
+    // 2 side rails + 2 floor strips split around the center hole
+    const descs = colliderDescriptors("funnel", 0);
+    expect(descs).toHaveLength(4);
+    // A gap exists along the channel center: no collider covers z=0 at y level
+    for (const d of descs) {
+      const zMin = d.offset[2] - d.hz;
+      const zMax = d.offset[2] + d.hz;
+      const coversCenter = zMin <= 0 && zMax >= 0 && d.hx > 0.3;
+      expect(coversCenter).toBe(false);
+    }
+  });
+
+  it("gives the goal a hole ring", () => {
     // 4 border strips forming the ring around the hole
     expect(colliderDescriptors("goal", 0)).toHaveLength(4);
+  });
+
+  it("rotating the funnel turns the channel east-west", () => {
+    const descs = colliderDescriptors("funnel", 1);
+    // Rails now run along x (long axis hx > hz)
+    const rails = descs.filter((d) => d.hx > d.hz);
+    expect(rails.length).toBe(2);
   });
 
   it("keeps every collider inside the cell footprint", () => {
@@ -77,6 +99,46 @@ describe("piece collider integration", () => {
     const p = body.translation();
     expect(p.y).toBeGreaterThan(0); // resting on the channel floor, not through it
     expect(Math.abs(p.x - 0.5)).toBeLessThan(0.45); // stayed between the rails
+    world.free();
+  });
+
+  it("routes a marble entering the bend from the north out through the east mouth", async () => {
+    const world = createPhysicsWorld();
+    // Curved piece at cell (2,2): world center (2.5, 2.5), mouths north + east.
+    const cx = 2.5;
+    const cz = 2.5;
+    for (const d of colliderDescriptors("curved", 0)) {
+      const yaw = d.yaw ?? 0;
+      const fixed = world.createRigidBody(
+        RAPIER.RigidBodyDesc.fixed()
+          .setTranslation(cx + d.offset[0], d.offset[1], cz + d.offset[2])
+          .setRotation({ w: Math.cos(yaw / 2), x: 0, y: Math.sin(yaw / 2), z: 0 }),
+      );
+      world.createCollider(
+        RAPIER.ColliderDesc.cuboid(d.hx, d.hy, d.hz).setRestitution(PHYSICS.boardRestitution),
+        fixed,
+      );
+    }
+    // Marble enters at floor level from the north mouth, rolling south.
+    const body = world.createRigidBody(
+      RAPIER.RigidBodyDesc.dynamic()
+        .setTranslation(cx, PHYSICS.marbleRadius, cz - 0.35)
+        .setLinvel(0, 0, 3),
+    );
+    world.createCollider(RAPIER.ColliderDesc.ball(PHYSICS.marbleRadius), body);
+
+    // Exited through the east mouth: past the cell's east edge shortly
+    // after deflection (assert then, before it rolls off this test's
+    // floorless world).
+    let exited = false;
+    for (let i = 0; i < 300 && !exited; i += 1) {
+      stepWorld(world);
+      if (body.translation().x > cx + 0.5) {
+        exited = true;
+      }
+    }
+    expect(exited).toBe(true);
+    expect(body.translation().y).toBeGreaterThan(-1);
     world.free();
   });
 });

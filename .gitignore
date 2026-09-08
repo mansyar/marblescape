@@ -27,3 +27,6 @@ dist-ssr
 test-results
 playwright-report
 coverage
+
+# playwright-cli scratch
+.playwright-cli/

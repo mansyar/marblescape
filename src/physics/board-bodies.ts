@@ -102,15 +102,14 @@ export function syncPieceBodies(
       }
     }
     const [wx, , wz] = cellToWorld(piece.x, piece.y);
-    const yaw = (-piece.rotation * Math.PI) / 2;
     const bodies = colliderDescriptors(piece.type, piece.rotation).map((d) => {
-      // Rotate the local offset by yaw (90° steps) around the cell center.
-      const cos = Math.round(Math.cos(yaw));
-      const sin = Math.round(Math.sin(yaw));
-      const ox = d.offset[0] * cos + d.offset[2] * sin;
-      const oz = -d.offset[0] * sin + d.offset[2] * cos;
+      // Offsets arrive fully rotated from colliderDescriptors; a yawed
+      // descriptor (diagonal deflector) needs its own body quaternion.
+      const yaw = d.yaw ?? 0;
       const body = world.createRigidBody(
-        RAPIER.RigidBodyDesc.fixed().setTranslation(wx + ox, d.offset[1], wz + oz),
+        RAPIER.RigidBodyDesc.fixed()
+          .setTranslation(wx + d.offset[0], d.offset[1], wz + d.offset[2])
+          .setRotation({ w: Math.cos(yaw / 2), x: 0, y: Math.sin(yaw / 2), z: 0 }),
       );
       world.createCollider(
         RAPIER.ColliderDesc.cuboid(d.hx, d.hy, d.hz).setRestitution(PHYSICS.boardRestitution),

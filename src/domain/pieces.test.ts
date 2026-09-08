@@ -22,6 +22,18 @@ describe("piece catalog", () => {
   it("maps straight to the straight.glb model", () => {
     expect(CONNECTIONS.straight.model).toBe("/models/pieces/straight.glb");
   });
+
+  it("maps curved and funnel to true 1x1-cell models with yaw offsets", () => {
+    // bend.glb (1x2) and funnel.glb (1.7x1) overhang neighboring cells;
+    // corner.glb and straight-hole.glb are exact 1x1 replacements.
+    expect(CONNECTIONS.curved.model).toBe("/models/pieces/corner.glb");
+    expect(CONNECTIONS.funnel.model).toBe("/models/pieces/straight-hole.glb");
+    // Model mouths sit 90° off the domain sides; the offset realigns them.
+    expect(CONNECTIONS.curved.modelYawOffset).toBe(-Math.PI / 2);
+    expect(CONNECTIONS.funnel.modelYawOffset).toBe(0);
+    expect(CONNECTIONS.straight.modelYawOffset).toBe(0);
+    expect(CONNECTIONS.goal.modelYawOffset).toBe(0);
+  });
 });
 
 describe("rotation state machine", () => {
@@ -37,16 +49,20 @@ describe("rotation state machine", () => {
     expect(nextRotation("curved", 3)).toBe(0);
   });
 
-  it("funnel and goal are orientation-independent (stay at 0)", () => {
-    expect(nextRotation("funnel", 0)).toBe(0);
+  it("goal is orientation-independent (stays at 0)", () => {
     expect(nextRotation("goal", 0)).toBe(0);
+  });
+
+  it("funnel (drop trap) cycles through 4 orientations", () => {
+    expect(nextRotation("funnel", 0)).toBe(1);
+    expect(nextRotation("funnel", 3)).toBe(0);
   });
 
   it("rotate applies n quarter turns modulo valid orientations", () => {
     expect(rotate("straight", 0 as Rotation, 5)).toBe(1);
     expect(rotate("straight", 3 as Rotation, 1)).toBe(0);
     expect(rotate("curved", 0 as Rotation, 2)).toBe(2);
-    expect(rotate("funnel", 0 as Rotation, 2)).toBe(0);
+    expect(rotate("funnel", 0 as Rotation, 2)).toBe(2);
   });
 
   it("throws on invalid rotation values", () => {
@@ -80,10 +96,14 @@ describe("connections", () => {
     expect(r1.length).toBe(2);
   });
 
-  it("funnel and goal expose their single connection side regardless of rotation", () => {
-    expect(CONNECTIONS.funnel.sides(0).length).toBe(1);
+  it("funnel is a straight drop channel: north + south mouths, shifting with rotation", () => {
+    expect(CONNECTIONS.funnel.sides(0).sort()).toEqual(["north", "south"]);
+    expect(CONNECTIONS.funnel.sides(1).sort()).toEqual(["east", "west"]);
+  });
+
+  it("goal exposes its single connection side regardless of rotation", () => {
     expect(CONNECTIONS.goal.sides(0).length).toBe(1);
-    expect(CONNECTIONS.funnel.sides(2)).toEqual(CONNECTIONS.funnel.sides(0));
+    expect(CONNECTIONS.goal.sides(2)).toEqual(CONNECTIONS.goal.sides(0));
   });
 
   it("connectsWith returns true when two placements share an open side pair", () => {
