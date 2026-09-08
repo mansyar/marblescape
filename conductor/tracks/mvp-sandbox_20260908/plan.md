@@ -26,7 +26,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Save/load serialization (a758186)
     - Red: round-trip tests (layout ↔ versioned localStorage schema)
     - Green: implement serializer
-- [ ] Task: Physics tuning config module
+- [~] Task: Physics tuning config module
     - Centralized constants: gravity scale, damping, restitution, marble count range, rescue timeout — no magic numbers elsewhere
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
