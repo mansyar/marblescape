@@ -10,7 +10,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Configure Vitest, Playwright, ESLint + Prettier per `conductor/code_styleguides/`
     - Verify `CI=true npm test` runs green on the empty suite
     - Fill in the **Development Commands** section of `conductor/workflow.md`
-- [~] Task: Download & structure Kenney Marble Kit assets
+- [x] Task: Download & structure Kenney Marble Kit assets (1d7c3f0)
     - Import 4 pieces (straight ramp, curved ramp, funnel, goal cup) + marbles + board materials as glTF
     - Verify assets load in the dev build
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
