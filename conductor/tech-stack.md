@@ -8,7 +8,7 @@ Version-checked against npm registry on 2026-09-08.
 |---|---|---|
 | Language | TypeScript (strict mode) | 6.0.3 |
 | Build tool / Dev server | Vite | 8.2.2 |
-| 3D Rendering | Three.js | 0.185.1 |
+| 3D Rendering | Three.js (@types/three for type declarations) | 0.185.1 |
 | Physics | @dimforge/rapier3d-compat (WASM, async-init build) | 0.20.0 |
 | PWA / Offline | vite-plugin-pwa (Workbox 7.4.1) | 1.3.0 |
 

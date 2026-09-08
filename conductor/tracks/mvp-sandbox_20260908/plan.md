@@ -32,7 +32,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 
 ## Phase 3 — 3D Diorama Rendering
 
-- [ ] Task: Scene, fixed tilted camera & responsive framing
+- [~] Task: Scene, fixed tilted camera & responsive framing
     - Red: tests for camera framing math per aspect ratio (portrait phone / landscape tablet)
     - Green: render board diorama, adaptive framing
 - [ ] Task: Board, raised edges & lighting
