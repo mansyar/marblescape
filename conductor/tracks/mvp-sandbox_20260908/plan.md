@@ -23,7 +23,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Piece definitions & rotation state machine (c44fb4a)
     - Red: tests for 4 piece types, 90° rotation cycling, orientation constraints (funnel/cup may have fewer valid orientations)
     - Green: implement piece catalog + rotation
-- [ ] Task: Save/load serialization
+- [~] Task: Save/load serialization
     - Red: round-trip tests (layout ↔ versioned localStorage schema)
     - Green: implement serializer
 - [ ] Task: Physics tuning config module
