@@ -30,9 +30,10 @@ describe("colliderDescriptors", () => {
     expect(desc).toHaveLength(3);
   });
 
-  it("gives funnel and goal a simple slab each", () => {
+  it("gives the funnel a simple slab and the goal a hole ring", () => {
     expect(colliderDescriptors("funnel", 0)).toHaveLength(1);
-    expect(colliderDescriptors("goal", 0)).toHaveLength(1);
+    // 4 border strips forming the ring around the hole
+    expect(colliderDescriptors("goal", 0)).toHaveLength(4);
   });
 
   it("keeps every collider inside the cell footprint", () => {

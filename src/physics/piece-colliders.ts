@@ -34,6 +34,19 @@ function curved(): ColliderDesc[] {
   ];
 }
 
+function goalWithHole(): ColliderDesc[] {
+  // End-hole piece: floor ring around a central hole (half-size 0.36) that a
+  // 0.3-radius marble falls through.
+  const ring = 0.07;
+  const center = 0.43;
+  return [
+    { hx: ring, hy: FLOOR_H, hz: 0.48, offset: [-center, FLOOR_Y, 0] },
+    { hx: ring, hy: FLOOR_H, hz: 0.48, offset: [center, FLOOR_Y, 0] },
+    { hx: 0.48, hy: FLOOR_H, hz: ring, offset: [0, FLOOR_Y, -center] },
+    { hx: 0.48, hy: FLOOR_H, hz: ring, offset: [0, FLOOR_Y, center] },
+  ];
+}
+
 function slab(): ColliderDesc[] {
   return [{ hx: 0.48, hy: FLOOR_H, hz: 0.48, offset: [0, FLOOR_Y, 0] }];
 }
@@ -43,7 +56,14 @@ function slab(): ColliderDesc[] {
  * Rotation is applied by swapping axis extents / offsets (90° steps).
  */
 export function colliderDescriptors(type: PieceType, rotation: Rotation): ColliderDesc[] {
-  const local = type === "straight" ? straight() : type === "curved" ? curved() : slab();
+  const local =
+    type === "straight"
+      ? straight()
+      : type === "curved"
+        ? curved()
+        : type === "goal"
+          ? goalWithHole()
+          : slab();
   if (rotation % 2 === 0) {
     return local;
   }
