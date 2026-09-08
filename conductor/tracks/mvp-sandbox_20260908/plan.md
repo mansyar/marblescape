@@ -35,7 +35,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Scene, fixed tilted camera & responsive framing (7a8363e)
     - Red: tests for camera framing math per aspect ratio (portrait phone / landscape tablet)
     - Green: render board diorama, adaptive framing
-- [ ] Task: Board, raised edges & lighting
+- [~] Task: Board, raised edges & lighting
     - Wooden tabletop, containment edges, soft shadows
 - [ ] Task: Piece rendering
     - glTF loading, grid-slot preview highlights (valid/invalid)

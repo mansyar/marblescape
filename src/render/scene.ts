@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { CAMERA_FOV_DEG, computeCameraFraming } from "./framing";
+import { addLighting, buildBoard } from "./board";
+import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./framing";
 
 /**
  * Boots the fixed-camera diorama: renderer, perspective camera and a resize
@@ -21,6 +22,9 @@ export function startRenderer(container: HTMLElement): {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
+  scene.add(buildBoard(BOARD_COLS, BOARD_ROWS));
+  addLighting(scene);
   const camera = new THREE.PerspectiveCamera(CAMERA_FOV_DEG, 1, 0.1, 200);
 
   const applyFraming = () => {
