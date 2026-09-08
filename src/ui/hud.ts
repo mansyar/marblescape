@@ -1,6 +1,5 @@
 import type { Game } from "../game/game";
-
-const SOUND_KEY = "marblescape.sound";
+import { isSoundOn } from "../audio/prefs";
 
 function button(label: string, bg: string): HTMLButtonElement {
   const btn = document.createElement("button");
@@ -11,21 +10,23 @@ function button(label: string, bg: string): HTMLButtonElement {
 
 /**
  * Top HUD: big Play button (drops marbles), mute toggle and board reset.
- * The mute flag persists under SOUND_KEY and is consumed by the audio
- * manager arriving in Phase 6.
+ * The mute preference persists and is applied to the game's audio manager.
  */
 export function createHud(game: Game, container: HTMLElement): HTMLElement {
   const bar = document.createElement("div");
   bar.style.cssText = "position:fixed;top:10px;right:10px;display:flex;gap:10px;z-index:10;";
 
   const play = button("▶", "#06d6a0");
-  play.addEventListener("click", () => game.play());
+  play.addEventListener("click", () => {
+    void game.initAudio();
+    game.play();
+  });
 
-  const mute = button(localStorage.getItem(SOUND_KEY) === "off" ? "🔇" : "🔊", "#118ab2");
+  const mute = button(isSoundOn(localStorage) ? "🔊" : "🔇", "#118ab2");
   mute.addEventListener("click", () => {
-    const off = localStorage.getItem(SOUND_KEY) === "off";
-    localStorage.setItem(SOUND_KEY, off ? "on" : "off");
-    mute.textContent = off ? "🔊" : "🔇";
+    const on = !isSoundOn(localStorage);
+    game.setSoundOn(on);
+    mute.textContent = on ? "🔊" : "🔇";
   });
 
   const reset = button("♻", "#ef476f");

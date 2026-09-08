@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import RAPIER from "@dimforge/rapier3d-compat";
+import { impactParams, selectImpactSound } from "../audio/impact-sounds";
+import { isSoundOn, setSoundOn } from "../audio/prefs";
+import { SoundManager } from "../audio/sound-manager";
 import {
   createBoard,
   type BoardState,
@@ -12,7 +16,8 @@ import { rotate } from "../domain/pieces";
 import { buildBoardBodies, syncPieceBodies, type PieceBodyEntry } from "../physics/board-bodies";
 import { MarbleManager } from "../physics/marbles";
 import { PHYSICS } from "../domain/physics-config";
-import { createPhysicsTicker, createPhysicsWorld, initPhysics, type World } from "../physics/world";
+import { createFixedStepLoop } from "../physics/fixed-step-loop";
+import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
 import { PieceRenderer } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
@@ -25,7 +30,7 @@ export class Game {
   private readonly container: HTMLElement;
   private rendererHandle: ReturnType<typeof startRenderer> | null = null;
   private world: World | null = null;
-  private ticker: ReturnType<typeof createPhysicsTicker> | null = null;
+  private ticker: ReturnType<typeof createFixedStepLoop> | null = null;
   private marbles: MarbleManager | null = null;
   private pieceRenderer: PieceRenderer | null = null;
   private pieceBodies = new Map<string, PieceBodyEntry>();
@@ -35,6 +40,10 @@ export class Game {
   private board: BoardState;
   private nextId = 1;
   private lastElapsed = -1;
+  private sound: SoundManager | null = null;
+  private audioCtx: AudioContext | null = null;
+  private eventQueue: RAPIER.EventQueue | null = null;
+  private lastImpactAt = 0;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -48,10 +57,21 @@ export class Game {
     await initPhysics();
     const world = createPhysicsWorld();
     this.world = world;
-    this.ticker = createPhysicsTicker(world);
+    this.eventQueue = new RAPIER.EventQueue(true);
+    this.ticker = createFixedStepLoop(
+      PHYSICS.fixedTimeStep,
+      () => {
+        stepWorld(world, this.eventQueue);
+        this.drainImpacts();
+      },
+      PHYSICS.maxSubSteps,
+    );
     buildBoardBodies(world);
     this.marbles = new MarbleManager(world, {
-      onCollected: (body) => this.removeMarbleMesh(body),
+      onCollected: (body) => {
+        this.removeMarbleMesh(body);
+        this.sound?.play("plonk", { rate: 1, volume: 0.9 });
+      },
       onRescued: (body) => this.removeMarbleMesh(body),
     });
 
@@ -212,6 +232,69 @@ export class Game {
     if (this.world) {
       this.pieceBodies = syncPieceBodies(this.world, this.pieceBodies, this.board.pieces);
     }
+  }
+
+  /** Lazily creates the audio graph; safe to call on every user interaction. */
+  async initAudio(): Promise<void> {
+    if (this.audioCtx) {
+      if (this.audioCtx.state === "suspended") {
+        await this.audioCtx.resume();
+      }
+      return;
+    }
+    try {
+      this.audioCtx = new AudioContext();
+    } catch {
+      return;
+    }
+    this.sound = new SoundManager(this.audioCtx);
+    await Promise.all([
+      this.sound.load("clack", "/sounds/clack.ogg"),
+      this.sound.load("tick", "/sounds/tick.ogg"),
+      this.sound.load("plonk", "/sounds/plonk.ogg"),
+    ]);
+    this.sound.setMuted(!isSoundOn(localStorage));
+  }
+
+  /** Mute toggle from the HUD; persists the preference. */
+  setSoundOn(on: boolean): void {
+    setSoundOn(on, localStorage);
+    this.sound?.setMuted(!on);
+  }
+
+  private drainImpacts(): void {
+    if (!this.world || !this.eventQueue || !this.marbles || !this.sound) {
+      return;
+    }
+    const world = this.world;
+    const marbles = this.marbles;
+    this.eventQueue.drainCollisionEvents((h1, h2, started) => {
+      if (!started) {
+        return;
+      }
+      const b1 = world.getCollider(h1)?.parent();
+      const b2 = world.getCollider(h2)?.parent();
+      if (!b1 || !b2) {
+        return;
+      }
+      const name = selectImpactSound(marbles.has(b1), marbles.has(b2));
+      if (!name) {
+        return;
+      }
+      // Relative speed at contact drives pitch and loudness.
+      const v1 = b1.linvel();
+      const v2 = b2.linvel();
+      const force = Math.hypot(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+      if (force < 1) {
+        return;
+      }
+      const now = performance.now();
+      if (now - this.lastImpactAt < 60) {
+        return; // avoid machine-gunning during pile-ups
+      }
+      this.lastImpactAt = now;
+      this.sound?.play(name, impactParams(force));
+    });
   }
 
   private syncMarbleMeshes(): void {

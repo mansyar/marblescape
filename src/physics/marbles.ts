@@ -40,6 +40,10 @@ export class MarbleManager {
     return this.bodies;
   }
 
+  has(body: RAPIER.RigidBody): boolean {
+    return this.bodies.includes(body);
+  }
+
   getCollected(): RAPIER.RigidBody[] {
     return this.collected;
   }

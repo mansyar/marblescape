@@ -21,9 +21,9 @@ export function createPhysicsWorld(): World {
  * Steps the world by exactly one fixed timestep. Call from a FixedStepLoop
  * so the simulation rate is decoupled from the render frame rate.
  */
-export function stepWorld(world: World): void {
+export function stepWorld(world: World, events?: RAPIER.EventQueue | null): void {
   world.timestep = PHYSICS.fixedTimeStep;
-  world.step();
+  world.step(events ?? undefined);
 }
 
 /**

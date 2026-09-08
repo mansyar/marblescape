@@ -75,7 +75,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [x] Task: Web Audio manager (630c2a2)
     - Red: pitch-mapping & event-wiring tests (audio graph mocked)
     - Green: CC0 samples, velocity-based pitch-shifting
-- [ ] Task: Mute toggle with persistence
+- [~] Task: Mute toggle with persistence
     - Red: preference round-trip test
     - Green: implement
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
