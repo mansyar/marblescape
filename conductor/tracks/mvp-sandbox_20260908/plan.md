@@ -28,7 +28,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: implement serializer
 - [x] Task: Physics tuning config module (167b144)
     - Centralized constants: gravity scale, damping, restitution, marble count range, rescue timeout — no magic numbers elsewhere
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
 
 ## Phase 3 — 3D Diorama Rendering
 
@@ -39,7 +39,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Wooden tabletop, containment edges, soft shadows
 - [ ] Task: Piece rendering
     - glTF loading, grid-slot preview highlights (valid/invalid)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
 
 ## Phase 4 — Physics & Marble Run
 
@@ -54,7 +54,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [ ] Task: Containment & rescue system
     - Red: rescue-trigger tests
     - Green: board-edge colliders + velocity≈0 timeout rescue
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
 
 ## Phase 5 — Touch Interaction & Edit UX
 
@@ -68,7 +68,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: pop-back-to-palette animation
 - [ ] Task: HUD (Play, mute, reset)
     - Green: Play drops marbles; child-driven run loop
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
 
 ## Phase 6 — Sound
 
@@ -78,7 +78,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [ ] Task: Mute toggle with persistence
     - Red: preference round-trip test
     - Green: implement
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
 
 ## Phase 7 — Persistence & Responsive Polish
 
@@ -86,7 +86,7 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
     - Green: debounced writes; restore on boot; wire tested Phase 2 serializer
 - [ ] Task: Dual-orientation layout polish
     - HUD placement, palette ergonomics in portrait and landscape
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
 
 ## Phase 8 — Reliability Gate & Track Completion
 
@@ -95,4 +95,4 @@ Every task: mark `[~]` in progress → Red (failing tests) → Green (implement)
 - [ ] Task: Reliability gate run
     - 20 consecutive scripted runs: 0 escapes / 0 stuck marbles
     - Coverage ≥ 80% verified
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f272132]
