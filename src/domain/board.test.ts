@@ -3,6 +3,7 @@ import {
   createBoard,
   fromJSON,
   placeTypedPiece,
+  removeTypedPiece,
   saveBoard,
   loadBoard,
   toJSON,
@@ -71,6 +72,33 @@ describe("fromJSON validation", () => {
     expect(
       fromJSON('{"version":1,"pieces":[{"id":"a","type":"straight","rotation":0,"x":"x","y":0}]}'),
     ).toBeNull();
+  });
+});
+
+describe("removeTypedPiece", () => {
+  it("removes a placed piece and frees its cell", () => {
+    const board = sampleBoard();
+    const cleared = removeTypedPiece(board, 2, 3);
+    expect(cleared.pieces).toEqual([]);
+    expect(cleared.cells[3 * 8 + 2]).toBeNull();
+  });
+
+  it("does not mutate the original board", () => {
+    const board = sampleBoard();
+    removeTypedPiece(board, 2, 3);
+    expect(board.pieces).toHaveLength(1);
+  });
+
+  it("throws when removing from an empty cell", () => {
+    expect(() => removeTypedPiece(createBoard(8, 6), 0, 0)).toThrow();
+  });
+
+  it("allows re-placing on the freed cell", () => {
+    let board = sampleBoard();
+    board = removeTypedPiece(board, 2, 3);
+    board = placeTypedPiece(board, { id: "p2", type: "curved", rotation: 1, x: 2, y: 3 });
+    expect(board.pieces).toHaveLength(1);
+    expect(board.pieces[0].type).toBe("curved");
   });
 });
 
