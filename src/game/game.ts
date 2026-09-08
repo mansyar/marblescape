@@ -214,7 +214,11 @@ export class Game {
     if (!this.isPlaceable(toX, toY)) {
       return false;
     }
-    this.board = placeTypedPiece(removeTypedPiece(this.board, fromX, fromY), piece);
+    // Re-place with UPDATED coordinates — the original piece object still
+    // carries the from-cell coords, so passing it directly would put the
+    // piece right back where it was.
+    const moved = { ...piece, x: toX, y: toY };
+    this.board = placeTypedPiece(removeTypedPiece(this.board, fromX, fromY), moved);
     this.syncPieces();
     return true;
   }
