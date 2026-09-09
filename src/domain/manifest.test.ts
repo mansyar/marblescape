@@ -99,6 +99,17 @@ describe("validateManifest", () => {
     ).toContain("missing maskable icon");
   });
 
+  it("rejects a maskable icon that is not 512x512", () => {
+    const m = validManifest() as { icons: Array<Record<string, unknown>> };
+    const offSize = { ...m.icons[2], sizes: "192x192" };
+    expect(
+      validateManifest({
+        ...m,
+        icons: [m.icons[0], m.icons[1], offSize],
+      }),
+    ).toContain("missing maskable icon");
+  });
+
   it("reports every problem found", () => {
     const errors = validateManifest({});
     expect(errors).toContain("missing name");

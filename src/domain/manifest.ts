@@ -36,7 +36,10 @@ export function validateManifest(input: unknown): string[] {
     );
     if (!has) errors.push(`missing ${size} icon`);
   }
-  const hasMaskable = icons.some((icon) => isRecord(icon) && icon.purpose === "maskable");
+  const hasMaskable = icons.some(
+    (icon) =>
+      isRecord(icon) && icon.purpose === "maskable" && icon.sizes === REQUIRED_ICON_SIZES[1],
+  );
   if (!hasMaskable) errors.push("missing maskable icon");
   return errors;
 }

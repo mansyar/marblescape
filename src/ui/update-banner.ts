@@ -42,7 +42,7 @@ export function createUpdateBanner(
   const updateBtn = document.createElement("button");
   updateBtn.textContent = "Update";
   updateBtn.style.cssText = [
-    "padding:8px 16px",
+    "padding:12px 18px",
     "font-size:18px",
     "font-weight:800",
     "background:#06d6a0",
@@ -57,9 +57,9 @@ export function createUpdateBanner(
   closeBtn.textContent = "✕";
   closeBtn.setAttribute("aria-label", "Dismiss update banner");
   closeBtn.style.cssText = [
-    "width:36px",
-    "height:36px",
-    "font-size:16px",
+    "width:44px",
+    "height:44px",
+    "font-size:18px",
     "font-weight:800",
     "background:#ef476f",
     "color:#fff",

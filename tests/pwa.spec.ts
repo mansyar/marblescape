@@ -59,8 +59,27 @@ test.describe("PWA production build", () => {
     await page.goto("/");
     await page.waitForFunction(() => window.__marblescape !== undefined);
     await page.waitForFunction(() => document.querySelector("canvas") !== null);
-    // Let the SW finish precaching before cutting the network.
-    await page.waitForTimeout(1500);
+    // Wait until the SW precache holds the game assets before cutting the
+    // network (a fixed sleep is flaky on slow CI runners).
+    await page.evaluate(async () => {
+      const hasAssets = async () => {
+        for (const name of await caches.keys()) {
+          const cache = await caches.open(name);
+          const urls = (await cache.keys()).map((r) => r.url);
+          if (
+            urls.some((u) => u.includes("/models/pieces/")) &&
+            urls.some((u) => u.includes("/sounds/"))
+          ) {
+            return true;
+          }
+        }
+        return false;
+      };
+      for (let i = 0; i < 50; i += 1) {
+        if (await hasAssets()) return;
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+    });
 
     await context.setOffline(true);
     await page.reload();
