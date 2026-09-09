@@ -4,6 +4,8 @@ import { screenToCell } from "./game/picking";
 import { computeCameraFraming } from "./render/framing";
 import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
+import { createUpdateBanner } from "./ui/update-banner";
+import { registerSW } from "virtual:pwa-register";
 import { LEVELS } from "./domain/levels";
 import { createLevelSelect, hideLevelSelect, showLevelSelect } from "./ui/level-select";
 
@@ -65,6 +67,17 @@ if (app) {
       // Picking the level already open keeps its placements (board replayable).
     });
     createHud(game, document.body, () => showLevelSelect(levelSelect));
+
+    // Update banner: prompts when a new version finished installing.
+    // Tap Update to apply (page reloads); ✕ dismisses until the next update.
+    const updateBanner = createUpdateBanner(document.body, () => {
+      updateSW(true);
+    });
+    const updateSW = registerSW({
+      immediate: true,
+      onNeedRefresh: () => updateBanner.show(),
+      onOfflineReady: () => {},
+    });
 
     // Post-solve overlay: ✓ pulse + big Home button on the first successful run.
     const solvedOverlay = document.createElement("div");

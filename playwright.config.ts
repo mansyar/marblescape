@@ -2,6 +2,8 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "tests",
+  // PWA specs run against the production build via playwright.pwa.config.ts.
+  testIgnore: ["tests/pwa*.spec.ts"],
   timeout: 120_000,
   // Rapier WASM physics + glTF loading per page: 2 workers keep the
   // fixed-step sims from starving each other (flaky timeouts at 3+).
