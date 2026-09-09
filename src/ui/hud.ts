@@ -20,6 +20,7 @@ export function createHud(game: Game, container: HTMLElement, onHome?: () => voi
   ].join(";");
 
   const home = button("🏠", "#073b4c");
+  home.dataset.testid = "hud-home";
   home.addEventListener("click", () => onHome?.());
 
   const play = button("▶", "#06d6a0");
