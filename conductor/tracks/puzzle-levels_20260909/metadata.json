@@ -1,0 +1,9 @@
+{
+  "id": "puzzle-levels_20260909",
+  "type": "feature",
+  "status": "new",
+  "description": "Puzzle mode: 6 complete-the-track levels with level select and persistent badges",
+  "branch": "track/puzzle-mode-6-levels",
+  "created": "2026-09-09T00:00:00.000Z",
+  "completed": null
+}

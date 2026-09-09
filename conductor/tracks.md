@@ -2,4 +2,4 @@
 
 ## Tracks
 
-(No active tracks - the MVP sandbox track is archived in conductor/archive/mvp-sandbox_20260908.)
+- [ ] **Track: Puzzle Mode — 6 Levels** *Link: [./tracks/puzzle-levels_20260909/index.md](./tracks/puzzle-levels_20260909/index.md)*
