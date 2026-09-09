@@ -37,7 +37,7 @@ if (app) {
         game.currentPalette(),
         (_type, ndcX, ndcY) => {
           const cell = cellFromNdc(ndcX, ndcY);
-          game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y) : false);
+          game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y, _type) : false);
         },
         (type, ndcX, ndcY) => {
           game.hideHighlight();

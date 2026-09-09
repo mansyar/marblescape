@@ -413,11 +413,16 @@ export class Game {
     return this.marbles?.getRescued().length ?? 0;
   }
 
-  isPlaceable(cellX: number, cellY: number): boolean {
+  isPlaceable(cellX: number, cellY: number, type?: PieceType): boolean {
     if (this.puzzle) {
-      // Drag feedback: an empty gap is a valid landing spot (the palette
-      // drag itself still enforces the gap's accepted types).
-      return gapAt(this.puzzle, cellX, cellY) !== null && !placementAt(this.puzzle, cellX, cellY);
+      // Drag feedback: an empty gap that accepts the dragged type (or any
+      // empty gap when no type is given) is a valid landing spot.
+      const gap = gapAt(this.puzzle, cellX, cellY);
+      return (
+        gap !== null &&
+        !placementAt(this.puzzle, cellX, cellY) &&
+        (type === undefined || gap.accepted.includes(type))
+      );
     }
     if (cellX < 0 || cellX >= this.board.width || cellY < 0 || cellY >= this.board.height) {
       return false;
