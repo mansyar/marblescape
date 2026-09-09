@@ -4,6 +4,8 @@ import { screenToCell } from "./game/picking";
 import { computeCameraFraming } from "./render/framing";
 import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
+import { LEVELS } from "./domain/levels";
+import { createLevelSelect, hideLevelSelect, showLevelSelect } from "./ui/level-select";
 
 declare global {
   interface Window {
@@ -25,24 +27,44 @@ if (app) {
       return screenToCell(ndcX, ndcY, computeCameraFraming(aspect()), aspect());
     };
 
-    // Palette: drag new pieces onto the board.
-    const palette = createPalette(
-      app,
-      ["straight", "curved", "funnel", "goal"],
-      (_type, ndcX, ndcY) => {
-        const cell = cellFromNdc(ndcX, ndcY);
-        game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y) : false);
-      },
-      (type, ndcX, ndcY) => {
-        game.hideHighlight();
-        const cell = cellFromNdc(ndcX, ndcY);
-        if (cell) {
-          game.place(type, cell.x, cell.y);
-        }
-      },
-    );
-    document.body.appendChild(palette);
-    createHud(game, document.body);
+    // Palette: drag new pieces onto the board. Rebuilt per mode so level
+    // palettes stay restricted to the pieces that solve that level.
+    let paletteBar: HTMLElement | null = null;
+    const buildPalette = () => {
+      paletteBar?.remove();
+      paletteBar = createPalette(
+        app,
+        game.currentPalette(),
+        (_type, ndcX, ndcY) => {
+          const cell = cellFromNdc(ndcX, ndcY);
+          game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y) : false);
+        },
+        (type, ndcX, ndcY) => {
+          game.hideHighlight();
+          const cell = cellFromNdc(ndcX, ndcY);
+          if (cell) {
+            game.place(type, cell.x, cell.y);
+          }
+        },
+      );
+      document.body.appendChild(paletteBar);
+    };
+    buildPalette();
+
+    // Level select: 7 tiles (sandbox + 6 levels), nothing locked.
+    const levelSelect = createLevelSelect(document.body, LEVELS, new Set(), (pick) => {
+      hideLevelSelect(levelSelect);
+      if (pick === "sandbox") {
+        game.exitLevel();
+        buildPalette();
+      } else if (game.currentLevelId() !== pick) {
+        game.exitLevel();
+        game.enterLevel(pick);
+        buildPalette();
+      }
+      // Picking the level already open keeps its placements (board replayable).
+    });
+    createHud(game, document.body, () => showLevelSelect(levelSelect));
 
     // Test hook for Playwright smoke/reliability runs.
     window.__marblescape = game;
