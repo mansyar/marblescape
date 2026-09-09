@@ -13,8 +13,22 @@ import {
   saveBoard,
   type PlacedPiece,
 } from "../domain/board";
+import { getLevel } from "../domain/levels";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { rotate } from "../domain/pieces";
+import { PIECE_TYPES } from "../domain/pieces";
+import {
+  boardFor,
+  createPuzzle,
+  gapAt,
+  move as puzzleMove,
+  place as puzzlePlace,
+  placementAt,
+  remove as puzzleRemove,
+  reset as puzzleReset,
+  rotate as puzzleRotate,
+  type PuzzleState,
+} from "../domain/puzzle";
 import {
   buildBoardBodies,
   syncFloorBodies,
@@ -45,6 +59,9 @@ export class Game {
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private board: BoardState;
+  /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
+  private puzzle: PuzzleState | null = null;
+  private sandboxBoard: BoardState | null = null;
   private nextId = 1;
   private lastElapsed = -1;
   private sound: SoundManager | null = null;
@@ -65,6 +82,9 @@ export class Game {
    * Phase 2 serializer; corrupt storage is forgiven with a fresh board.
    */
   private scheduleSave(): void {
+    if (this.puzzle) {
+      return; // never clobber the sandbox save while a level is loaded
+    }
     if (this.saveTimer !== null) {
       clearTimeout(this.saveTimer);
     }
@@ -143,10 +163,60 @@ export class Game {
   }
 
   /**
+   * Enters puzzle mode for a level: parks the sandbox board, loads the level's
+   * furniture, and switches every interaction to gap-only placement.
+   */
+  enterLevel(id: number): boolean {
+    if (this.puzzle) {
+      return false;
+    }
+    const level = getLevel(id);
+    if (!level) {
+      return false;
+    }
+    this.sandboxBoard = this.board;
+    this.puzzle = createPuzzle(level);
+    this.board = boardFor(this.puzzle);
+    this.syncPieces();
+    return true;
+  }
+
+  /** Leaves puzzle mode and restores the sandbox board exactly as it was. */
+  exitLevel(): void {
+    if (!this.puzzle) {
+      return;
+    }
+    this.puzzle = null;
+    this.board = this.sandboxBoard ?? this.board;
+    this.sandboxBoard = null;
+    this.syncPieces();
+  }
+
+  /** The level id while in puzzle mode, otherwise null (sandbox). */
+  currentLevelId(): number | null {
+    return this.puzzle?.level.id ?? null;
+  }
+
+  /** Palette pieces for the current mode: level palette, or all pieces. */
+  currentPalette(): PieceType[] {
+    return this.puzzle ? this.puzzle.level.palette : [...PIECE_TYPES];
+  }
+
+  /**
    * Places a piece of the given type at a cell (drag-from-palette target).
    * Returns false when the cell is occupied or off-board (reject wiggle).
    */
   place(type: PieceType, cellX: number, cellY: number): boolean {
+    if (this.puzzle) {
+      const next = puzzlePlace(this.puzzle, type, cellX, cellY);
+      if (next === this.puzzle) {
+        return false;
+      }
+      this.puzzle = next;
+      this.board = boardFor(next);
+      this.syncPieces();
+      return true;
+    }
     const piece: PlacedPiece = {
       id: `p${this.nextId++}`,
       type,
@@ -165,6 +235,16 @@ export class Game {
 
   /** Tap-to-rotate: cycles a piece's rotation 90° per tap. */
   rotate(cellX: number, cellY: number): void {
+    if (this.puzzle) {
+      const next = puzzleRotate(this.puzzle, cellX, cellY);
+      if (next === this.puzzle) {
+        return;
+      }
+      this.puzzle = next;
+      this.board = boardFor(next);
+      this.syncPieces();
+      return;
+    }
     const piece = this.pieceAt(cellX, cellY);
     if (!piece) {
       return;
@@ -182,6 +262,17 @@ export class Game {
 
   /** Removes the piece at a cell; returns the removed type (palette pop-back) or null. */
   remove(cellX: number, cellY: number): PieceType | null {
+    if (this.puzzle) {
+      const existing = placementAt(this.puzzle, cellX, cellY);
+      if (!existing) {
+        return null;
+      }
+      const next = puzzleRemove(this.puzzle, cellX, cellY);
+      this.puzzle = next;
+      this.board = boardFor(next);
+      this.syncPieces();
+      return existing.type;
+    }
     const piece = this.pieceAt(cellX, cellY);
     if (!piece) {
       return null;
@@ -196,6 +287,20 @@ export class Game {
    * "pop-back" before it returns home to the palette.
    */
   popOut(cellX: number, cellY: number): PieceType | null {
+    if (this.puzzle) {
+      const existing = placementAt(this.puzzle, cellX, cellY);
+      if (!existing) {
+        return null;
+      }
+      const mesh = this.pieceRenderer?.meshFor(existing.id);
+      const removed = this.remove(cellX, cellY);
+      if (mesh && this.rendererHandle) {
+        const parent = this.rendererHandle.scene;
+        parent.add(mesh);
+        this.popTweens.push({ mesh, t: 0 });
+      }
+      return removed;
+    }
     const piece = this.pieceAt(cellX, cellY);
     if (!piece) {
       return null;
@@ -213,6 +318,16 @@ export class Game {
 
   /** Hold-drag-to-move: relocates a piece, keeping its id/type/rotation. */
   move(fromX: number, fromY: number, toX: number, toY: number): boolean {
+    if (this.puzzle) {
+      const next = puzzleMove(this.puzzle, fromX, fromY, toX, toY);
+      if (next === this.puzzle) {
+        return false;
+      }
+      this.puzzle = next;
+      this.board = boardFor(next);
+      this.syncPieces();
+      return true;
+    }
     const piece = this.pieceAt(fromX, fromY);
     if (!piece || (fromX === toX && fromY === toY)) {
       return false;
@@ -231,11 +346,21 @@ export class Game {
 
   /** Big Play button: drops a batch of marbles above the spawn cell. */
   play(): void {
+    if (this.puzzle) {
+      this.marbles?.spawnDrop(this.puzzle.level.spawn.x, this.puzzle.level.spawn.y);
+      return;
+    }
     this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0);
   }
 
-  /** Reset: clears all placed pieces (marbles finish their run naturally). */
+  /** Reset: clears placed pieces (marbles finish their run naturally). */
   reset(): void {
+    if (this.puzzle) {
+      this.puzzle = puzzleReset(this.puzzle);
+      this.board = boardFor(this.puzzle);
+      this.syncPieces();
+      return;
+    }
     const pieces = [...this.board.pieces];
     for (const piece of pieces) {
       this.board = removeTypedPiece(this.board, piece.x, piece.y);
@@ -277,6 +402,11 @@ export class Game {
   }
 
   isPlaceable(cellX: number, cellY: number): boolean {
+    if (this.puzzle) {
+      // Drag feedback: an empty gap is a valid landing spot (the palette
+      // drag itself still enforces the gap's accepted types).
+      return gapAt(this.puzzle, cellX, cellY) !== null && !placementAt(this.puzzle, cellX, cellY);
+    }
     if (cellX < 0 || cellX >= this.board.width || cellY < 0 || cellY >= this.board.height) {
       return false;
     }
@@ -284,6 +414,11 @@ export class Game {
   }
 
   pieceAt(cellX: number, cellY: number): PlacedPiece | null {
+    if (this.puzzle) {
+      // Furniture is not interactive: only child-placed pieces can be
+      // tapped/rotated/moved/removed in level mode.
+      return placementAt(this.puzzle, cellX, cellY);
+    }
     return this.board.pieces.find((p) => p.x === cellX && p.y === cellY) ?? null;
   }
 
