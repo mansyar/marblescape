@@ -30,7 +30,7 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
   - [x] `registerSW` from `virtual:pwa-register` with `onNeedRefresh` → show banner ("New version ready — Update", cozy HUD style, `data-testid="update-banner"`); tap → `updateSW(true)`
   - [x] Banner is non-blocking (fixed top, dismissible by tapping Update or X), never interrupts play
 - [x] Task: Coverage check + commit + git note — `90daae9`, `8b47315`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint — [checkpoint: b0570b0]
 
 ## Phase 3 — PWA e2e verification & regression
 
