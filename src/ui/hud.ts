@@ -12,12 +12,16 @@ function button(label: string, bg: string): HTMLButtonElement {
  * Top HUD: big Play button (drops marbles), mute toggle and board reset.
  * The mute preference persists and is applied to the game's audio manager.
  */
-export function createHud(game: Game, container: HTMLElement): HTMLElement {
+export function createHud(game: Game, container: HTMLElement, onHome?: () => void): HTMLElement {
   const bar = document.createElement("div");
   bar.style.cssText = [
     "position:fixed;top:10px;right:max(10px, env(safe-area-inset-right))",
     "display:flex;gap:10px;z-index:10",
   ].join(";");
+
+  const home = button("🏠", "#073b4c");
+  home.dataset.testid = "hud-home";
+  home.addEventListener("click", () => onHome?.());
 
   const play = button("▶", "#06d6a0");
   play.style.flex = "0 0 auto";
@@ -36,7 +40,7 @@ export function createHud(game: Game, container: HTMLElement): HTMLElement {
   const reset = button("♻", "#ef476f");
   reset.addEventListener("click", () => game.reset());
 
-  bar.append(play, mute, reset);
+  bar.append(home, play, mute, reset);
   container.appendChild(bar);
   return bar;
 }

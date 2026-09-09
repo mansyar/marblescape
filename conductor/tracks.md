@@ -2,4 +2,4 @@
 
 ## Tracks
 
-(No active tracks - the MVP sandbox track is archived in conductor/archive/mvp-sandbox_20260908.)
+*No active tracks. All completed tracks live in [./archive/](./archive/).*

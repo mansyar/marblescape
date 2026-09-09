@@ -1,4 +1,4 @@
-import { CONNECTIONS, type PieceType, type Rotation } from "../domain/pieces";
+import type { PieceType, Rotation } from "../domain/pieces";
 
 export interface ColliderDesc {
   /** Half-extents of the box collider in local piece space. */
@@ -20,16 +20,17 @@ const FLOOR_H = 0.08; // floor slab half-height
 const FLOOR_Y = FLOOR_H; // top of floor sits at board surface
 
 function straight(): ColliderDesc[] {
-  // Channel runs north-south: floor + rails pitched as one downhill ramp
-  // (high end north, low end south — the whole body tilts together), then
-  // LIFTED so the low (south) exit sits flush with neighboring piece
-  // floors (0.16) — otherwise chained ramps wedge the marble in a valley.
-  const pitch = CONNECTIONS.straight.slope ?? 0;
-  const lift = 0.48 * Math.sin(pitch);
+  // Channel runs north-south: FLAT floor + rails. The marble rolls on the
+  // world's tilted gravity, not on piece pitch — a pitched floor creates a
+  // step-up WALL at every joint (the next piece's north end sits higher
+  // than this piece's south exit), which traps slow marbles: observed
+  // ~25% jam rate at the chute joint on level runs (marble embeds in the
+  // joint wall face and freezes). Flat floors are flush everywhere, so a
+  // marble rolls continuously with no walls to climb.
   return [
-    { hx: 0.48, hy: FLOOR_H, hz: 0.48, offset: [0, FLOOR_Y + lift, 0], pitch },
-    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [-RAIL_INSET, RAIL_H + lift, 0], pitch },
-    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [RAIL_INSET, RAIL_H + lift, 0], pitch },
+    { hx: 0.48, hy: FLOOR_H, hz: 0.48, offset: [0, FLOOR_Y, 0] },
+    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [-RAIL_INSET, RAIL_H, 0] },
+    { hx: RAIL, hy: RAIL_H, hz: 0.42, offset: [RAIL_INSET, RAIL_H, 0] },
   ];
 }
 

@@ -62,14 +62,11 @@ export class MarbleManager {
     for (let i = 0; i < PHYSICS.maxMarblesPerDrop; i += 1) {
       // Tiny scatter so marbles don't stack perfectly and explode apart.
       const jitter = (Math.random() - 0.5) * 0.2;
-      // Spawn near the cell's north (high) end and drop from low height:
-      // tilted gravity drifts marbles south while falling, and landing at
-      // the top of a ramp gives them the full tile to build hop speed.
-      this.spawnAt(
-        cellX + 0.5 + jitter,
-        PHYSICS.spawnHeight + i * 0.8,
-        cellZ + 0.12 + jitter * 0.8,
-      );
+      // Drop onto the trough CENTER: the north-end position sat 0.12 from
+      // the chute's elevated rim, so a jittered spawn could wedge against
+      // the end wall and stall (flaky on level runs). Center is clear of
+      // both rims; the marble still has the full tile to build speed.
+      this.spawnAt(cellX + 0.5 + jitter, PHYSICS.spawnHeight + i * 0.8, cellZ + 0.5 + jitter * 0.8);
     }
   }
 
@@ -86,7 +83,11 @@ export class MarbleManager {
         .setTranslation(x, y, z)
         .setLinearDamping(PHYSICS.linearDamping)
         .setAngularDamping(PHYSICS.angularDamping)
-        .setCcdEnabled(true),
+        .setCcdEnabled(true)
+        // Marbles must NEVER sleep: the world is tilted, so a body that
+        // settles mid-track and goes to sleep ignores gravity and jams
+        // forever (observed: ~25% jam rate in the chute on level runs).
+        .setCanSleep(false),
     );
     this.world.createCollider(
       RAPIER.ColliderDesc.ball(PHYSICS.marbleRadius).setRestitution(PHYSICS.marbleRestitution),
