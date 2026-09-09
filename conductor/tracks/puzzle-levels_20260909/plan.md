@@ -19,14 +19,14 @@
 
 ## Phase 2 — Puzzle Mode State & Game Integration
 
-- [ ] Task: Write failing tests for puzzle mode state (`src/game/mode.test.ts` or `src/domain/puzzle.test.ts`)
-  - [ ] Loading a level: fixed pieces placed immovable, gaps registered, palette restricted
-  - [ ] Gap-only placement: accepts palette piece into empty gap; rejects wrong piece, non-gap slots, furniture slots
-  - [ ] Rotate/move/delete allowed on gap pieces only; furniture operations no-op
-  - [ ] Returning to sandbox restores prior sandbox board
-- [ ] Task: Extend `Game` with mode switching (sandbox | level(n)) wiring board/physics/render/palette
-  - [ ] Furniture flags through `board.ts`/`piece-view.ts` (non-interactive placement)
-  - [ ] Palette filters to level pieces
+- [x] Task: Write failing tests for puzzle mode state (`src/domain/puzzle.test.ts`) — `338a17e`
+  - [x] Loading a level: fixed pieces placed immovable, gaps registered, palette restricted
+  - [x] Gap-only placement: accepts palette piece into empty gap; rejects wrong piece, non-gap slots, furniture slots
+  - [x] Rotate/move/delete allowed on gap pieces only; furniture operations no-op
+  - [x] Returning to sandbox restores prior sandbox board (puzzle state is isolated from sandbox board)
+- [x] Task: Extend `Game` with mode switching (sandbox | level(n)) wiring board/physics/render/palette — `2556c7d`
+  - [x] Furniture flags through `board.ts`/`piece-view.ts` (non-interactive placement) — furniture renders via merged `boardFor`; Game-level guards make it non-interactive
+  - [ ] Palette filters to level pieces (visual rebuild in `main.ts` lands with Phase 3 navigation; `currentPalette()` API ready)
 - [ ] Task: Coverage check + commit + git note
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
