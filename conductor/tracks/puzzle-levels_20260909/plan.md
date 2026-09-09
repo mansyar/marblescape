@@ -5,16 +5,16 @@
 
 ## Phase 1 — Level Data Model & Solvability Validation
 
-- [ ] Task: Write failing tests for level data types & validators (`src/domain/levels.test.ts`)
-  - [ ] Level definition schema: id, name, board size, fixed pieces (type/pos/rotation), gaps (pos + accepted piece types), start chute, goal cup, palette
-  - [ ] Validator rejects: overlaps, gaps on non-empty slots, palette pieces not in registry, missing start/goal
-- [ ] Task: Implement `src/domain/levels.ts` (types, 6 level definitions, `validateLevel`)
-  - [ ] L1 straight → L6 finale per spec table (piece order, gap counts 1→3)
-- [ ] Task: Write failing tests for route-solvability checker
-  - [ ] Solvable: connected route exists start → goal using gap placements from palette
-  - [ ] Unsolvable fixtures rejected (missing connection, wrong piece available)
-- [ ] Task: Implement solvability check (mouth-graph traversal over CONNECTIONS + gap candidates)
-- [ ] Task: Coverage check (>80% on new modules) + commit + git note
+- [x] Task: Write failing tests for level data types & validators (`src/domain/levels.test.ts`) — `0273fa3`
+  - [x] Level definition schema: id, name, board size, fixed pieces (type/pos/rotation), gaps (pos + accepted piece types), start chute, goal cup, palette
+  - [x] Validator rejects: overlaps, gaps on non-empty slots, palette pieces not in registry, missing start/goal
+- [x] Task: Implement `src/domain/levels.ts` (types, 6 level definitions, `validateLevel`) — `0273fa3`
+  - [x] L1 straight → L6 finale per spec table (piece order, gap counts 1→3)
+- [x] Task: Write failing tests for route-solvability checker — `0273fa3`
+  - [x] Solvable: connected route exists start → goal using gap placements from palette
+  - [x] Unsolvable fixtures rejected (missing connection, wrong piece available)
+- [x] Task: Implement solvability check (mouth-graph traversal over CONNECTIONS + gap candidates) — `0273fa3`
+- [x] Task: Coverage check (>80% on new modules) + commit + git note — `0273fa3`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Puzzle Mode State & Game Integration
