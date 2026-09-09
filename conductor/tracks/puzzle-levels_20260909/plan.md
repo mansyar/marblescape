@@ -66,4 +66,4 @@
 - [x] Task: Full suite: `pnpm check` + `pnpm test` + coverage report — `5022d8f`
   - [x] `pnpm check` clean (53 files), 203/203 unit, e2e 10/10 (6 levels + 2 smoke + reliability 20-drop + funnel probe)
   - [x] Coverage: levels 93.1% stmts/90% branch, puzzle 91.5%/88.5%, badges 100%, solve 100%
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint — `[checkpoint: 0042d9f]`
