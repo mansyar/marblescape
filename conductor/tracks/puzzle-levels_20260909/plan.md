@@ -53,7 +53,7 @@
   - [x] Home button visibility after first solve; Play remains usable
 - [x] Task: Implement solve wiring in `Game` (goal-cup contact → event → `ui` effects) + badge store — `cc2c9cd`
 - [x] Task: Coverage check + commit + git note — `cc2c9cd`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint — `[checkpoint: c879ac4]`
 
 ## Phase 5 — E2E Verification, Regression & Track Completion
 
