@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [ ] **Track: CI/CD Pipeline** *Link: [./tracks/ci-cd-pipeline_20260910/index.md](./tracks/ci-cd-pipeline_20260910/index.md)*
+- [~] **Track: CI/CD Pipeline** *Link: [./tracks/ci-cd-pipeline_20260910/index.md](./tracks/ci-cd-pipeline_20260910/index.md)*
 
 ## Archive
 
