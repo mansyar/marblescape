@@ -42,7 +42,7 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
   - [x] Spec: **level 1 solvable offline** — enter level, place ramp, play, marble collected (badge persists)
 - [x] Task: Full regression gate — `pnpm check`, unit suite, existing dev-server e2e suite (10 tests) all green — `8fb224b`
 - [x] Task: Coverage check + commit + git note — `8fb224b`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint — [checkpoint: 8fb224b]
 
 ## Phase 4 — Track completion
 
