@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import RAPIER from "@dimforge/rapier3d-compat";
 import { impactParams, selectImpactSound } from "../audio/impact-sounds";
+import { playChime } from "../audio/chime";
 import { isSoundOn, setSoundOn } from "../audio/prefs";
 import { SoundManager } from "../audio/sound-manager";
 import {
@@ -14,6 +15,7 @@ import {
   type PlacedPiece,
 } from "../domain/board";
 import { getLevel } from "../domain/levels";
+import { markSolved } from "../domain/solve";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { rotate } from "../domain/pieces";
 import { PIECE_TYPES } from "../domain/pieces";
@@ -62,6 +64,9 @@ export class Game {
   /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
   private puzzle: PuzzleState | null = null;
   private sandboxBoard: BoardState | null = null;
+
+  /** Fired each time a marble lands in the goal cup while in level mode. */
+  onLevelSolved: ((levelId: number) => void) | null = null;
   private nextId = 1;
   private lastElapsed = -1;
   private sound: SoundManager | null = null;
@@ -130,6 +135,13 @@ export class Game {
       onCollected: (body) => {
         this.removeMarbleMesh(body);
         this.sound?.play("plonk", { rate: 1, volume: 0.9 });
+        if (this.puzzle) {
+          // Goal cup reached in level mode: persist the badge (first solve
+          // only), play the win chime, and let the UI pulse + show Home.
+          markSolved(localStorage, this.puzzle.level.id);
+          playChime(this.audioCtx);
+          this.onLevelSolved?.(this.puzzle.level.id);
+        }
       },
       onRescued: (body) => this.removeMarbleMesh(body),
     });

@@ -66,6 +66,40 @@ if (app) {
     });
     createHud(game, document.body, () => showLevelSelect(levelSelect));
 
+    // Post-solve overlay: ✓ pulse + big Home button on the first successful run.
+    const solvedOverlay = document.createElement("div");
+    solvedOverlay.dataset.testid = "solved-overlay";
+    solvedOverlay.style.cssText =
+      "position:fixed;inset:0;z-index:18;display:none;align-items:center;justify-content:center;flex-direction:column;gap:24px;background:rgba(20,30,40,0.55)";
+    const solvedCheck = document.createElement("div");
+    solvedCheck.textContent = "✓";
+    solvedCheck.style.cssText =
+      "width:112px;height:112px;border-radius:50%;background:#06d6a0;color:#fff;font-size:64px;font-weight:800;display:flex;align-items:center;justify-content:center;animation:ms-pop 0.5s ease-out;box-shadow:0 8px 24px rgba(6,214,160,0.6)";
+    const solvedHome = document.createElement("button");
+    solvedHome.textContent = "🏠";
+    solvedHome.setAttribute("aria-label", "Back to level select");
+    solvedHome.style.cssText =
+      "min-width:112px;min-height:112px;font-size:52px;border-radius:24px;border:3px solid #2c3e50;background:#073b4c;touch-action:manipulation";
+    const solvedLabel = document.createElement("div");
+    solvedLabel.textContent = "Level solved!";
+    solvedLabel.style.cssText = "color:#f8f3e9;font-size:28px;font-weight:700";
+    solvedOverlay.append(solvedCheck, solvedLabel, solvedHome);
+    document.body.appendChild(solvedOverlay);
+    const hideSolved = () => {
+      solvedOverlay.style.display = "none";
+    };
+    solvedHome.addEventListener("click", () => {
+      hideSolved();
+      showLevelSelect(levelSelect);
+    });
+    game.onLevelSolved = () => {
+      solvedOverlay.style.display = "flex";
+    };
+    const style = document.createElement("style");
+    style.textContent =
+      "@keyframes ms-pop{0%{transform:scale(0.4)}60%{transform:scale(1.15)}100%{transform:scale(1)}}";
+    document.head.appendChild(style);
+
     // Test hook for Playwright smoke/reliability runs.
     window.__marblescape = game;
 
