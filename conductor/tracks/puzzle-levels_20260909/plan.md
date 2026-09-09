@@ -38,8 +38,10 @@
 - [x] Task: Implement level select screen (`src/ui/level-select.ts`) — icon-only tiles ≥64px, ✓ badges — `7502676`
   - [x] Home button in HUD → level select; tile tap loads sandbox/level
   - [x] Portrait + landscape layout (responsive grid, full-screen overlay)
-- [ ] Task: Manual touch verification plan (Playwright touch emulation for taps/navigation)
-- [ ] Task: Coverage check + commit + git note
+- [x] Task: Manual touch verification plan (Playwright touch emulation for taps/navigation) — `85f3004`
+  - [x] Fix: pre-placed start chute at spawn cell in all 6 levels (user reported marble dropping to floor)
+  - [x] Verified: probe.spec.ts (touch viewport) — enterLevel(1), bridge gap, play → marble collected in cup
+- [x] Task: Coverage check + commit + git note — `91b923e`, `7502676`, `85f3004`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Solve Detection, Badges & Post-Solve Flow
