@@ -26,7 +26,7 @@
   - [x] Returning to sandbox restores prior sandbox board (puzzle state is isolated from sandbox board)
 - [x] Task: Extend `Game` with mode switching (sandbox | level(n)) wiring board/physics/render/palette — `2556c7d`
   - [x] Furniture flags through `board.ts`/`piece-view.ts` (non-interactive placement) — furniture renders via merged `boardFor`; Game-level guards make it non-interactive
-  - [ ] Palette filters to level pieces (visual rebuild in `main.ts` lands with Phase 3 navigation; `currentPalette()` API ready)
+  - [x] Palette filters to level pieces (visual rebuild in `main.ts` lands with Phase 3 navigation; `currentPalette()` API ready) — `7502676`
 - [x] Task: Coverage check + commit + git note — `338a17e` (coverage 91.5%/90.9%, note attached)
 - [x] Task: Phase Verification & Checkpoint — `[checkpoint: df4f152]`
 
@@ -67,3 +67,7 @@
   - [x] `pnpm check` clean (53 files), 203/203 unit, e2e 10/10 (6 levels + 2 smoke + reliability 20-drop + funnel probe)
   - [x] Coverage: levels 93.1% stmts/90% branch, puzzle 91.5%/88.5%, badges 100%, solve 100%
 - [x] Task: Phase Verification & Checkpoint — `[checkpoint: 0042d9f]`
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions — `2fe116e`
