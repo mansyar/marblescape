@@ -27,8 +27,8 @@
 - [x] Task: Extend `Game` with mode switching (sandbox | level(n)) wiring board/physics/render/palette — `2556c7d`
   - [x] Furniture flags through `board.ts`/`piece-view.ts` (non-interactive placement) — furniture renders via merged `boardFor`; Game-level guards make it non-interactive
   - [ ] Palette filters to level pieces (visual rebuild in `main.ts` lands with Phase 3 navigation; `currentPalette()` API ready)
-- [ ] Task: Coverage check + commit + git note
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Coverage check + commit + git note — `338a17e` (coverage 91.5%/90.9%, note attached)
+- [x] Task: Phase Verification & Checkpoint — `[checkpoint: df4f152]`
 
 ## Phase 3 — Level Select Screen & Navigation
 
