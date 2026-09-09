@@ -375,13 +375,13 @@ export const LEVELS: LevelDef[] = [
     fixed: [
       { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 1 },
-      { type: "curved", rotation: 2, x: 4, y: 3 },
-      { type: "straight", rotation: 0, x: 4, y: 4 },
+      { type: "straight", rotation: 0, x: 3, y: 2 },
+      { type: "curved", rotation: 2, x: 4, y: 4 },
       { type: "goal", rotation: 0, x: 4, y: 5 },
     ],
     gaps: [
-      { x: 3, y: 2, accepted: ["straight"] },
-      { x: 3, y: 3, accepted: ["curved"] },
+      { x: 3, y: 3, accepted: ["straight"] },
+      { x: 3, y: 4, accepted: ["curved"] },
     ],
     palette: ["straight", "curved"],
     spawn: { x: 3, y: 0 },
@@ -433,17 +433,17 @@ export const LEVELS: LevelDef[] = [
     fixed: [
       { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 2 },
-      { type: "curved", rotation: 1, x: 2, y: 3 },
-      { type: "goal", rotation: 0, x: 2, y: 5 },
+      { type: "curved", rotation: 2, x: 4, y: 4 },
+      { type: "goal", rotation: 0, x: 4, y: 5 },
     ],
     gaps: [
       { x: 3, y: 1, accepted: ["straight"] },
-      { x: 3, y: 3, accepted: ["curved"] },
-      { x: 2, y: 4, accepted: ["straight"] },
+      { x: 3, y: 3, accepted: ["funnel"] },
+      { x: 3, y: 4, accepted: ["curved"] },
     ],
     palette: ["straight", "curved", "funnel", "goal"],
     spawn: { x: 3, y: 0 },
-    goal: { x: 2, y: 5 },
+    goal: { x: 4, y: 5 },
   },
 ];
 

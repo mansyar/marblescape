@@ -109,22 +109,40 @@ describe("rotate", () => {
 
 describe("move", () => {
   it("relocates a placement into another valid gap and rejects invalid targets", () => {
-    // Level 6: straight gaps at (3,1) and (2,4); curved-only gap at (3,3).
-    const lvl = level(6);
+    // Custom level with two straight gaps (so a move is possible) + a curved-only gap.
+    const lvl: LevelDef = {
+      id: 6,
+      name: "Custom",
+      boardWidth: 8,
+      boardHeight: 6,
+      fixed: [
+        { type: "straight", rotation: 0, x: 3, y: 0 },
+        { type: "straight", rotation: 0, x: 3, y: 2 },
+        { type: "goal", rotation: 0, x: 3, y: 5 },
+      ],
+      gaps: [
+        { x: 3, y: 1, accepted: ["straight"] },
+        { x: 3, y: 3, accepted: ["straight"] },
+        { x: 4, y: 3, accepted: ["curved"] },
+      ],
+      palette: ["straight", "curved"],
+      spawn: { x: 3, y: 0 },
+      goal: { x: 3, y: 5 },
+    };
     const p = place(createPuzzle(lvl), "straight", 3, 1);
-    const moved = move(p, 3, 1, 2, 4);
+    const moved = move(p, 3, 1, 3, 3);
     expect(placementAt(moved, 3, 1)).toBeNull();
-    expect(placementAt(moved, 2, 4)?.type).toBe("straight");
-    expect(move(moved, 2, 4, 4, 4)).toBe(moved); // not a gap
-    expect(move(moved, 2, 4, 3, 2)).toBe(moved); // furniture
-    expect(move(moved, 2, 4, 3, 3)).toBe(moved); // gap accepts curved only
+    expect(placementAt(moved, 3, 3)?.type).toBe("straight");
+    expect(move(moved, 3, 3, 4, 4)).toBe(moved); // not a gap
+    expect(move(moved, 3, 3, 3, 2)).toBe(moved); // furniture
+    expect(move(moved, 3, 3, 4, 3)).toBe(moved); // gap accepts curved only
     // Moving back into the now-free original gap is valid.
-    const back = move(moved, 2, 4, 3, 1);
-    expect(placementAt(back, 2, 4)).toBeNull();
+    const back = move(moved, 3, 3, 3, 1);
+    expect(placementAt(back, 3, 3)).toBeNull();
     expect(placementAt(back, 3, 1)?.type).toBe("straight");
     // Occupied targets are rejected.
-    const both = place(place(createPuzzle(lvl), "straight", 3, 1), "straight", 2, 4);
-    expect(move(both, 3, 1, 2, 4)).toBe(both);
+    const both = place(place(createPuzzle(lvl), "straight", 3, 1), "straight", 3, 3);
+    expect(move(both, 3, 1, 3, 3)).toBe(both);
   });
 });
 
