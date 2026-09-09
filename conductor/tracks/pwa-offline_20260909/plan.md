@@ -5,11 +5,11 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
 ## Phase 1 — Manifest module, icons & PWA config
 
 - [ ] Task: Document PWA wiring in `conductor/tech-stack.md` (vite-plugin-pwa moved from "listed, not wired" to "wired: generateSW + prompt registration") before implementation
-- [ ] Task: Write failing tests for manifest validation module
-  - [ ] `src/domain/manifest.test.ts`: accepts a valid manifest (name, short_name, id, start_url `/`, display `standalone`, theme_color, background_color, icons incl. 192×192, 512×512, and a `purpose: "maskable"` 512 icon)
-  - [ ] Rejects missing/empty `name`, missing `short_name`, non-`standalone` display, missing start_url, missing theme/background color, missing icons, icons without a 192 or a 512 entry, missing maskable icon
-  - [ ] Red confirmed (module missing → test file fails to load)
-- [ ] Task: Implement `src/domain/manifest.ts` (validateManifest returning `string[]` errors, exported `REQUIRED_ICON_SIZES`) — Green, coverage > 80%
+- [x] Task: Write failing tests for manifest validation module
+  - [x] `src/domain/manifest.test.ts`: accepts a valid manifest (name, short_name, id, start_url `/`, display `standalone`, theme_color, background_color, icons incl. 192×192, 512×512, and a `purpose: "maskable"` 512 icon)
+  - [x] Rejects missing/empty `name`, missing `short_name`, non-`standalone` display, missing start_url, missing theme/background color, missing icons, icons without a 192 or a 512 entry, missing maskable icon
+  - [x] Red confirmed (module missing → test file fails to load)
+- [x] Task: Implement `src/domain/manifest.ts` (validateManifest returning `string[]` errors, exported `REQUIRED_ICON_SIZES`) — Green, coverage > 80% — `7743ddc`
 - [ ] Task: Generate app icons
   - [ ] `scripts/gen-icons.mjs`: Playwright-driven render of the favicon brand motif (sky-blue rounded square + orange marble) at 192/512/512-maskable/180 px → `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`
   - [ ] Run once, verify PNG dimensions, check in
