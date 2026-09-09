@@ -46,6 +46,6 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
 
 ## Phase 4 — Track completion
 
-- [ ] Task: Mark track complete — registry `[x]`, metadata `completed`
+- [x] Task: Mark track complete — registry `[x]`, metadata `completed` — `cea48d2`
 - [ ] Task: Final full-suite certification + git note
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
