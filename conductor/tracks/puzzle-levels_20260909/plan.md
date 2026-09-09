@@ -46,13 +46,13 @@
 
 ## Phase 4 — Solve Detection, Badges & Post-Solve Flow
 
-- [ ] Task: Write failing tests for solve detection & badge lifecycle
-  - [ ] Marble reaching goal cup in level mode emits solve event
-  - [ ] Badge set once per level; persists across reload
-  - [ ] Chime + pulse fire per successful run; badge write only on first solve
-  - [ ] Home button visibility after first solve; Play remains usable
-- [ ] Task: Implement solve wiring in `Game` (goal-cup contact → event → `ui` effects) + badge store
-- [ ] Task: Coverage check + commit + git note
+- [x] Task: Write failing tests for solve detection & badge lifecycle — `cc2c9cd`
+  - [x] Marble reaching goal cup in level mode emits solve event
+  - [x] Badge set once per level; persists across reload
+  - [x] Chime + pulse fire per successful run; badge write only on first solve
+  - [x] Home button visibility after first solve; Play remains usable
+- [x] Task: Implement solve wiring in `Game` (goal-cup contact → event → `ui` effects) + badge store — `cc2c9cd`
+- [x] Task: Coverage check + commit + git note — `cc2c9cd`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 5 — E2E Verification, Regression & Track Completion
