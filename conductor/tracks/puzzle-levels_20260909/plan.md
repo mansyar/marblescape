@@ -57,7 +57,13 @@
 
 ## Phase 5 — E2E Verification, Regression & Track Completion
 
-- [ ] Task: Playwright E2E: navigate level select → solve each of 6 levels → ✓ badges asserted
-- [ ] Task: Sandbox regression gate: existing smoke + reliability specs pass unchanged
-- [ ] Task: Full suite: `pnpm check` + `pnpm test` + coverage report
+- [x] Task: Playwright E2E: navigate level select → solve each of 6 levels → ✓ badges asserted — `a96916b`
+  - [x] `tests/levels.spec.ts`: real UI navigation (HUD home → tile → placements → play), badge + overlay + ✓ chip asserted per level
+  - [x] `tests/probe.spec.ts`: 8-run funnel-level reliability probe
+  - [x] `fix(levels) e96dff4`: L3/L6 redesigned (curved gaps at row 4, 4-piece run-up) after curve stalls
+  - [x] `fix(physics) 5022d8f`: flat straight colliders remove 0.086 joint walls (marble jams); trough-center spawn; marbles never sleep
+- [x] Task: Sandbox regression gate: existing smoke + reliability specs pass unchanged — `a96916b`
+- [x] Task: Full suite: `pnpm check` + `pnpm test` + coverage report — `5022d8f`
+  - [x] `pnpm check` clean (53 files), 203/203 unit, e2e 10/10 (6 levels + 2 smoke + reliability 20-drop + funnel probe)
+  - [x] Coverage: levels 93.1% stmts/90% branch, puzzle 91.5%/88.5%, badges 100%, solve 100%
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
