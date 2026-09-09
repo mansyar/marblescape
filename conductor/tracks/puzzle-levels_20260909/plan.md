@@ -42,7 +42,7 @@
   - [x] Fix: pre-placed start chute at spawn cell in all 6 levels (user reported marble dropping to floor)
   - [x] Verified: probe.spec.ts (touch viewport) — enterLevel(1), bridge gap, play → marble collected in cup
 - [x] Task: Coverage check + commit + git note — `91b923e`, `7502676`, `85f3004`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint — `[checkpoint: 8bb6e21]`
 
 ## Phase 4 — Solve Detection, Badges & Post-Solve Flow
 
