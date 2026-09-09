@@ -2,4 +2,4 @@
 
 ## Tracks
 
-- [x] **Track: Puzzle Mode — 6 Levels** *Link: [./tracks/puzzle-levels_20260909/index.md](./tracks/puzzle-levels_20260909/index.md)* *(completed — merged-ready branch `track/puzzle-mode-6-levels`)*
+*No active tracks. All completed tracks live in [./archive/](./archive/).*
