@@ -22,14 +22,14 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
 
 ## Phase 2 — Update banner
 
-- [ ] Task: Write failing tests for update-banner state
-  - [ ] `src/domain/pwa-update.test.ts`: state machine `'idle' | 'ready' | 'activating'` — onNeedRefresh transitions idle→ready; update/dismiss transitions ready→activating/idle; repeat needRefresh while ready stays ready
-  - [ ] Red confirmed
-- [ ] Task: Implement `src/domain/pwa-update.ts` (pure reducer + `createUpdateState()`) — Green, coverage > 80%
-- [ ] Task: Implement `src/ui/update-banner.ts` + wire registration in `src/main.ts`
-  - [ ] `registerSW` from `virtual:pwa-register` with `onNeedRefresh` → show banner ("New version ready — Update", cozy HUD style, `data-testid="update-banner"`); tap → `updateSW(true)`
-  - [ ] Banner is non-blocking (fixed top, dismissible by tapping Update or X), never interrupts play
-- [ ] Task: Coverage check + commit + git note
+- [x] Task: Write failing tests for update-banner state — `90daae9`
+  - [x] `src/domain/pwa-update.test.ts`: state machine `'idle' | 'ready' | 'activating'` — onNeedRefresh transitions idle→ready; update/dismiss transitions ready→activating/idle; repeat needRefresh while ready stays ready
+  - [x] Red confirmed
+- [x] Task: Implement `src/domain/pwa-update.ts` (pure reducer + `createUpdateState()`) — Green, coverage > 80% — `90daae9`
+- [x] Task: Implement `src/ui/update-banner.ts` + wire registration in `src/main.ts` — `8b47315`
+  - [x] `registerSW` from `virtual:pwa-register` with `onNeedRefresh` → show banner ("New version ready — Update", cozy HUD style, `data-testid="update-banner"`); tap → `updateSW(true)`
+  - [x] Banner is non-blocking (fixed top, dismissible by tapping Update or X), never interrupts play
+- [x] Task: Coverage check + commit + git note — `90daae9`, `8b47315`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — PWA e2e verification & regression
