@@ -23,7 +23,7 @@ function level(overrides: Partial<LevelDef>): LevelDef {
     name: "Test",
     boardWidth: 8,
     boardHeight: 6,
-    fixed: [fixed("straight", 3, 1), fixed("goal", 3, 5)],
+    fixed: [fixed("straight", 3, 0), fixed("straight", 3, 1), fixed("goal", 3, 5)],
     gaps: [gap(3, 2, ["straight"])],
     palette: ["straight"],
     spawn: { x: 3, y: 0 },
@@ -101,7 +101,7 @@ describe("level definition schema", () => {
 
   it("accepts a goal reached via a gap that accepts the goal piece", () => {
     const lvl = level({
-      fixed: [fixed("straight", 3, 1)],
+      fixed: [fixed("straight", 3, 0), fixed("straight", 3, 1)],
       gaps: [gap(3, 2, ["straight"]), gap(3, 5, ["goal"])],
       palette: ["straight", "goal"],
       goal: { x: 3, y: 5 },
@@ -111,14 +111,39 @@ describe("level definition schema", () => {
 
   it("rejects more than one goal piece on the board", () => {
     const twoGoals = level({
-      fixed: [fixed("straight", 3, 1), fixed("goal", 3, 5), fixed("goal", 4, 5)],
+      fixed: [
+        fixed("straight", 3, 0),
+        fixed("straight", 3, 1),
+        fixed("goal", 3, 5),
+        fixed("goal", 4, 5),
+      ],
       goal: { x: 3, y: 5 },
     });
     expect(() => validateLevel(twoGoals)).toThrow(/goal/i);
   });
 
-  it("rejects a spawn cell occupied by a fixed piece", () => {
-    expect(() => validateLevel(level({ spawn: { x: 3, y: 1 } }))).toThrow(/spawn/i);
+  it("rejects a level missing its start chute at the spawn cell", () => {
+    expect(() =>
+      validateLevel(level({ fixed: [fixed("straight", 3, 1), fixed("goal", 3, 5)] })),
+    ).toThrow(/spawn|chute/i);
+  });
+
+  it("rejects a non-straight start chute", () => {
+    expect(() =>
+      validateLevel(
+        level({ fixed: [fixed("curved", 3, 0), fixed("straight", 3, 1), fixed("goal", 3, 5)] }),
+      ),
+    ).toThrow(/chute/i);
+  });
+
+  it("rejects a rotated start chute", () => {
+    expect(() =>
+      validateLevel(
+        level({
+          fixed: [fixed("straight", 3, 0, 1), fixed("straight", 3, 1), fixed("goal", 3, 5)],
+        }),
+      ),
+    ).toThrow(/chute/i);
   });
 });
 
@@ -155,7 +180,7 @@ describe("solvability", () => {
 
   it("rejects a route with a missing connection (gap too far from the route)", () => {
     const broken = level({
-      fixed: [fixed("straight", 3, 1), fixed("goal", 5, 5)],
+      fixed: [fixed("straight", 3, 0), fixed("straight", 3, 1), fixed("goal", 5, 5)],
       gaps: [gap(3, 2, ["straight"])],
       goal: { x: 5, y: 5 },
     });
@@ -172,7 +197,12 @@ describe("solvability", () => {
     // Straight at (3,1) opens north+south, so it cannot connect east to a route
     // that only approaches from the west.
     const blocked = level({
-      fixed: [fixed("straight", 3, 1), fixed("straight", 3, 3), fixed("goal", 3, 5)],
+      fixed: [
+        fixed("straight", 0, 0),
+        fixed("straight", 3, 1),
+        fixed("straight", 3, 3),
+        fixed("goal", 3, 5),
+      ],
       gaps: [gap(3, 2, ["straight"])],
       spawn: { x: 0, y: 0 },
       goal: { x: 3, y: 5 },
@@ -185,7 +215,7 @@ describe("solvability", () => {
     // Gap at (3,3) needs north (from (3,2)) and west (to the goal at (2,3)):
     // curved rotation 3 opens west+north.
     const lvl = level({
-      fixed: [fixed("straight", 3, 1), fixed("goal", 2, 3)],
+      fixed: [fixed("straight", 3, 0), fixed("straight", 3, 1), fixed("goal", 2, 3)],
       gaps: [gap(3, 2, ["straight"]), gap(3, 3, ["curved"])],
       palette: ["straight", "curved"],
       goal: { x: 2, y: 3 },
@@ -195,7 +225,12 @@ describe("solvability", () => {
 
   it("treats the goal cell as open from any side (a cup catches marbles)", () => {
     const lvl = level({
-      fixed: [fixed("straight", 3, 1), fixed("straight", 3, 3), fixed("goal", 3, 5)],
+      fixed: [
+        fixed("straight", 3, 0),
+        fixed("straight", 3, 1),
+        fixed("straight", 3, 3),
+        fixed("goal", 3, 5),
+      ],
       gaps: [gap(3, 2, ["straight"]), gap(3, 4, ["funnel"])],
       palette: ["straight", "funnel"],
       goal: { x: 3, y: 5 },

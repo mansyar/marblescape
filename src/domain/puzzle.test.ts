@@ -148,9 +148,9 @@ describe("boardFor", () => {
     const board = boardFor(p);
     expect(board.width).toBe(8);
     expect(board.height).toBe(6);
-    expect(board.pieces).toHaveLength(6); // 4 fixed + 2 placed
+    expect(board.pieces).toHaveLength(7); // 5 fixed (incl. start chute) + 2 placed
     const fixed = board.pieces.filter((piece) => piece.id.startsWith("f"));
-    expect(fixed).toHaveLength(4);
+    expect(fixed).toHaveLength(5);
     expect(board.pieces.some((piece) => piece.type === "goal")).toBe(true);
   });
 
@@ -168,7 +168,7 @@ describe("boardFor", () => {
   it("assigns stable ids to furniture pieces", () => {
     const board = boardFor(createPuzzle(level(1)));
     const fixed = board.pieces.filter((piece) => piece.id.startsWith("f"));
-    expect(fixed.map((piece) => piece.id)).toEqual(["f3,1", "f3,3", "f3,4", "f3,5"]);
+    expect(fixed.map((piece) => piece.id)).toEqual(["f3,0", "f3,1", "f3,3", "f3,4", "f3,5"]);
   });
 });
 

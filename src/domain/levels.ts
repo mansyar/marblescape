@@ -133,12 +133,17 @@ export function validateLevel(level: LevelDef): void {
     throw new Error(`Level must contain at most one goal piece, found ${goalPieces}`);
   }
 
-  // Spawn must be free and on the board.
-  if (!inside(level.spawn.x, level.spawn.y)) {
-    throw new Error(`Spawn cell outside board at (${level.spawn.x}, ${level.spawn.y})`);
+  // Start chute: exactly one fixed straight (rotation 0) at the spawn cell.
+  const chute = level.fixed.filter((p) => p.x === level.spawn.x && p.y === level.spawn.y);
+  if (chute.length !== 1) {
+    throw new Error(
+      `Spawn cell (${level.spawn.x}, ${level.spawn.y}) must hold exactly one start chute piece`,
+    );
   }
-  if (occupied.has(key(level.spawn.x, level.spawn.y))) {
-    throw new Error(`Spawn cell occupied at (${level.spawn.x}, ${level.spawn.y})`);
+  if (chute[0].type !== "straight" || chute[0].rotation !== 0) {
+    throw new Error(
+      `Start chute at (${level.spawn.x}, ${level.spawn.y}) must be a straight with rotation 0`,
+    );
   }
 
   // Goal cell must be inside and hold exactly one goal piece (fixed or gap).
@@ -222,15 +227,14 @@ export function isLevelSolvable(level: LevelDef): boolean {
     gapAt.set(key(gap.x, gap.y), gap);
   }
 
-  const isSpawn = (x: number, y: number) => x === level.spawn.x && y === level.spawn.y;
   const isGoal = (x: number, y: number) => x === level.goal.x && y === level.goal.y;
   const isNode = (x: number, y: number) =>
-    isSpawn(x, y) || isGoal(x, y) || fixedAt.has(key(x, y)) || gapAt.has(key(x, y));
+    isGoal(x, y) || fixedAt.has(key(x, y)) || gapAt.has(key(x, y));
 
   /** Can a marble exit cell (x,y) toward `side`, or enter it from `side`? */
   const acceptsFrom = (x: number, y: number, side: Side): boolean => {
-    if (isSpawn(x, y) || isGoal(x, y)) {
-      return true; // chute and cup are open on every side
+    if (isGoal(x, y)) {
+      return true; // the cup catches marbles from any side
     }
     const fixed = fixedAt.get(key(x, y));
     if (fixed) {
@@ -332,6 +336,7 @@ export const LEVELS: LevelDef[] = [
     boardWidth: 8,
     boardHeight: 6,
     fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 1 },
       { type: "straight", rotation: 0, x: 3, y: 3 },
       { type: "straight", rotation: 0, x: 3, y: 4 },
@@ -348,6 +353,7 @@ export const LEVELS: LevelDef[] = [
     boardWidth: 8,
     boardHeight: 6,
     fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 1 },
       { type: "straight", rotation: 0, x: 3, y: 3 },
       { type: "curved", rotation: 2, x: 4, y: 4 },
@@ -367,6 +373,7 @@ export const LEVELS: LevelDef[] = [
     boardWidth: 8,
     boardHeight: 6,
     fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 1 },
       { type: "curved", rotation: 2, x: 4, y: 3 },
       { type: "straight", rotation: 0, x: 4, y: 4 },
@@ -386,6 +393,7 @@ export const LEVELS: LevelDef[] = [
     boardWidth: 8,
     boardHeight: 6,
     fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 1 },
       { type: "straight", rotation: 0, x: 3, y: 3 },
       { type: "straight", rotation: 0, x: 3, y: 4 },
@@ -404,6 +412,7 @@ export const LEVELS: LevelDef[] = [
     boardWidth: 8,
     boardHeight: 6,
     fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 1 },
       { type: "straight", rotation: 0, x: 3, y: 3 },
       { type: "goal", rotation: 0, x: 3, y: 5 },
@@ -422,6 +431,7 @@ export const LEVELS: LevelDef[] = [
     boardWidth: 8,
     boardHeight: 6,
     fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
       { type: "straight", rotation: 0, x: 3, y: 2 },
       { type: "curved", rotation: 1, x: 2, y: 3 },
       { type: "goal", rotation: 0, x: 2, y: 5 },
