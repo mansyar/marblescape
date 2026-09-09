@@ -49,3 +49,7 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
 - [x] Task: Mark track complete — registry `[x]`, metadata `completed` — `cea48d2`
 - [x] Task: Final full-suite certification + git note — `cea48d2`
 - [x] Task: Phase Verification & Checkpoint — [checkpoint: cea48d2]
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions `5bb264d`
