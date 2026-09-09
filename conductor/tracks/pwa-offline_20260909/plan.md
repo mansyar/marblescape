@@ -10,13 +10,13 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
   - [x] Rejects missing/empty `name`, missing `short_name`, non-`standalone` display, missing start_url, missing theme/background color, missing icons, icons without a 192 or a 512 entry, missing maskable icon
   - [x] Red confirmed (module missing → test file fails to load)
 - [x] Task: Implement `src/domain/manifest.ts` (validateManifest returning `string[]` errors, exported `REQUIRED_ICON_SIZES`) — Green, coverage > 80% — `7743ddc`
-- [ ] Task: Generate app icons
-  - [ ] `scripts/gen-icons.mjs`: Playwright-driven render of the favicon brand motif (sky-blue rounded square + orange marble) at 192/512/512-maskable/180 px → `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`
-  - [ ] Run once, verify PNG dimensions, check in
-- [ ] Task: Wire `vite-plugin-pwa` into `vite.config.ts`
-  - [ ] `vitePWA({ registerType: 'prompt', includeAssets, workbox: { globPatterns incl. `**/*.glb`, `**/*.ogg`, navigateFallback: 'index.html' }, manifest: { …FR1 fields, icons } })`
-  - [ ] `index.html`: manifest link + apple-touch-icon link added (injected/static)
-- [ ] Task: Build & preview smoke — `pnpm build` emits `dist/manifest.webmanifest`, `dist/sw.js`, precached assets; `pnpm preview` serves them; `pnpm check` clean
+- [x] Task: Generate app icons — `241fb64`
+  - [x] `scripts/gen-icons.mjs`: Playwright-driven render of the favicon brand motif (sky-blue rounded square + orange marble) at 192/512/512-maskable/180 px → `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`
+  - [x] Run once, verify PNG dimensions, check in
+- [x] Task: Wire `vite-plugin-pwa` into `vite.config.ts` — `5d29767`
+  - [x] `vitePWA({ registerType: 'prompt', includeAssets, workbox: { globPatterns incl. `**/*.glb`, `**/*.ogg`, navigateFallback: 'index.html' }, manifest: { …FR1 fields, icons } })`
+  - [x] `index.html`: apple-touch-icon link added (manifest link left to plugin injection; plugin installed — was listed in tech-stack but missing from package.json)
+- [x] Task: Build & preview smoke — `pnpm build` emits `dist/manifest.webmanifest`, `dist/sw.js`, precached assets; `pnpm preview` serves them; `pnpm check` clean — `5d29767`
 - [ ] Task: Coverage check + commit + git note (incl. tech-stack.md update)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
