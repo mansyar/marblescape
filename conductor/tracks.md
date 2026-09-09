@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [ ] **Track: PWA & Offline Install** *Link: [./tracks/pwa-offline_20260909/index.md](./tracks/pwa-offline_20260909/index.md)*
+- [~] **Track: PWA & Offline Install** *Link: [./tracks/pwa-offline_20260909/index.md](./tracks/pwa-offline_20260909/index.md)*
 
 ## Archive
 
