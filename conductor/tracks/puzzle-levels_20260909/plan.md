@@ -32,12 +32,12 @@
 
 ## Phase 3 — Level Select Screen & Navigation
 
-- [ ] Task: Write failing tests for level-select state/persistence helpers
-  - [ ] 7 tiles (sandbox + 6 levels), nothing locked
-  - [ ] ✓ badge read/write in localStorage (`badges.test.ts` style per existing `prefs.test.ts`)
-- [ ] Task: Implement level select screen (`src/ui/level-select.ts`) — icon-only tiles ≥64px, ✓ badges
-  - [ ] Home button in HUD → level select; tile tap loads sandbox/level
-  - [ ] Portrait + landscape layout (reuse `framing.ts` breakpoints)
+- [x] Task: Write failing tests for level-select state/persistence helpers — `91b923e`
+  - [x] 7 tiles (sandbox + 6 levels), nothing locked
+  - [x] ✓ badge read/write in localStorage (`badges.test.ts` style per existing `prefs.test.ts`)
+- [x] Task: Implement level select screen (`src/ui/level-select.ts`) — icon-only tiles ≥64px, ✓ badges — `7502676`
+  - [x] Home button in HUD → level select; tile tap loads sandbox/level
+  - [x] Portrait + landscape layout (responsive grid, full-screen overlay)
 - [ ] Task: Manual touch verification plan (Playwright touch emulation for taps/navigation)
 - [ ] Task: Coverage check + commit + git note
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
