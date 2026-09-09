@@ -4,7 +4,7 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
 
 ## Phase 1 — Manifest module, icons & PWA config
 
-- [ ] Task: Document PWA wiring in `conductor/tech-stack.md` (vite-plugin-pwa moved from "listed, not wired" to "wired: generateSW + prompt registration") before implementation
+- [x] Task: Document PWA wiring in `conductor/tech-stack.md` (vite-plugin-pwa moved from "listed, not wired" to "wired: generateSW + prompt registration") before implementation — `730b594`
 - [x] Task: Write failing tests for manifest validation module
   - [x] `src/domain/manifest.test.ts`: accepts a valid manifest (name, short_name, id, start_url `/`, display `standalone`, theme_color, background_color, icons incl. 192×192, 512×512, and a `purpose: "maskable"` 512 icon)
   - [x] Rejects missing/empty `name`, missing `short_name`, non-`standalone` display, missing start_url, missing theme/background color, missing icons, icons without a 192 or a 512 entry, missing maskable icon
@@ -17,8 +17,8 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
   - [x] `vitePWA({ registerType: 'prompt', includeAssets, workbox: { globPatterns incl. `**/*.glb`, `**/*.ogg`, navigateFallback: 'index.html' }, manifest: { …FR1 fields, icons } })`
   - [x] `index.html`: apple-touch-icon link added (manifest link left to plugin injection; plugin installed — was listed in tech-stack but missing from package.json)
 - [x] Task: Build & preview smoke — `pnpm build` emits `dist/manifest.webmanifest`, `dist/sw.js`, precached assets; `pnpm preview` serves them; `pnpm check` clean — `5d29767`
-- [ ] Task: Coverage check + commit + git note (incl. tech-stack.md update)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Coverage check + commit + git note (incl. tech-stack.md update) — `7743ddc`, `730b594`
+- [x] Task: Phase Verification & Checkpoint — [checkpoint: a28494c]
 
 ## Phase 2 — Update banner
 
