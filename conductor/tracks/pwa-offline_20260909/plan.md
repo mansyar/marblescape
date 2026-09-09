@@ -34,14 +34,14 @@ Branch: `track/pwa-offline-install` (from `master` @ merge of puzzle track)
 
 ## Phase 3 — PWA e2e verification & regression
 
-- [ ] Task: Write `tests/pwa.spec.ts` (production-build spec) + `playwright.pwa.config.ts`
-  - [ ] Config: `webServer: pnpm build && pnpm preview --port 4173 --strictPort`, testMatch `tests/pwa.spec.ts`, excluded from the main dev-server config
-  - [ ] Spec: manifest served at `/manifest.webmanifest` and passes `validateManifest` (unit module reused in e2e); `index.html` contains manifest + apple-touch-icon links; `sw.js` served with JS content type
-  - [ ] Spec: SW registration becomes active and precache completes (first online load)
-  - [ ] Spec: `context.setOffline(true)` → reload → full app boots (canvas + HUD visible, `window.__marblescape` present)
-  - [ ] Spec: **level 1 solvable offline** — enter level, place ramp, play, marble collected (badge persists)
-- [ ] Task: Full regression gate — `pnpm check`, unit suite, existing dev-server e2e suite (10 tests) all green
-- [ ] Task: Coverage check + commit + git note
+- [x] Task: Write `tests/pwa.spec.ts` (production-build spec) + `playwright.pwa.config.ts` — `8fb224b`
+  - [x] Config: `webServer: pnpm build && pnpm preview --port 4173 --strictPort`, testMatch `tests/pwa.spec.ts`, excluded from the main dev-server config
+  - [x] Spec: manifest served at `/manifest.webmanifest` and passes `validateManifest` (unit module reused in e2e); `index.html` contains manifest + apple-touch-icon links; `sw.js` served with JS content type
+  - [x] Spec: SW registration becomes active and precache completes (first online load)
+  - [x] Spec: `context.setOffline(true)` → reload → full app boots (canvas + HUD visible, `window.__marblescape` present)
+  - [x] Spec: **level 1 solvable offline** — enter level, place ramp, play, marble collected (badge persists)
+- [x] Task: Full regression gate — `pnpm check`, unit suite, existing dev-server e2e suite (10 tests) all green — `8fb224b`
+- [x] Task: Coverage check + commit + git note — `8fb224b`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Track completion
