@@ -2,6 +2,8 @@
 
 ## Tracks
 
+- [ ] **Track: CI/CD Pipeline** *Link: [./tracks/ci-cd-pipeline_20260910/index.md](./tracks/ci-cd-pipeline_20260910/index.md)*
+
 ## Archive
 
 - [x] **Track: Puzzle Mode — 6 Levels** *Link: [./archive/puzzle-levels_20260909/index.md](./archive/puzzle-levels_20260909/index.md)* *(completed — merged to `master` @ `9581f51`)*
