@@ -15,7 +15,7 @@
   - [x] Unsolvable fixtures rejected (missing connection, wrong piece available)
 - [x] Task: Implement solvability check (mouth-graph traversal over CONNECTIONS + gap candidates) — `0273fa3`
 - [x] Task: Coverage check (>80% on new modules) + commit + git note — `0273fa3`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint — `[checkpoint: 9ca2c6b]`
 
 ## Phase 2 — Puzzle Mode State & Game Integration
 
