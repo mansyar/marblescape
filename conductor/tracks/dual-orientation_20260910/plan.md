@@ -45,6 +45,10 @@
 - [x] Task: Push branch, open PR, verify CI runs the full matrix green (64/64, check, unit ≥223) — PR #2, CI Verify pass 3m56s (80 runs, 2 landscape-only skips)
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) — `[checkpoint: cbe3d47]`
 
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions `c0ac2be`
+
 ## Phase 4 — Track completion
 
 - [x] Task: Mark track complete — registry `[x]`, metadata.json `completed` — `c2ec3f3`
