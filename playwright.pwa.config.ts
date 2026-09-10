@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
 // in `pnpm build` output), served by `pnpm preview`. The dev-server suite
 // (playwright.config.ts) remains for local development only.
 //
-// Every spec runs in all four viewports (16 specs × 4 projects = 64 runs):
+// Every spec runs in all four viewports (20 specs × 4 projects = 80 runs):
 // portrait/landscape phones and iPads cover the dual-orientation matrix.
 export default defineConfig({
   testDir: "tests",
