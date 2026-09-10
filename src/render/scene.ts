@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { addLighting, buildBoard } from "./board";
 import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./framing";
 import { registerViewportResize } from "./resize";
-import { layoutMode } from "../ui/layout";
+import { cameraReservation } from "../ui/layout";
 
 /**
  * Boots the fixed-camera diorama: renderer, perspective camera and a
@@ -42,7 +42,7 @@ export function startRenderer(container: HTMLElement): {
     const height = container.clientHeight || 1;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    const reserved = layoutMode(width, height).reservedWidth;
+    const reserved = cameraReservation(width, height);
     const framing = computeCameraFraming(
       camera.aspect,
       BOARD_COLS,

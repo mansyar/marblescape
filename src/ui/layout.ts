@@ -21,3 +21,8 @@ export function layoutMode(width: number, height: number): ViewportLayout {
     reservedWidth: mode === "landscape" ? LANDSCAPE_RAIL_FRACTION : 0,
   };
 }
+
+/** Reserved viewport-width fraction the camera must avoid (rail in landscape). */
+export function cameraReservation(width: number, height: number): number {
+  return layoutMode(width, height).reservedWidth;
+}

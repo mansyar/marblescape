@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LANDSCAPE_RAIL_FRACTION, layoutMode } from "./layout";
+import { LANDSCAPE_RAIL_FRACTION, cameraReservation, layoutMode } from "./layout";
 
 describe("layoutMode", () => {
   it("classifies portrait phones as portrait with no rail reservation", () => {
@@ -32,5 +32,15 @@ describe("layoutMode", () => {
   it("keeps the rail fraction a strict minority of the viewport width", () => {
     expect(LANDSCAPE_RAIL_FRACTION).toBeGreaterThan(0);
     expect(LANDSCAPE_RAIL_FRACTION).toBeLessThan(0.5);
+  });
+});
+
+describe("cameraReservation", () => {
+  it("passes the rail reservation to framing in landscape", () => {
+    expect(cameraReservation(844, 390)).toBe(LANDSCAPE_RAIL_FRACTION);
+  });
+
+  it("passes no reservation to framing in portrait", () => {
+    expect(cameraReservation(390, 844)).toBe(0);
   });
 });
