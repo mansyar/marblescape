@@ -61,11 +61,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 4 — Sorting levels: solve flow & visible progress (TDD)
 
-- [~] Task: Write failing tests for per-color solve accounting (`src/game/game.ts`, `src/domain/solve.ts`)
+- [x] Task: Write failing tests for per-color solve accounting (`src/game/game.ts`, `src/domain/solve.ts`) [fd83687]
   - [ ] Collected counts per color vs script; solved when all met → existing chime/sparkle/confetti/overlay + ✓ badge
   - [ ] Lost marble: next Play drops the first unmet color; partial progress persists across replays within the level
   - [ ] Collected marbles rest visibly in their cups (non-physics trophy meshes, cleared on reset/exit)
-- [ ] Task: Implement solve accounting + trophy cups to green
+- [x] Task: Implement solve accounting + trophy cups to green [fd83687]
 - [ ] Task: Write failing tests + wire levels 7–9 into level select (`src/ui/level-select.ts`); badges for 7–9 refresh correctly
 - [ ] Task: e2e `tests/e2e/levels.spec.ts`: scripted solve of L7; smoke-pass L8/L9; preview recovery after a wandered marble; mismatches never fail
 - [ ] Task: Manual feel pass (portrait + landscape): lid readability, cycle affordance, color clarity (incl. color-blind spot check)
