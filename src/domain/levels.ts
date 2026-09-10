@@ -464,7 +464,7 @@ function hasRoute(level: LevelDef, target: { x: number; y: number }): boolean {
   return true;
 }
 
-// --- The six shipped levels ---
+// --- The nine shipped levels ---
 // Board is 8 cols x 6 rows; rows run north (0) to south (5); the tilted table
 // drains south, so routes always flow north → south toward the cup.
 
@@ -583,6 +583,74 @@ export const LEVELS: LevelDef[] = [
     palette: ["straight", "curved", "funnel", "goal"],
     spawn: { x: 3, y: 0 },
     goal: { x: 4, y: 5 },
+  },
+  {
+    id: 7,
+    name: "Two Colors",
+    boardWidth: 8,
+    boardHeight: 6,
+    fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
+      { type: "straight", rotation: 0, x: 3, y: 1 },
+      { type: "straight", rotation: 0, x: 3, y: 3 },
+      { type: "straight", rotation: 0, x: 3, y: 4 },
+      { type: "curved", rotation: 2, x: 4, y: 2 },
+      { type: "straight", rotation: 0, x: 4, y: 3 },
+      { type: "straight", rotation: 0, x: 4, y: 4 },
+      { type: "goal", rotation: 0, x: 3, y: 5, color: "raspberry" },
+      { type: "goal", rotation: 0, x: 4, y: 5, color: "mint" },
+    ],
+    gaps: [{ x: 3, y: 2, accepted: ["straight", "curved"] }],
+    palette: ["straight", "curved"],
+    spawn: { x: 3, y: 0 },
+    marbleColors: ["raspberry", "mint"],
+  },
+  {
+    id: 8,
+    name: "Funnel Sort",
+    boardWidth: 8,
+    boardHeight: 6,
+    fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
+      { type: "straight", rotation: 0, x: 3, y: 1 },
+      { type: "straight", rotation: 0, x: 3, y: 3 },
+      { type: "curved", rotation: 2, x: 4, y: 4 },
+      { type: "goal", rotation: 0, x: 3, y: 5, color: "lemon" },
+      { type: "goal", rotation: 0, x: 4, y: 5, color: "blueberry" },
+    ],
+    gaps: [
+      { x: 3, y: 2, accepted: ["funnel"] },
+      { x: 3, y: 4, accepted: ["straight", "curved"] },
+    ],
+    palette: ["straight", "curved", "funnel"],
+    spawn: { x: 3, y: 0 },
+    marbleColors: ["lemon", "blueberry"],
+  },
+  {
+    id: 9,
+    name: "Color Finale",
+    boardWidth: 8,
+    boardHeight: 6,
+    fixed: [
+      { type: "straight", rotation: 0, x: 3, y: 0 },
+      { type: "straight", rotation: 0, x: 3, y: 1 },
+      { type: "straight", rotation: 0, x: 3, y: 3 },
+      { type: "curved", rotation: 2, x: 4, y: 2 },
+      { type: "curved", rotation: 0, x: 4, y: 3 },
+      { type: "curved", rotation: 2, x: 4, y: 4 },
+      { type: "curved", rotation: 2, x: 5, y: 3 },
+      { type: "straight", rotation: 0, x: 5, y: 4 },
+      { type: "goal", rotation: 0, x: 3, y: 5, color: "raspberry" },
+      { type: "goal", rotation: 0, x: 4, y: 5, color: "mint" },
+      { type: "goal", rotation: 0, x: 5, y: 5, color: "grape" },
+    ],
+    gaps: [
+      { x: 3, y: 2, accepted: ["straight", "curved"] },
+      { x: 3, y: 4, accepted: ["straight", "curved", "funnel"] },
+    ],
+    palette: ["straight", "curved", "funnel"],
+    spawn: { x: 3, y: 0 },
+    marbleColors: ["raspberry", "mint", "grape"],
   },
 ];
 

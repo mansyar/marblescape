@@ -275,9 +275,9 @@ describe("sorting level schema", () => {
 });
 
 describe("level catalog", () => {
-  it("exposes exactly 6 levels with unique sequential ids", () => {
-    expect(LEVELS).toHaveLength(6);
-    expect(LEVELS.map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 6]);
+  it("exposes exactly 9 levels with unique sequential ids", () => {
+    expect(LEVELS).toHaveLength(9);
+    expect(LEVELS.map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   it("exposes readable names for every level", () => {
@@ -298,8 +298,49 @@ describe("level catalog", () => {
   });
 });
 
+describe("sorting level catalog", () => {
+  const sortingLevels = LEVELS.filter((lvl) => lvl.marbleColors !== undefined);
+
+  it("ships sorting levels 7 through 9", () => {
+    expect(sortingLevels.map((lvl) => lvl.id)).toEqual([7, 8, 9]);
+  });
+
+  it("gives every sorting level unique colored cups fully covered by its script", () => {
+    for (const lvl of sortingLevels) {
+      const cups = lvl.fixed.filter((piece) => piece.type === "goal");
+      expect(cups.length, `${lvl.name} needs at least two cups`).toBeGreaterThanOrEqual(2);
+      const cupColors = cups.map((c) => c.color);
+      expect(new Set(cupColors).size).toBe(cupColors.length);
+      expect(new Set(cupColors)).toEqual(new Set(lvl.marbleColors ?? []));
+    }
+  });
+
+  it("teaches a single reroute in level 7", () => {
+    const lvl = getLevel(7);
+    expect(lvl?.gaps).toHaveLength(1);
+    expect(lvl?.gaps[0].accepted).toEqual(expect.arrayContaining(["straight", "curved"]));
+    expect(lvl?.marbleColors).toHaveLength(2);
+  });
+
+  it("drops through the funnel in level 8", () => {
+    const lvl = getLevel(8);
+    expect(lvl?.gaps.some((g) => g.accepted.includes("funnel"))).toBe(true);
+    expect(lvl?.palette).toContain("funnel");
+    expect(lvl?.marbleColors).toHaveLength(2);
+  });
+
+  it("builds a three-color finale in level 9", () => {
+    const lvl = getLevel(9);
+    const cups = lvl?.fixed.filter((piece) => piece.type === "goal") ?? [];
+    expect(cups).toHaveLength(3);
+    expect(lvl?.marbleColors).toHaveLength(3);
+    expect(lvl?.gaps.length).toBeGreaterThanOrEqual(2);
+    expect(lvl?.palette).toEqual(expect.arrayContaining(["straight", "curved", "funnel"]));
+  });
+});
+
 describe("solvability", () => {
-  it("declares all six shipped levels solvable with their restricted palettes", () => {
+  it("declares all nine shipped levels solvable with their restricted palettes", () => {
     for (const lvl of LEVELS) {
       expect(isLevelSolvable(lvl), `${lvl.name} should be solvable`).toBe(true);
     }
