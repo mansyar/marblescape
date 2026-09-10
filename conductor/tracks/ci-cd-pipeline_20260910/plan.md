@@ -20,8 +20,8 @@
 - [x] Task: Write `Dockerfile` (node:24-alpine build → nginx:alpine, SPA fallback, manifest/sw MIME, gzip) + `.dockerignore` — `a72fa83`
 - [x] Task: Local image verification — `buildx` amd64+arm64, `docker run`, curl checks (SPA fallback, `application/manifest+json`, sw.js JS MIME, game boots) — `a72fa83` (both arch build+load; all curl checks green; Playwright probe: boots + SW scope)
 - [x] Task: Write `.github/workflows/release.yml` — `v*` tags only, full CI gates re-run, buildx multi-arch push `ghcr.io/mansyar/marblescape:{v1.2.3,latest}`, Coolify webhook POST + bearer token, auto GitHub Release — `46036c7`
-- [ ] Task: Set `COOLIFY_WEBHOOK_URL` + `COOLIFY_WEBHOOK_TOKEN` Actions secrets (values from user) via `gh secret set`
-- [ ] Task: Dry-run release — tag `v0.1.0` → image on GHCR (public), webhook 200, Release created
+- [ ] Task: Set `COOLIFY_WEBHOOK_URL` + `COOLIFY_WEBHOOK_TOKEN` Actions secrets (values from user) via `gh secret set` — ⏳ awaiting user values
+- [x] Task: Dry-run release — tag `v0.1.0` → image on GHCR (public), webhook 200, Release created — `46036c7`-based: verify ✅, docker ✅ (multi-arch index amd64+arm64 on GHCR, unauthenticated inspect OK), Release "Marble Scape v0.1.0" ✅; deploy ⏳ pending secrets
 - [ ] Task: Phase Verification & Checkpoint
 
 ## Phase 4 — Track completion
