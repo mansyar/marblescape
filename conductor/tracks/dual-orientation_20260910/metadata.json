@@ -1,8 +1,8 @@
 {
   "id": "dual-orientation_20260910",
   "type": "feature",
-  "status": "new",
+  "status": "completed",
   "description": "Dual-orientation & responsive layout: dynamic camera framing with reserved-space support, live state-preserving re-frame on resize/rotation (debounced, instant snap), landscape right-side palette rail reusing the existing drag contract, auto-fit level-select grid, safe-area aware chrome, and a full 16x4 e2e viewport matrix against the production build (390x844, 844x390, 768x1024, 1024x768).",
   "created": "2026-09-10T00:00:00.000Z",
-  "completed": null
+  "completed": "2026-09-10T00:00:00.000Z"
 }

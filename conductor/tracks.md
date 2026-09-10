@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [~] **Track: Dual-Orientation & Responsive Layout** *Link: [./tracks/dual-orientation_20260910/index.md](./tracks/dual-orientation_20260910/index.md)*
+- [x] **Track: Dual-Orientation & Responsive Layout** *Link: [./tracks/dual-orientation_20260910/index.md](./tracks/dual-orientation_20260910/index.md)*
 
 ## Archive
 
