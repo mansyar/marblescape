@@ -1,7 +1,7 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
 import { PHYSICS } from "../domain/physics-config";
-import { colliderDescriptors } from "./piece-colliders";
+import { colliderDescriptors, type GoalLid } from "./piece-colliders";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { cellToWorld } from "../render/piece-view";
 import type { World } from "./world";
@@ -80,7 +80,14 @@ export interface PieceBodyEntry {
 export function syncPieceBodies(
   world: World,
   existing: Map<string, PieceBodyEntry>,
-  pieces: ReadonlyArray<{ id: string; type: PieceType; rotation: Rotation; x: number; y: number }>,
+  pieces: ReadonlyArray<{
+    id: string;
+    type: PieceType;
+    rotation: Rotation;
+    x: number;
+    y: number;
+    lid?: GoalLid;
+  }>,
 ): Map<string, PieceBodyEntry> {
   const keep = new Set(pieces.map((p) => p.id));
   for (const [id, entry] of existing) {
@@ -94,7 +101,7 @@ export function syncPieceBodies(
 
   for (const piece of pieces) {
     const current = existing.get(piece.id);
-    const signature = `${piece.type}:${piece.rotation}:${piece.x}:${piece.y}`;
+    const signature = `${piece.type}:${piece.rotation}:${piece.x}:${piece.y}:${piece.lid ?? ""}`;
     if (current && current.sig === signature) {
       continue;
     }
@@ -104,7 +111,7 @@ export function syncPieceBodies(
       }
     }
     const [wx, , wz] = cellToWorld(piece.x, piece.y);
-    const bodies = colliderDescriptors(piece.type, piece.rotation).map((d) => {
+    const bodies = colliderDescriptors(piece.type, piece.rotation, piece.lid ?? "open").map((d) => {
       // Offsets arrive fully rotated from colliderDescriptors. Body
       // orientation = yaw (about Y, from piece rotation + deflector) then
       // pitch (about the piece-local X axis, for ramps): q = qYaw ⊗ qPitch.

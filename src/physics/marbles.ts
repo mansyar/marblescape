@@ -104,13 +104,18 @@ export class MarbleManager {
     return this.colors.get(body) ?? MARBLE_COLORS[0];
   }
 
+  /** Next random candy color WITHOUT consuming the sequence (preview). */
+  peekColor(): MarbleColor {
+    return MARBLE_COLORS[this.nextColor % MARBLE_COLORS.length];
+  }
+
   spawnAt(x: number, y: number, z: number, color?: MarbleColor): RAPIER.RigidBody {
     this.runSpawned += 1;
     let assigned = color;
     if (assigned === undefined) {
       // Explicit colors (scripted / previewed) don't consume the random
       // sequence, so sandbox drops keep their cycling candy order.
-      assigned = MARBLE_COLORS[this.nextColor % MARBLE_COLORS.length];
+      assigned = this.peekColor();
       this.nextColor += 1;
     }
     const body = this.world.createRigidBody(

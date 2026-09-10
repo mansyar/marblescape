@@ -181,4 +181,48 @@ describe("syncPieceBodies", () => {
     marbles.dispose();
     world.free();
   });
+
+  it("rebuilds a goal cup when its lid state changes", () => {
+    const world = createPhysicsWorld();
+    const open = syncPieceBodies(world, new Map(), [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 3, lid: "open" as const },
+    ]);
+    const before = countFixedBodies(world);
+    syncPieceBodies(world, open, [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 3, lid: "closed" as const },
+    ]);
+    // Open cup ring = 4 slabs; the closed lid adds the center plug.
+    expect(countFixedBodies(world)).toBe(before + 1);
+    world.free();
+  });
+
+  it("keeps a marble on a closed cup and drops it through an open one", () => {
+    const closed = createPhysicsWorld();
+    buildBoardBodies(closed, []);
+    syncPieceBodies(closed, new Map(), [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 4, y: 2, lid: "closed" as const },
+    ]);
+    const heldMarbles = new MarbleManager(closed);
+    const held = heldMarbles.spawnAt(4.5, 1, 2.5);
+    for (let i = 0; i < 120; i += 1) {
+      stepWorld(closed);
+    }
+    expect(held.translation().y).toBeGreaterThan(0.2);
+    heldMarbles.dispose();
+    closed.free();
+
+    const open = createPhysicsWorld();
+    buildBoardBodies(open, [{ x: 4, z: 2 }]);
+    syncPieceBodies(open, new Map(), [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 4, y: 2, lid: "open" as const },
+    ]);
+    const droppedMarbles = new MarbleManager(open);
+    const dropped = droppedMarbles.spawnAt(4.5, 1, 2.5);
+    for (let i = 0; i < 120; i += 1) {
+      stepWorld(open);
+    }
+    expect(dropped.translation().y).toBeLessThan(-1);
+    droppedMarbles.dispose();
+    open.free();
+  });
 });

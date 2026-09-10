@@ -203,4 +203,15 @@ describe("MarbleManager", () => {
     marbles.dispose();
     world.free();
   });
+
+  it("peeks the next random color without consuming it", () => {
+    const world = createPhysicsWorld();
+    const marbles = new MarbleManager(world);
+    expect(marbles.peekColor()).toBe(MARBLE_COLORS[0]);
+    marbles.spawnDrop(4, 4);
+    expect(marbles.peekColor()).toBe(MARBLE_COLORS[1]);
+    expect(marbles.colorOf(marbles.all()[0])).toBe(MARBLE_COLORS[0]);
+    marbles.dispose();
+    world.free();
+  });
 });

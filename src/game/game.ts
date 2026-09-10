@@ -17,7 +17,8 @@ import {
   saveBoard,
   type PlacedPiece,
 } from "../domain/board";
-import { getLevel } from "../domain/levels";
+import { openCupKeys } from "../domain/cup-lids";
+import { getLevel, nextScriptedColor } from "../domain/levels";
 import { markSolved } from "../domain/solve";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { CONNECTIONS, rotate } from "../domain/pieces";
@@ -41,7 +42,7 @@ import {
   type PieceBodyEntry,
 } from "../physics/board-bodies";
 import { MarbleManager } from "../physics/marbles";
-import { colorHex } from "../domain/colors";
+import { colorHex, MARBLE_COLORS, type MarbleColor } from "../domain/colors";
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
@@ -85,6 +86,7 @@ export class Game {
   private rolls: RollVoices | null = null;
   private floorBodies: RAPIER.RigidBody[] = [];
   private floorHolesKey: string | null = "init";
+  private readonly collectedByColor = new Map<MarbleColor, number>();
   private saveTimer: number | null = null;
 
   constructor(container: HTMLElement) {
@@ -152,13 +154,14 @@ export class Game {
     );
     this.floorBodies = buildBoardBodies(world);
     this.marbles = new MarbleManager(world, {
-      onCollected: (body) => {
+      onCollected: (body, color) => {
         this.removeMarbleMesh(body);
         this.sound?.play("plonk", { rate: 1, volume: 0.9 });
         const cup = cupBurstPosition(this.board);
         if (cup) {
           this.sparkles?.burstAt(cup);
         }
+        this.collectedByColor.set(color, (this.collectedByColor.get(color) ?? 0) + 1);
         if (this.puzzle) {
           // Goal cup reached in level mode: persist the badge (first solve
           // only), play the win chime, and let the UI pulse + show Home.
@@ -166,6 +169,8 @@ export class Game {
           playChime(this.audioCtx);
           this.onLevelSolved?.(this.puzzle.level.id);
         }
+        // The collectible color advances: refresh which cups are open.
+        this.refreshCupState();
       },
       onRescued: (body) => this.removeMarbleMesh(body),
       // Run over: a soft cue only when the run ended without a goal (the
@@ -220,6 +225,7 @@ export class Game {
     this.sandboxBoard = this.board;
     this.puzzle = createPuzzle(level);
     this.board = boardFor(this.puzzle);
+    this.collectedByColor.clear();
     this.syncPieces();
     return true;
   }
@@ -232,6 +238,7 @@ export class Game {
     this.puzzle = null;
     this.board = this.sandboxBoard ?? this.board;
     this.sandboxBoard = null;
+    this.collectedByColor.clear();
     this.syncPieces();
   }
 
@@ -425,10 +432,20 @@ export class Game {
   /** Big Play button: drops a batch of marbles above the spawn cell. */
   play(): void {
     if (this.puzzle) {
-      this.marbles?.spawnDrop(this.puzzle.level.spawn.x, this.puzzle.level.spawn.y);
-      return;
+      const script = this.puzzle.level.marbleColors;
+      const color = script ? nextScriptedColor(script, this.collectedByColor) : null;
+      this.marbles?.spawnDrop(
+        this.puzzle.level.spawn.x,
+        this.puzzle.level.spawn.y,
+        color ?? undefined,
+      );
+    } else {
+      // Sandbox drops ride the natural random sequence: peekColor() is
+      // exactly this marble's color, so preview and drop never disagree.
+      this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0);
     }
-    this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0);
+    // A live marble changes which cups are compatible: refresh lids/floors.
+    this.refreshCupState();
   }
 
   /** Reset: clears placed pieces (marbles finish their run naturally). */
@@ -533,21 +550,52 @@ export class Game {
 
   private syncPieces(): void {
     this.pieceRenderer?.sync(this.board.pieces);
-    if (this.world) {
-      this.pieceBodies = syncPieceBodies(this.world, this.pieceBodies, this.board.pieces);
-    }
-    this.updateGoalCell();
+    this.refreshCupState();
     this.scheduleSave();
   }
 
   /**
-   * Keeps cup holes in sync: every placed cup opens a hole in the floor
-   * (lids are handled by the piece bodies) and the marble manager gets a
-   * collection footprint.
+   * The cup state machine: a cup is open when it can currently collect —
+   * classic cups always, colored cups only while they match the collectible
+   * marble (the live marble in flight, else the next drop's color). Refreshes
+   * piece lids, floor holes and marble collection targets together.
    */
-  private updateGoalCell(): void {
-    const goals = this.board.pieces.filter((p) => p.type === "goal");
-    const holes = goals.map((p) => ({ x: p.x, z: p.y }));
+  private refreshCupState(): void {
+    const openKeys = openCupKeys(this.board.pieces, this.collectibleColor());
+    if (this.world) {
+      const pieces = this.board.pieces.map((p) =>
+        p.type === "goal" && !openKeys.has(`${p.x},${p.y}`) ? { ...p, lid: "closed" as const } : p,
+      );
+      this.pieceBodies = syncPieceBodies(this.world, this.pieceBodies, pieces);
+    }
+    this.syncGoalBodies(openKeys);
+  }
+
+  /** The color the next collection can match: live marble, else next drop. */
+  private collectibleColor(): MarbleColor {
+    const marbles = this.marbles;
+    const live = marbles?.all()[0];
+    if (marbles && live) {
+      return marbles.colorOf(live);
+    }
+    return this.nextDropColor();
+  }
+
+  /** The color the next Play drops (scripted in levels, cycle in sandbox). */
+  private nextDropColor(): MarbleColor {
+    const script = this.puzzle?.level.marbleColors;
+    if (script) {
+      return nextScriptedColor(script, this.collectedByColor) ?? MARBLE_COLORS[0];
+    }
+    return this.marbles?.peekColor() ?? MARBLE_COLORS[0];
+  }
+
+  /** Opens holes under the open cups and points collection at them. */
+  private syncGoalBodies(openKeys: Set<string>): void {
+    const openCups = this.board.pieces.filter(
+      (p) => p.type === "goal" && openKeys.has(`${p.x},${p.y}`),
+    );
+    const holes = openCups.map((p) => ({ x: p.x, z: p.y }));
     const key = holes.map((hole) => `${hole.x},${hole.z}`).join("|");
     if (key !== this.floorHolesKey) {
       this.floorHolesKey = key;
@@ -556,7 +604,7 @@ export class Game {
       }
     }
     if (this.marbles) {
-      this.marbles.setGoalCells(goals.map((p) => ({ x: p.x, z: p.y, color: p.color ?? null })));
+      this.marbles.setGoalCells(openCups.map((p) => ({ x: p.x, z: p.y, color: p.color ?? null })));
     }
   }
 
