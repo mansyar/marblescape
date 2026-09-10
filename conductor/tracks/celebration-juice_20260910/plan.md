@@ -27,12 +27,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 3 — Interaction juice: wiggle, bounce, pickup, rotate (TDD)
 
-- [ ] Task: Write failing tests for pure animation helpers (`src/render/piece-anim.ts`): snap-bounce scale curve, reject-wiggle angle curve, rotate-yaw interpolation (game logic stays immediate; visuals tween)
-- [ ] Task: Implement helpers to green; >80% coverage
-- [ ] Task: Write failing tests + wire reject feedback: invalid drop (occupied/off-board/not-accepted) wiggles the involved piece or originating palette tile + soft low-pitched tick (existing sample)
-- [ ] Task: Write failing tests + wire valid-drop snap-bounce (palette → board and re-place moves)
-- [ ] Task: Write failing tests + implement palette pickup feedback (tile lift/squish on drag start, reset on pointerup) and rotate tap animation (quarter-turn tween + existing tick)
-- [ ] Task: Manual feel pass on dev build (portrait + landscape); iterate timings once
+- [x] Task: Write failing tests for pure animation helpers (`src/render/piece-anim.ts`): snap-bounce scale curve, reject-wiggle angle curve, rotate-yaw interpolation (game logic stays immediate; visuals tween) [a03c648]
+- [x] Task: Implement helpers to green; >80% coverage [a03c648]
+- [x] Task: Write failing tests + wire reject feedback: invalid drop (occupied/off-board/not-accepted) wiggles the involved piece or originating palette tile + soft low-pitched tick (existing sample) [a0583ab]
+- [x] Task: Write failing tests + wire valid-drop snap-bounce (palette → board and re-place moves) [a0583ab]
+- [x] Task: Write failing tests + implement palette pickup feedback (tile lift/squish on drag start, reset on pointerup) and rotate tap animation (quarter-turn tween + existing tick) [a0583ab]
+- [~] Task: Manual feel pass on dev build (portrait + landscape); iterate timings once
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Track completion
