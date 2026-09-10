@@ -1,4 +1,6 @@
+import { colorHex, type MarbleColor } from "../domain/colors";
 import type { PieceType } from "../domain/pieces";
+import { DRAG_THRESHOLD_PX } from "../game/gestures";
 import type { LayoutMode } from "./layout";
 
 /** Kid-facing button labels, in canonical palette order (Ramp → Hole). */
@@ -8,6 +10,26 @@ export const LABELS: Record<PieceType, string> = {
   funnel: "Funnel",
   goal: "Hole",
 };
+
+/** A palette tile: a piece plus the candy color it will place (color cups). */
+export interface PaletteItem {
+  type: PieceType;
+  color?: MarbleColor;
+}
+
+/** Accepts legacy string palettes or typed items; strings become plain tiles. */
+export function normalizePaletteItems(items: readonly (PieceType | PaletteItem)[]): PaletteItem[] {
+  return items.map((item) => (typeof item === "string" ? { type: item } : item));
+}
+
+/** Styles for the color-cup tile's candy dot. */
+export function colorSwatchCss(color: MarbleColor): string {
+  return [
+    "width:18px;height:18px;border-radius:50%;display:inline-block",
+    `background:${colorHex(color)}`,
+    "border:2px solid rgba(44,62,80,0.65)",
+  ].join(";");
+}
 
 const CONTAINER_PORTRAIT = [
   "position:fixed;left:0;right:0;bottom:0",
@@ -82,15 +104,17 @@ export function palettePickupTransform(dragging: boolean): string {
 }
 
 /**
- * Bottom palette: one big (64px+) button per piece type. Dragging from a
- * button streams NDC coordinates into the given callbacks until release.
+ * Bottom palette: one big (64px+) button per entry. Dragging streams NDC
+ * coordinates into the given callbacks until release; tapping a color tile
+ * cycles its candy color instead (onCycle).
  */
 export function createPalette(
   root: HTMLElement,
-  types: readonly PieceType[],
-  onDrag: (type: PieceType, ndcX: number, ndcY: number | null) => void,
-  onDrop: (type: PieceType, ndcX: number, ndcY: number | null, button: HTMLButtonElement) => void,
+  items: readonly (PieceType | PaletteItem)[],
+  onDrag: (item: PaletteItem, ndcX: number, ndcY: number | null) => void,
+  onDrop: (item: PaletteItem, ndcX: number, ndcY: number | null, button: HTMLButtonElement) => void,
   mode: LayoutMode,
+  onCycle?: (item: PaletteItem) => MarbleColor | null,
 ): HTMLElement {
   const bar = document.createElement("div");
   bar.style.cssText = paletteLayout(mode).containerCss;
@@ -99,11 +123,24 @@ export function createPalette(
   style.textContent = paletteRejectKeyframes();
   bar.appendChild(style);
 
-  for (const type of types) {
+  for (const entry of normalizePaletteItems(items)) {
+    let item = entry;
     const btn = document.createElement("button");
-    btn.textContent = LABELS[type];
-    btn.dataset.pieceType = type;
+    btn.textContent = LABELS[item.type];
+    btn.dataset.pieceType = item.type;
     btn.style.cssText = paletteLayout(mode).buttonCss;
+    // Color cup tile: a candy dot under the label, redrawn on every cycle.
+    let swatch: HTMLSpanElement | null = null;
+    if (item.color !== undefined) {
+      btn.dataset.color = item.color;
+      btn.style.display = "flex";
+      btn.style.flexDirection = "column";
+      btn.style.alignItems = "center";
+      btn.style.gap = "4px";
+      swatch = document.createElement("span");
+      swatch.style.cssText = colorSwatchCss(item.color);
+      btn.appendChild(swatch);
+    }
 
     const ndcFromEvent = (e: PointerEvent): [number, number | null] => {
       const canvas = root.querySelector("canvas");
@@ -124,8 +161,14 @@ export function createPalette(
       return [ndcX, ndcY];
     };
 
+    let startX = 0;
+    let startY = 0;
+    let moved = false;
     btn.addEventListener("pointerdown", (e) => {
       btn.setPointerCapture(e.pointerId);
+      startX = e.clientX;
+      startY = e.clientY;
+      moved = false;
       // Pickup feedback: the tile lifts while the child drags its piece out.
       btn.style.transition = PALETTE_PICKUP_TRANSITION;
       btn.style.transform = palettePickupTransform(true);
@@ -134,8 +177,11 @@ export function createPalette(
       if (!btn.hasPointerCapture(e.pointerId)) {
         return;
       }
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > DRAG_THRESHOLD_PX) {
+        moved = true;
+      }
       const [ndcX, ndcY] = ndcFromEvent(e);
-      onDrag(type, ndcX, ndcY);
+      onDrag(item, ndcX, ndcY);
     });
     btn.addEventListener("pointerup", (e) => {
       if (!btn.hasPointerCapture(e.pointerId)) {
@@ -143,7 +189,20 @@ export function createPalette(
       }
       btn.style.transform = palettePickupTransform(false);
       const [ndcX, ndcY] = ndcFromEvent(e);
-      onDrop(type, ndcX, ndcY, btn);
+      if (!moved && item.color !== undefined && onCycle) {
+        // Tap on the color tile: cycle the swatch (a swipe still places a
+        // colored cup). Other tiles fall through to the reject shake.
+        const next = onCycle(item);
+        if (next) {
+          item = { type: item.type, color: next };
+          btn.dataset.color = next;
+          if (swatch) {
+            swatch.style.cssText = colorSwatchCss(next);
+          }
+        }
+        return;
+      }
+      onDrop(item, ndcX, ndcY, btn);
     });
     bar.appendChild(btn);
   }

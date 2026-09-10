@@ -51,14 +51,14 @@ if (app) {
       paletteBar = createPalette(
         app,
         game.currentPalette(),
-        (_type, ndcX, ndcY) => {
+        (item, ndcX, ndcY) => {
           const cell = cellFromNdc(ndcX, ndcY);
-          game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y, _type) : false);
+          game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y, item.type) : false);
         },
-        (type, ndcX, ndcY, button) => {
+        (item, ndcX, ndcY, button) => {
           game.hideHighlight();
           const cell = cellFromNdc(ndcX, ndcY);
-          if (!cell || !game.place(type, cell.x, cell.y)) {
+          if (!cell || !game.place(item.type, cell.x, cell.y, item.color)) {
             // Rejected (occupied, off-board, or not accepted here): the tile
             // shakes and the toy answers with a soft low tick.
             pulseReject(button);
@@ -66,6 +66,7 @@ if (app) {
           }
         },
         layoutMode(window.innerWidth, window.innerHeight).mode,
+        (item) => (item.color === undefined ? null : game.cyclePaletteColor()),
       );
       document.body.appendChild(paletteBar);
     };

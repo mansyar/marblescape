@@ -78,6 +78,8 @@ export class Game {
   private sandboxBoard: BoardState | null = null;
   /** Child-chosen sandbox marble color (tap the chute); null = natural cycle. */
   private sandboxColor: MarbleColor | null = null;
+  /** Color used by the sandbox color-cup palette tile. */
+  private cupColor: MarbleColor = MARBLE_COLORS[0];
   private reducedMotion = false;
 
   /** Fired each time a marble lands in the goal cup while in level mode. */
@@ -264,9 +266,12 @@ export class Game {
     return this.puzzle?.level.id ?? null;
   }
 
-  /** Palette pieces for the current mode: level palette, or all pieces. */
-  currentPalette(): PieceType[] {
-    return this.puzzle ? this.puzzle.level.palette : [...PIECE_TYPES];
+  /** Palette entries for the current mode; sandbox adds the color-cup tile. */
+  currentPalette(): Array<{ type: PieceType; color?: MarbleColor }> {
+    if (this.puzzle) {
+      return this.puzzle.level.palette.map((type) => ({ type }));
+    }
+    return [...PIECE_TYPES.map((type) => ({ type })), { type: "goal", color: this.cupColor }];
   }
 
   /**
@@ -532,6 +537,12 @@ export class Game {
       this.juice.tintPulse(cupTintTarget(mesh));
     }
     return next;
+  }
+
+  /** Palette color-tile tap: advances the color new cups will wear. */
+  cyclePaletteColor(): MarbleColor {
+    this.cupColor = nextMarbleColor(this.cupColor);
+    return this.cupColor;
   }
 
   /**
