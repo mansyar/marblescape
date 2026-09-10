@@ -31,7 +31,7 @@
 - [x] Task: Level-select auto-fit grid — `cdcc2a9`
   - [ ] `src/ui/level-select.ts`: switch grid to `repeat(auto-fit, minmax(96px, 1fr))`
   - [ ] E2E (Phase 3 spec) will verify all 6 cards visible/tappable in every viewport
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) — `[checkpoint: cdcc2a9]`
 
 ## Phase 3 — E2E viewport matrix (production build)
 
