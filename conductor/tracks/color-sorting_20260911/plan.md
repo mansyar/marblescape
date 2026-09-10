@@ -67,7 +67,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [ ] Collected marbles rest visibly in their cups (non-physics trophy meshes, cleared on reset/exit)
 - [x] Task: Implement solve accounting + trophy cups to green [fd83687]
 - [x] Task: Write failing tests + wire levels 7–9 into level select (`src/ui/level-select.ts`); badges for 7–9 refresh correctly [1501058]
-- [~] Task: e2e `tests/e2e/levels.spec.ts`: scripted solve of L7; smoke-pass L8/L9; preview recovery after a wandered marble; mismatches never fail
+- [x] Task: e2e `tests/e2e/levels.spec.ts`: scripted solve of L7; smoke-pass L8/L9; preview recovery after a wandered marble; mismatches never fail [39aed00]
 - [ ] Task: Manual feel pass (portrait + landscape): lid readability, cycle affordance, color clarity (incl. color-blind spot check)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
