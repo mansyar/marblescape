@@ -44,10 +44,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 3 — Interaction & UI: waiting marble, tap-to-cycle, palette (TDD)
 
-- [ ] Task: Write failing tests for the waiting-marble preview (`src/game/game.ts`, `src/render/`)
+- [x] Task: Write failing tests for the waiting-marble preview (`src/game/game.ts`, `src/render/`) [2d996ee]
   - [ ] Non-physics mesh at the spawn point (fixed chute in levels, top-center in sandbox); hidden while a marble is live; truthfully shows the next color
   - [ ] Static under reduced motion; test hooks + testid
-- [ ] Task: Implement the waiting-marble preview to green
+- [x] Task: Implement the waiting-marble preview to green [2d996ee]
 - [ ] Task: Write failing tests for tap-to-cycle
   - [ ] Sandbox: tap the spawn/chute cell with no live marble cycles the preview color (existing tick); level chute taps are a no-op
   - [ ] Placed colored cup: tap cycles its color in both modes (replaces rotate); tint pulse (instant under reduced motion)
