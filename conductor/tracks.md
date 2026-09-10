@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [ ] **Track: Celebration & Interaction Juice** *Link: [./tracks/celebration-juice_20260910/index.md](./tracks/celebration-juice_20260910/index.md)*
+- [~] **Track: Celebration & Interaction Juice** *Link: [./tracks/celebration-juice_20260910/index.md](./tracks/celebration-juice_20260910/index.md)*
 
 ## Archive
 

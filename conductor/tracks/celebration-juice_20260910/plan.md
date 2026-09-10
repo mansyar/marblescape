@@ -6,7 +6,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Collect celebration: sparkle burst (TDD)
 
-- [ ] Task: Write failing tests for the sparkle burst module (pooling, caps, lifecycle)
+- [~] Task: Write failing tests for the sparkle burst module (pooling, caps, lifecycle)
   - [ ] New module `src/render/sparkles.ts`: pooled burst emitter anchored at a world position
   - [ ] Hard cap ≤64 live particles per burst; bounded slot reuse/coalescing for rapid collects; auto-expire ≤1 s
   - [ ] Reduced-motion branch yields a non-flying glow pulse
