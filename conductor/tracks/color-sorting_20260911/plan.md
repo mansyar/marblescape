@@ -25,7 +25,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement levels 7–9 to green; `pnpm check` clean [479bd63]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 2 — Physics: cup lids & colored collection (TDD)
+## Phase 2 — Physics: cup lids & colored collection (TDD) [checkpoint: 479b2cf]
 
 - [x] Task: Write failing tests for lid colliders (`src/physics/piece-colliders.ts`): `goalWithHole` open (existing ring) vs closed (full slab + rim); rotation support unchanged [f697df4]
 - [x] Task: Implement lid collider variants to green; >80% coverage [f697df4]
