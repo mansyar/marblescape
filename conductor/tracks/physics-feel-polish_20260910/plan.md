@@ -20,7 +20,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Write failing tests for refined pitch/volume curves; implement (musical band kept) [dfb2c3c]
 - [x] Task: Write failing tests for roll-voice module (`src/audio/roll.ts`): speed→gain/rate mapping, start/stop lifecycle, mute honored, no voice leaks on reap [c12fca3]
 - [x] Task: Implement roll module; source + add CC0 roll sample asset (Kenney audio or equivalent) to precache [c12fca3]
-- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: e58a592]
 
 ## Phase 3 — Motion retuning & game integration
 
