@@ -48,10 +48,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [ ] Non-physics mesh at the spawn point (fixed chute in levels, top-center in sandbox); hidden while a marble is live; truthfully shows the next color
   - [ ] Static under reduced motion; test hooks + testid
 - [x] Task: Implement the waiting-marble preview to green [2d996ee]
-- [ ] Task: Write failing tests for tap-to-cycle
+- [x] Task: Write failing tests for tap-to-cycle [126d61a]
   - [ ] Sandbox: tap the spawn/chute cell with no live marble cycles the preview color (existing tick); level chute taps are a no-op
   - [ ] Placed colored cup: tap cycles its color in both modes (replaces rotate); tint pulse (instant under reduced motion)
-- [ ] Task: Implement tap-to-cycle + cup tint pulse to green; wire gestures in `src/main.ts`
+- [x] Task: Implement tap-to-cycle + cup tint pulse to green; wire gestures in `src/main.ts` [126d61a]
 - [ ] Task: Write failing tests for the palette color-cup tile (`src/ui/palette.ts`, `src/main.ts`)
   - [ ] Palette items become `{type, color?}`; cup tile tap-vs-drag discrimination (tap cycles swatch, drag places colored cup)
   - [ ] `Game.place`/`currentPalette` carry optional color; level palettes normalized (legacy string entries keep working)
