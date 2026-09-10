@@ -83,7 +83,7 @@ export class Game {
   private readonly impactThrottler = new ImpactThrottler();
   private rolls: RollVoices | null = null;
   private floorBodies: RAPIER.RigidBody[] = [];
-  private floorGoal: string | null = "init";
+  private floorHolesKey: string | null = "init";
   private saveTimer: number | null = null;
 
   constructor(container: HTMLElement) {
@@ -539,25 +539,27 @@ export class Game {
     this.scheduleSave();
   }
 
-  /** Tells the marble manager where the goal hole is (collection footprint). */
+  /**
+   * Keeps cup holes in sync: every placed cup opens a hole in the floor
+   * (lids are handled by the piece bodies) and the marble manager gets a
+   * collection footprint.
+   */
   private updateGoalCell(): void {
-    const goal = this.board.pieces.find((p) => p.type === "goal");
-    const key = goal ? `${goal.x},${goal.y}` : null;
-    if (key !== this.floorGoal) {
-      this.floorGoal = key;
+    const goals = this.board.pieces.filter((p) => p.type === "goal");
+    const holes = goals.map((p) => ({ x: p.x, z: p.y }));
+    const key = holes.map((hole) => `${hole.x},${hole.z}`).join("|");
+    if (key !== this.floorHolesKey) {
+      this.floorHolesKey = key;
       if (this.world) {
-        this.floorBodies = syncFloorBodies(
-          this.world,
-          this.floorBodies,
-          goal ? { x: goal.x, z: goal.y } : null,
-        );
+        this.floorBodies = syncFloorBodies(this.world, this.floorBodies, holes);
       }
     }
     if (!this.marbles) {
       return;
     }
-    if (goal) {
-      this.marbles.setGoalCell(goal.x, goal.y);
+    const first = goals[0];
+    if (first) {
+      this.marbles.setGoalCell(first.x, first.y);
     } else {
       this.marbles.setGoalCell(null);
     }
