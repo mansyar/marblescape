@@ -15,12 +15,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] `SCHEMA_VERSION → 2`; `toJSON`/`fromJSON` handle optional `color` with strict validation (known value, goal-only)
   - [x] v1 fixture migrates losslessly (colorless goal = classic cup); corrupt data still → null
 - [x] Task: Implement schema v2 + migration to green; >80% coverage [cf58599]
-- [ ] Task: Write failing tests for sorting-level domain (`src/domain/levels.ts`, `src/domain/puzzle.ts`)
-  - [ ] `LevelDef`: goals as colored cups (classic single-goal shape still validated), optional ordered `marbleColors` script, id range → 1–9
-  - [ ] Pure script consumption: first scripted color with unmet required count; per-color collected accounting
-  - [ ] `validateLevel`: sorting levels need ≥2 unique colored cups, no classic goal, non-empty script whose colors all have cups
-  - [ ] `isLevelSolvable`: each scripted color independently routable from spawn to its matching cup (classic check preserved)
-- [ ] Task: Implement sorting-level domain to green; >80% coverage
+- [x] Task: Write failing tests for sorting-level domain (`src/domain/levels.ts`, `src/domain/puzzle.ts`) [2782ed0]
+  - [x] `LevelDef`: goals as colored cups (classic single-goal shape still validated), optional ordered `marbleColors` script, id range → 1–9
+  - [x] Pure script consumption: first scripted color with unmet required count; per-color collected accounting
+  - [x] `validateLevel`: sorting levels need ≥2 unique colored cups, no classic goal, non-empty script whose colors all have cups
+  - [x] `isLevelSolvable`: each scripted color independently routable from spawn to its matching cup (classic check preserved)
+- [x] Task: Implement sorting-level domain to green; >80% coverage [2782ed0]
 - [ ] Task: Write failing tests + author levels 7–9 (L7 two colors/one reroute · L8 funnel combo · L9 three-color finale); validation + solvability must pass
 - [ ] Task: Implement levels 7–9 to green; `pnpm check` clean
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
