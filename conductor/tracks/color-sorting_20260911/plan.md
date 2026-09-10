@@ -27,9 +27,9 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Physics: cup lids & colored collection (TDD)
 
-- [ ] Task: Write failing tests for lid colliders (`src/physics/piece-colliders.ts`): `goalWithHole` open (existing ring) vs closed (full slab + rim); rotation support unchanged
-- [ ] Task: Implement lid collider variants to green; >80% coverage
-- [ ] Task: Write failing tests for multi-goal floor sync (`src/physics/board-bodies.ts`): `syncFloorBodies(world, existing, openHoles[])` — floor skipped only under open holes; closed cups get floor
+- [x] Task: Write failing tests for lid colliders (`src/physics/piece-colliders.ts`): `goalWithHole` open (existing ring) vs closed (full slab + rim); rotation support unchanged [f697df4]
+- [x] Task: Implement lid collider variants to green; >80% coverage [f697df4]
+- [~] Task: Write failing tests for multi-goal floor sync (`src/physics/board-bodies.ts`): `syncFloorBodies(world, existing, openHoles[])` — floor skipped only under open holes; closed cups get floor
 - [ ] Task: Implement multi-goal floor sync to green; migrate call sites; >80% coverage
 - [ ] Task: Write failing tests for colored spawn & collection (`src/physics/marbles.ts`)
   - [ ] `spawnDrop(cellX, cellZ, color?)` — explicit color overrides the random candy sequence; `setGoalCells([{x,z,color|null}])`
