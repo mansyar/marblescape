@@ -4,7 +4,7 @@ Branch: `track/color-sorting` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Domain: colors, schema v2, scripts, levels 7–9 (TDD)
+## Phase 1 — Domain: colors, schema v2, scripts, levels 7–9 (TDD) [checkpoint: 479bd63]
 
 - [x] Task: Write failing tests for the color model (`src/domain/colors.ts`) and goal-piece color field [1518768]
   - [x] `MarbleColor` union derived from `MARBLE_PALETTE` (6 candy colors); cycle helper (tap order); color→hex lookup
