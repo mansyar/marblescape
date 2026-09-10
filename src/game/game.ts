@@ -630,6 +630,13 @@ export class Game {
     });
   }
 
+  /** Live marble colors for the Playwright hooks. */
+  marbleColors(): MarbleColor[] {
+    return (this.marbles?.all() ?? []).map(
+      (body) => this.marbles?.colorOf(body) ?? MARBLE_COLORS[0],
+    );
+  }
+
   /** Waiting-marble state for the Playwright hooks. */
   waitingVisible(): boolean {
     return this.waiting?.isVisible() ?? false;
