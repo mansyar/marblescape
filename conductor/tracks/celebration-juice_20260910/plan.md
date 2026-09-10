@@ -18,9 +18,9 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Solve celebration: confetti, overlay enrichments, instant replay (TDD)
 
-- [ ] Task: Write failing tests for the confetti layer module (`src/ui/confetti.ts`): ≤120 pieces, ~2.5 s auto-cleanup, reduced-motion branch, testid hook
-- [ ] Task: Implement confetti module to green; >80% coverage
-- [ ] Task: Write failing tests for the enriched solved overlay: ▶ "Play again" button (112 px, aria-label, testid) hides overlay + re-runs the same track (placements unchanged); 🏠 unchanged
+- [x] Task: Write failing tests for the confetti layer module (`src/ui/confetti.ts`): ≤120 pieces, ~2.5 s auto-cleanup, reduced-motion branch, testid hook [ce6728e]
+- [x] Task: Implement confetti module to green; >80% coverage [ce6728e]
+- [~] Task: Write failing tests for the enriched solved overlay: ▶ "Play again" button (112 px, aria-label, testid) hides overlay + re-runs the same track (placements unchanged); 🏠 unchanged
 - [ ] Task: Implement overlay + wiring in `src/main.ts`; confetti fires on `onLevelSolved`; green
 - [ ] Task: Extend e2e (levels spec): solve → overlay + confetti layer + ▶ replay re-runs without leaving/altering placements
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
