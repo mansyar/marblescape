@@ -76,11 +76,32 @@ function funnel(): ColliderDesc[] {
   ];
 }
 
+function goalClosed(): ColliderDesc[] {
+  // Closed lid: the open cup's border ring plus a center plug, all slabs at
+  // the flush floor height so a marble rolls straight over with no step. The
+  // plug overlaps the ring so no seam gap remains anywhere in the cell.
+  const ring = 0.035;
+  const center = 0.465;
+  return [
+    { hx: ring, hy: FLOOR_H, hz: 0.48, offset: [-center, FLOOR_Y, 0] },
+    { hx: ring, hy: FLOOR_H, hz: 0.48, offset: [center, FLOOR_Y, 0] },
+    { hx: 0.48, hy: FLOOR_H, hz: ring, offset: [0, FLOOR_Y, -center] },
+    { hx: 0.48, hy: FLOOR_H, hz: ring, offset: [0, FLOOR_Y, center] },
+    { hx: center, hy: FLOOR_H, hz: center, offset: [0, FLOOR_Y, 0] },
+  ];
+}
+
 /**
  * Hand-authored collision shapes per piece type, expressed in local space.
  * Rotation is applied by swapping axis extents / offsets (90° steps).
  */
-export function colliderDescriptors(type: PieceType, rotation: Rotation): ColliderDesc[] {
+export type GoalLid = "open" | "closed";
+
+export function colliderDescriptors(
+  type: PieceType,
+  rotation: Rotation,
+  goalLid: GoalLid = "open",
+): ColliderDesc[] {
   const local =
     type === "straight"
       ? straight()
@@ -88,7 +109,9 @@ export function colliderDescriptors(type: PieceType, rotation: Rotation): Collid
         ? curved()
         : type === "funnel"
           ? funnel()
-          : goalWithHole();
+          : goalLid === "closed"
+            ? goalClosed()
+            : goalWithHole();
   // Apply `rotation` clockwise quarter turns (matches the domain side
   // shift north→east): offsets rotate (x,z)→(−z,x) per turn; axis-aligned
   // boxes swap extents, yawed boxes keep local extents and add +90° yaw.
