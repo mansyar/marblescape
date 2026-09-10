@@ -26,9 +26,9 @@
   - [ ] Rail respects `env(safe-area-inset-right)` padding
   - [ ] Portrait mode output unchanged (bottom bar)
 - [x] Task: Implement landscape rail in `src/ui/palette.ts` (reuse `onDrag`/`onDrop` NDC contract; picking/gesture code untouched) — make tests green — `39c6880`
-- [ ] Task: Wire the rail's reserved width into the game's framing call (Phase 1 plumbing)
+- [x] Task: Wire the rail's reserved width into the game's framing call (Phase 1 plumbing) — `aeccbf2`
   - [ ] Unit test: game/scene passes landscape rail reservation; portrait passes none
-- [ ] Task: Level-select auto-fit grid
+- [x] Task: Level-select auto-fit grid — `cdcc2a9`
   - [ ] `src/ui/level-select.ts`: switch grid to `repeat(auto-fit, minmax(96px, 1fr))`
   - [ ] E2E (Phase 3 spec) will verify all 6 cards visible/tappable in every viewport
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
