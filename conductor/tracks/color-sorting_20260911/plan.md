@@ -42,7 +42,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Extend e2e reliability: 20 matching colored drops (all collected, zero rescues) + mismatch roll-over run (no collection, no escapes, no body leak) [479b2cf]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 3 — Interaction & UI: waiting marble, tap-to-cycle, palette (TDD)
+## Phase 3 — Interaction & UI: waiting marble, tap-to-cycle, palette (TDD) [checkpoint: 19fcf27]
 
 - [x] Task: Write failing tests for the waiting-marble preview (`src/game/game.ts`, `src/render/`) [2d996ee]
   - [ ] Non-physics mesh at the spawn point (fixed chute in levels, top-center in sandbox); hidden while a marble is live; truthfully shows the next color
@@ -61,7 +61,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 4 — Sorting levels: solve flow & visible progress (TDD)
 
-- [ ] Task: Write failing tests for per-color solve accounting (`src/game/game.ts`, `src/domain/solve.ts`)
+- [~] Task: Write failing tests for per-color solve accounting (`src/game/game.ts`, `src/domain/solve.ts`)
   - [ ] Collected counts per color vs script; solved when all met → existing chime/sparkle/confetti/overlay + ✓ badge
   - [ ] Lost marble: next Play drops the first unmet color; partial progress persists across replays within the level
   - [ ] Collected marbles rest visibly in their cups (non-physics trophy meshes, cleared on reset/exit)
