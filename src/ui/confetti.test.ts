@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MARBLE_PALETTE } from "../domain/physics-config";
+import { MARBLE_PALETTE } from "../domain/colors";
 import {
   CONFETTI_DURATION_MS,
   CONFETTI_MAX_PIECES,

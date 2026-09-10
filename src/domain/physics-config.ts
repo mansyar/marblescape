@@ -39,13 +39,3 @@ export const PHYSICS = Object.freeze({
   /** Extra clearance used by guard rails / edge walls. */
   wallHeight: 0.75,
 });
-
-/** Candy colors for marble random assignment (hex). */
-export const MARBLE_PALETTE: readonly string[] = Object.freeze([
-  "#ef476f", // raspberry
-  "#f78c6b", // tangerine
-  "#ffd166", // lemon
-  "#06d6a0", // mint
-  "#118ab2", // blueberry
-  "#9b5de5", // grape
-]);

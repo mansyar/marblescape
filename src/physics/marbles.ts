@@ -5,7 +5,8 @@ import {
   type RunSettleOptions,
   type SettleReason,
 } from "../domain/run-settle";
-import { MARBLE_PALETTE, PHYSICS } from "../domain/physics-config";
+import { MARBLE_PALETTE } from "../domain/colors";
+import { PHYSICS } from "../domain/physics-config";
 import type { World } from "./world";
 
 const RESCUE_Y = -5; // below this, a marble has left the play area for good

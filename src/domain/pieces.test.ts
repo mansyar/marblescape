@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canCarryColor,
   CONNECTIONS,
   connectsWith,
   nextRotation,
@@ -126,3 +127,12 @@ function shift(side: string): string {
   const order = ["north", "east", "south", "west"];
   return order[(order.indexOf(side) + 1) % 4];
 }
+
+describe("color support", () => {
+  it("only the goal cup can carry a candy color", () => {
+    expect(canCarryColor("goal")).toBe(true);
+    expect(canCarryColor("straight")).toBe(false);
+    expect(canCarryColor("curved")).toBe(false);
+    expect(canCarryColor("funnel")).toBe(false);
+  });
+});

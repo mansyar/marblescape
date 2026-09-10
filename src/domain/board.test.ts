@@ -9,6 +9,7 @@ import {
   toJSON,
   type BoardState,
 } from "./board";
+import type { MarbleColor } from "./colors";
 import type { Storage } from "./storage";
 
 function sampleBoard(): BoardState {
@@ -124,6 +125,21 @@ describe("localStorage persistence", () => {
     const storage = memoryStorage();
     storage.setItem(STORAGE_KEY, "garbage!!!");
     expect(loadBoard(storage)).toBeNull();
+  });
+});
+
+describe("goal cup colors", () => {
+  it("goal pieces can carry a candy color", () => {
+    const color: MarbleColor = "mint";
+    const placed = placeTypedPiece(createBoard(8, 6), {
+      id: "g1",
+      type: "goal",
+      rotation: 0,
+      x: 3,
+      y: 5,
+      color,
+    });
+    expect(placed.pieces[0].color).toBe("mint");
   });
 });
 

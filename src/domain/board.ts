@@ -1,3 +1,4 @@
+import type { MarbleColor } from "./colors";
 import { createGrid, placePiece, type GridState, isInside } from "./grid";
 import { CONNECTIONS, PIECE_TYPES, type PieceType, type Rotation } from "./pieces";
 import type { Storage } from "./storage";
@@ -11,6 +12,8 @@ export interface PlacedPiece {
   rotation: Rotation;
   x: number;
   y: number;
+  /** Candy color for goal cups; absent = classic catch-all cup. */
+  color?: MarbleColor;
 }
 
 export interface BoardState extends GridState {
