@@ -11,10 +11,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] `PlacedPiece` gains optional `color` (goal pieces only); non-goal pieces stay color-free by type
   - [x] Tests: cycle wraps all 6; unknown color rejected
 - [x] Task: Implement the color model to green; >80% coverage [1518768]
-- [ ] Task: Write failing tests for board schema v2 (`src/domain/board.ts`)
-  - [ ] `SCHEMA_VERSION → 2`; `toJSON`/`fromJSON` handle optional `color` with strict validation (known value, goal-only)
-  - [ ] v1 fixture migrates losslessly (colorless goal = classic cup); corrupt data still → null
-- [ ] Task: Implement schema v2 + migration to green; >80% coverage
+- [x] Task: Write failing tests for board schema v2 (`src/domain/board.ts`) [cf58599]
+  - [x] `SCHEMA_VERSION → 2`; `toJSON`/`fromJSON` handle optional `color` with strict validation (known value, goal-only)
+  - [x] v1 fixture migrates losslessly (colorless goal = classic cup); corrupt data still → null
+- [x] Task: Implement schema v2 + migration to green; >80% coverage [cf58599]
 - [ ] Task: Write failing tests for sorting-level domain (`src/domain/levels.ts`, `src/domain/puzzle.ts`)
   - [ ] `LevelDef`: goals as colored cups (classic single-goal shape still validated), optional ordered `marbleColors` script, id range → 1–9
   - [ ] Pure script consumption: first scripted color with unmet required count; per-color collected accounting
