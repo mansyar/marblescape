@@ -29,13 +29,13 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 - [x] Task: Write failing tests for lid colliders (`src/physics/piece-colliders.ts`): `goalWithHole` open (existing ring) vs closed (full slab + rim); rotation support unchanged [f697df4]
 - [x] Task: Implement lid collider variants to green; >80% coverage [f697df4]
-- [~] Task: Write failing tests for multi-goal floor sync (`src/physics/board-bodies.ts`): `syncFloorBodies(world, existing, openHoles[])` — floor skipped only under open holes; closed cups get floor
-- [ ] Task: Implement multi-goal floor sync to green; migrate call sites; >80% coverage
-- [ ] Task: Write failing tests for colored spawn & collection (`src/physics/marbles.ts`)
-  - [ ] `spawnDrop(cellX, cellZ, color?)` — explicit color overrides the random candy sequence; `setGoalCells([{x,z,color|null}])`
-  - [ ] Match: classic cup collects any color; colored cup only its own; `onCollected` carries the marble's color
-- [ ] Task: Implement colored spawn & collection to green; >80% coverage
-- [ ] Task: Write failing tests for the lid state machine (`src/game/game.ts`)
+- [x] Task: Write failing tests for multi-goal floor sync (`src/physics/board-bodies.ts`): `syncFloorBodies(world, existing, openHoles[])` — floor skipped only under open holes; closed cups get floor [28ab0a0]
+- [x] Task: Implement multi-goal floor sync to green; migrate call sites; >80% coverage [28ab0a0]
+- [x] Task: Write failing tests for colored spawn & collection (`src/physics/marbles.ts`) [8dfe104]
+  - [x] `spawnDrop(cellX, cellZ, color?)` — explicit color overrides the random candy sequence; `setGoalCells([{x,z,color|null}])` [8dfe104]
+  - [x] Match: classic cup collects any color; colored cup only its own; `onCollected` carries the marble's color [8dfe104]
+- [x] Task: Implement colored spawn & collection to green; >80% coverage [8dfe104]
+- [~] Task: Write failing tests for the lid state machine (`src/game/game.ts`)
   - [ ] Open holes = cups compatible with the collectible marble (live marble in flight, else next previewed color); classic cup always open
   - [ ] Re-evaluated on spawn/collect, cup place/move/remove/cycle, level enter/exit; wired through `syncPieces`
 - [ ] Task: Implement lid state machine to green; wire floor + marble goal updates together
