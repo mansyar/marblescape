@@ -10,8 +10,8 @@
 
 ## Phase 2 — CI workflow (PRs + master)
 
-- [ ] Task: Write `.github/workflows/ci.yml` — checkout → Node 24.16.0 + pnpm 11.24.0 (exact) → frozen install → `pnpm check` → `pnpm test` → `pnpm build` → Playwright Chromium → 16 prod e2e vs preview `:4173` → failure-only artifacts → pnpm/browser/build caching → `cancel-in-progress`
-- [ ] Task: Broaden `playwright.pwa.config.ts` `testMatch` to all 16 specs; confirm dev-server suite stays out of CI
+- [x] Task: Write `.github/workflows/ci.yml` — checkout → Node 24.16.0 + pnpm 11.24.0 (exact) → frozen install → `pnpm check` → `pnpm test` → `pnpm build` → Playwright Chromium → 16 prod e2e vs preview `:4173` → failure-only artifacts → pnpm/browser/build caching → `cancel-in-progress` — `696505d`
+- [x] Task: Broaden `playwright.pwa.config.ts` `testMatch` to all 16 specs; confirm dev-server suite stays out of CI — `696505d` (16/16 vs prod build locally)
 - [ ] Task: Push branch → open PR → verify CI run green (check ✅, 223 unit ✅, 16/16 prod e2e ✅)
 - [ ] Task: Phase Verification & Checkpoint
 
