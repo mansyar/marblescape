@@ -16,7 +16,7 @@
 - [ ] Task: Implement `src/render/resize.ts` — make tests green
 - [x] Task: Wire re-frame into the game: on debounced resize, recompute `computeCameraFraming` (passing landscape rail reservation) and re-apply camera transform; board state untouched (no reload, no re-init) — `9795ed1`
   - [ ] Unit test: layout-mode helper (`src/ui/layout.ts`) maps viewport size → mode (portrait/landscape) + reserved rail fraction
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) — `[checkpoint: 9795ed1]`
 
 ## Phase 2 — Landscape UI chrome (palette rail + level grid)
 
