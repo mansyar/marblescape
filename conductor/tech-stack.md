@@ -18,6 +18,7 @@ Version-checked against npm registry on 2026-09-08.
 > - **TypeScript:** 6.0.3 instead of 7.0.2. At scaffold time, TS 7's release postdates several lint toolchain peer ranges; pinned to 6.0.3 for toolchain compatibility. Revisit upgrade when the lint toolchain ecosystem fully supports TS 7.
 > - **PWA wiring (2026-09-09, track `pwa-offline_20260909`):** vite-plugin-pwa activated in `vite.config.ts` — Workbox `generateSW` precaches the full offline bundle (JS/CSS, Rapier WASM, 4 piece GLBs, 3 OGGs, icons, favicon) with `navigateFallback: 'index.html'`; `registerType: 'prompt'` shows a non-blocking "New version ready — Update" banner; manifest served at `/manifest.webmanifest`; icons generated to `public/icons/` (192/512/maskable/apple-touch).
 > - **Audio & physics feel (2026-09-10, track `physics-feel-polish_20260910`):** per-marble impact throttling replaces the global 60 ms gate; gentle-impact cutoff lowered (force 1 → 0.35); eased pitch/volume curves; looping roll voice per marble (`public/sounds/roll.ogg`, CC0 qubodup — 4th precached OGG); soft run-settle cue when a run ends away from the goal (stall-capped at 15 s, quiet reap). Physics tunables rebalanced (linear/angular damping 0.3/0.45, restitution 0.3/0.2, spawn height 0.9) — gravity direction fixed.
+> - **Celebration & interaction juice (2026-09-11, track `celebration-juice_20260910`):** no new runtime dependencies, assets, or precache entries — sparkles/confetti/juice are code-driven and pooled inside the existing 60 fps budget. See "Celebration & interaction juice" below.
 
 ## Art & Audio
 
@@ -54,3 +55,13 @@ CI/CD (track `ci-cd-pipeline_20260910`, 2026-09-10):
 ## Responsive layout
 
 Dual-orientation (track `dual-orientation_20260910`, 2026-09-10): `computeCameraFraming` accepts reserved width/height fractions (pure, unit-tested); `src/ui/layout.ts` classifies viewport (portrait/landscape; landscape rail reserves 18% viewport width); debounced ~100 ms resize watcher (`src/render/resize.ts`, resize + orientationchange) re-frames live without reload or state loss; landscape palette is a right-side rail reusing the portrait drag contract; level-select uses an auto-fit `minmax(96px, 1fr)` grid; safe-area insets respected. E2E: 4 viewport projects (390×844, 844×390, 768×1024, 1024×768) × full production-build suite.
+
+## Celebration & interaction juice
+
+Celebration & Interaction Juice (track `celebration-juice_20260910`, 2026-09-11): everything is code-driven — **no new dependencies, assets, or precache entries**.
+
+- **Collect celebration:** pooled 3D sparkle burst anchored at the goal cup on every collect (≤64 particles per burst, ~0.9 s life, coalesced within 150 ms, 4-slot pool) — `src/render/sparkles.ts`.
+- **Solve celebration:** DOM confetti layer (≤120 pieces, ~2.5 s auto-cleanup, one reused layer) plus a solved overlay whose ▶ "Play again" instantly replays the same track with placements untouched (🏠 still returns to level select) — `src/ui/confetti.ts`, `src/ui/solved-overlay.ts`.
+- **Interaction juice:** pure curve helpers (`src/render/piece-anim.ts`: snap-bounce 0.22 s `0.85 → 1.06 → 1`, reject wiggle 0.32 s decaying ±0.18 rad, short-way rotate yaw 0.14 s) applied through `src/render/piece-juice.ts` (one tween per mesh, restores rest on cancel, huge-frame safe): valid drop snap-bounce, rejected drop wiggles the piece or the originating palette tile plus a soft low tick, palette tile lift on pickup, quarter-turn spin + tick on tap. Game state still changes immediately — visuals only.
+- **Reduced motion:** `prefers-reduced-motion: reduce` is honoured live via a `matchMedia` change listener — sparkles and confetti degrade to a single soft glow (no flying particles).
+- **Audio:** reuses the existing `tick`/`clack` samples; the persistent mute toggle governs every effect sound.

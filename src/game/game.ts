@@ -20,7 +20,7 @@ import {
 import { getLevel } from "../domain/levels";
 import { markSolved } from "../domain/solve";
 import type { PieceType, Rotation } from "../domain/pieces";
-import { rotate } from "../domain/pieces";
+import { CONNECTIONS, rotate } from "../domain/pieces";
 import { PIECE_TYPES } from "../domain/pieces";
 import {
   boardFor,
@@ -44,9 +44,12 @@ import { MarbleManager } from "../physics/marbles";
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
-import { PieceRenderer } from "../render/piece-view";
+import { PieceJuice } from "../render/piece-juice";
+import { PieceRenderer, rotationYaw } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
+import { SparkleSystem } from "../render/sparkles";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
+import { cupBurstPosition } from "./celebration";
 
 /**
  * Game orchestrator: owns board state, physics world and rendering, and
@@ -63,6 +66,8 @@ export class Game {
   private marbleMeshes = new Map<object, THREE.Mesh>();
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
+  private sparkles: SparkleSystem | null = null;
+  private readonly juice = new PieceJuice();
   private board: BoardState;
   /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
   private puzzle: PuzzleState | null = null;
@@ -122,6 +127,15 @@ export class Game {
     const handle = startRenderer(this.container);
     this.rendererHandle = handle;
 
+    // Collect-celebration sparkles ride on the scene; reduced-motion users
+    // get the gentle pulse fallback and the setting is honored live.
+    this.sparkles = new SparkleSystem(handle.scene);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.sparkles.setReducedMotion(reducedMotion.matches);
+    reducedMotion.addEventListener("change", (event) => {
+      this.sparkles?.setReducedMotion(event.matches);
+    });
+
     await initPhysics();
     const world = createPhysicsWorld();
     this.world = world;
@@ -140,6 +154,10 @@ export class Game {
       onCollected: (body) => {
         this.removeMarbleMesh(body);
         this.sound?.play("plonk", { rate: 1, volume: 0.9 });
+        const cup = cupBurstPosition(this.board);
+        if (cup) {
+          this.sparkles?.burstAt(cup);
+        }
         if (this.puzzle) {
           // Goal cup reached in level mode: persist the badge (first solve
           // only), play the win chime, and let the UI pulse + show Home.
@@ -173,12 +191,16 @@ export class Game {
     handle.scene.add(this.highlight);
 
     handle.onFrame((elapsed) => {
+      const dt = this.lastElapsed >= 0 ? Math.min(elapsed - this.lastElapsed, 0.1) : 0;
+      this.lastElapsed = elapsed;
       if (this.ticker) {
         this.ticker.update(elapsed);
       }
       this.marbles?.reap();
       this.syncMarbleMeshes();
-      this.stepPopTweens(elapsed);
+      this.stepPopTweens(dt);
+      this.juice.update(dt);
+      this.sparkles?.update(dt);
     });
   }
 
@@ -235,6 +257,10 @@ export class Game {
       this.puzzle = next;
       this.board = boardFor(next);
       this.syncPieces();
+      const placed = placementAt(this.puzzle, cellX, cellY);
+      if (placed) {
+        this.snapBouncePiece(placed.id);
+      }
       return true;
     }
     const piece: PlacedPiece = {
@@ -250,12 +276,16 @@ export class Game {
       return false;
     }
     this.syncPieces();
+    this.snapBouncePiece(piece.id);
     return true;
   }
 
   /** Tap-to-rotate: cycles a piece's rotation 90° per tap. */
   rotate(cellX: number, cellY: number): void {
     if (this.puzzle) {
+      const existing = placementAt(this.puzzle, cellX, cellY);
+      const mesh = existing ? (this.pieceRenderer?.meshFor(existing.id) ?? null) : null;
+      const fromYaw = mesh?.rotation.y ?? 0;
       const next = puzzleRotate(this.puzzle, cellX, cellY);
       if (next === this.puzzle) {
         return;
@@ -263,6 +293,15 @@ export class Game {
       this.puzzle = next;
       this.board = boardFor(next);
       this.syncPieces();
+      const rotated = placementAt(this.puzzle, cellX, cellY);
+      if (mesh && rotated) {
+        this.juice.rotate(
+          mesh,
+          fromYaw,
+          rotationYaw(rotated.rotation) + CONNECTIONS[rotated.type].modelYawOffset,
+        );
+      }
+      this.sound?.play("tick", { rate: 1, volume: 0.4 });
       return;
     }
     const piece = this.pieceAt(cellX, cellY);
@@ -273,11 +312,24 @@ export class Game {
       ...piece,
       rotation: rotate(piece.type, piece.rotation, 1),
     };
+    if (rotated.rotation === piece.rotation) {
+      return; // not rotatable: no spin, no tick
+    }
+    const mesh = this.pieceRenderer?.meshFor(piece.id) ?? null;
+    const fromYaw = mesh?.rotation.y ?? 0;
     this.board = {
       ...this.board,
       pieces: this.board.pieces.map((p) => (p.id === piece.id ? rotated : p)),
     };
     this.syncPieces();
+    if (mesh) {
+      this.juice.rotate(
+        mesh,
+        fromYaw,
+        rotationYaw(rotated.rotation) + CONNECTIONS[rotated.type].modelYawOffset,
+      );
+    }
+    this.sound?.play("tick", { rate: 1, volume: 0.4 });
   }
 
   /** Removes the piece at a cell; returns the removed type (palette pop-back) or null. */
@@ -346,6 +398,10 @@ export class Game {
       this.puzzle = next;
       this.board = boardFor(next);
       this.syncPieces();
+      const placed = placementAt(this.puzzle, toX, toY);
+      if (placed) {
+        this.snapBouncePiece(placed.id);
+      }
       return true;
     }
     const piece = this.pieceAt(fromX, fromY);
@@ -361,6 +417,7 @@ export class Game {
     const moved = { ...piece, x: toX, y: toY };
     this.board = placeTypedPiece(removeTypedPiece(this.board, fromX, fromY), moved);
     this.syncPieces();
+    this.snapBouncePiece(piece.id);
     return true;
   }
 
@@ -406,6 +463,32 @@ export class Game {
 
   hideHighlight(): void {
     this.showHighlight(null, false);
+  }
+
+  /**
+   * Invalid move feedback: the piece shakes side to side and answers with a
+   * soft low tick, so the toy says "not there" without words.
+   */
+  rejectPiece(cell: { x: number; y: number } | null): void {
+    const piece = cell ? this.pieceAt(cell.x, cell.y) : null;
+    const mesh = piece ? this.pieceRenderer?.meshFor(piece.id) : null;
+    if (mesh) {
+      this.juice.wiggle(mesh);
+    }
+    this.sound?.play("tick", { rate: 0.7, volume: 0.5 });
+  }
+
+  /** Valid-drop pop for a piece that just landed (palette or re-place). */
+  private snapBouncePiece(id: string): void {
+    const mesh = this.pieceRenderer?.meshFor(id);
+    if (mesh) {
+      this.juice.snapBounce(mesh);
+    }
+  }
+
+  /** Collect-celebration counter for the Playwright hooks. */
+  burstCount(): number {
+    return this.sparkles?.totalBurstCount ?? 0;
   }
 
   /** Marble bookkeeping for the Playwright reliability gate. */
@@ -604,9 +687,7 @@ export class Game {
     }
   }
 
-  private stepPopTweens(elapsed: number): void {
-    const dt = this.lastElapsed >= 0 ? Math.min(elapsed - this.lastElapsed, 0.1) : 0;
-    this.lastElapsed = elapsed;
+  private stepPopTweens(dt: number): void {
     const done: Array<{ mesh: THREE.Object3D; t: number }> = [];
     for (const tween of this.popTweens) {
       tween.t += dt / 0.25;

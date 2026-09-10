@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { LABELS, paletteLayout } from "./palette";
+import {
+  LABELS,
+  PALETTE_REJECT_ANIMATION,
+  paletteLayout,
+  palettePickupTransform,
+  paletteRejectKeyframes,
+  pulseReject,
+} from "./palette";
 import type { PieceType } from "../domain/pieces";
 
 const ALL_TYPES: readonly PieceType[] = ["straight", "curved", "funnel", "goal"];
@@ -36,6 +43,30 @@ describe("paletteLayout portrait (bottom bar)", () => {
     const { buttonCss } = paletteLayout("portrait");
     expect(buttonCss).toContain("flex:1 1 72px;max-width:110px;min-height:72px");
     expect(buttonCss).toContain("touch-action:none");
+  });
+});
+
+describe("palette reject feedback", () => {
+  it("shakes the tile with a bounded, restartable animation", () => {
+    expect(PALETTE_REJECT_ANIMATION).toContain("0.32s");
+    const keyframes = paletteRejectKeyframes();
+    expect(keyframes).toContain("@keyframes ms-palette-reject");
+    expect(keyframes).toContain("translateX(-6px)");
+    expect(keyframes).toContain("translateX(6px)");
+    expect(keyframes.endsWith("}")).toBe(true);
+  });
+
+  it("restarts the shake from rest on every reject", () => {
+    const tile = { style: { animation: "" }, offsetWidth: 0 } as unknown as HTMLElement;
+    pulseReject(tile);
+    expect(tile.style.animation).toBe(PALETTE_REJECT_ANIMATION);
+  });
+});
+
+describe("palette pickup feedback", () => {
+  it("lifts the tile while dragging and settles it back on release", () => {
+    expect(palettePickupTransform(true)).toContain("-4px");
+    expect(palettePickupTransform(false)).toBe("");
   });
 });
 
