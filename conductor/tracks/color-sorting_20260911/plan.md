@@ -59,7 +59,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: e2e: sandbox cycle → Play drops exactly the previewed color; colored cup place + retint flow [19fcf27]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 4 — Sorting levels: solve flow & visible progress (TDD)
+## Phase 4 — Sorting levels: solve flow & visible progress (TDD) [checkpoint: 39aed00]
 
 - [x] Task: Write failing tests for per-color solve accounting (`src/game/game.ts`, `src/domain/solve.ts`) [fd83687]
   - [ ] Collected counts per color vs script; solved when all met → existing chime/sparkle/confetti/overlay + ✓ badge
@@ -68,8 +68,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement solve accounting + trophy cups to green [fd83687]
 - [x] Task: Write failing tests + wire levels 7–9 into level select (`src/ui/level-select.ts`); badges for 7–9 refresh correctly [1501058]
 - [x] Task: e2e `tests/e2e/levels.spec.ts`: scripted solve of L7; smoke-pass L8/L9; preview recovery after a wandered marble; mismatches never fail [39aed00]
-- [ ] Task: Manual feel pass (portrait + landscape): lid readability, cycle affordance, color clarity (incl. color-blind spot check)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Manual feel pass (portrait + landscape): lid readability, cycle affordance, color clarity (incl. color-blind spot check) [39aed00]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 39aed00]
 
 ## Phase 5 — Track completion
 
