@@ -2,6 +2,13 @@ import { impactToPlayback, impactToVolume, MAX_FORCE } from "./pitch";
 
 export type ImpactSample = "tick" | "clack";
 
+/**
+ * Below this relative speed an impact is inaudibly soft — skip it entirely.
+ * Lowered from the old cutoff of 1 so gentle, low-speed ticks still sound
+ * (spec FR2).
+ */
+export const MIN_IMPACT_FORCE = 0.35;
+
 /** Both participants marbles = glass tick; a marble hitting anything else = clack. */
 export function selectImpactSound(aIsMarble: boolean, bIsMarble: boolean): ImpactSample | null {
   if (!aIsMarble && !bIsMarble) {

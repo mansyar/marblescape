@@ -42,6 +42,27 @@ describe("PHYSICS tuning config", () => {
       (PHYSICS as Record<string, unknown>).marbleRadius = 99;
     }).toThrow();
   });
+
+  it("keeps gravity tilted due south (direction fixed, spec FR1)", () => {
+    expect(PHYSICS.gravity[0]).toBe(0); // no east-west drift
+    expect(PHYSICS.gravity[2]).toBeGreaterThan(1.5); // south pull preserved
+  });
+
+  it("keeps momentum between the v1 mud-band and the too-fast extreme", () => {
+    expect(PHYSICS.linearDamping).toBeGreaterThan(0); // still settles
+    expect(PHYSICS.linearDamping).toBeLessThan(0.45);
+    expect(PHYSICS.angularDamping).toBeGreaterThan(0);
+    expect(PHYSICS.angularDamping).toBeLessThan(0.6);
+  });
+
+  it("bounces livelier than v1 for click-clack drama", () => {
+    expect(PHYSICS.marbleRestitution).toBeGreaterThanOrEqual(0.25);
+    expect(PHYSICS.boardRestitution).toBeGreaterThanOrEqual(0.15);
+  });
+
+  it("drops from high enough for an audible entrance", () => {
+    expect(PHYSICS.spawnHeight).toBeGreaterThanOrEqual(0.8);
+  });
 });
 
 describe("MARBLE_PALETTE", () => {

@@ -1,8 +1,11 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import RAPIER from "@dimforge/rapier3d-compat";
-import { impactParams, selectImpactSound } from "../audio/impact-sounds";
+import { impactParams, MIN_IMPACT_FORCE, selectImpactSound } from "../audio/impact-sounds";
+import { IMPACT_COOLDOWN_MS, ImpactThrottler } from "../audio/impact-throttle";
+import { RollVoices } from "../audio/roll";
 import { playChime } from "../audio/chime";
+import { playSettleCue } from "../audio/settle-cue";
 import { isSoundOn, setSoundOn } from "../audio/prefs";
 import { SoundManager } from "../audio/sound-manager";
 import {
@@ -72,7 +75,8 @@ export class Game {
   private sound: SoundManager | null = null;
   private audioCtx: AudioContext | null = null;
   private eventQueue: RAPIER.EventQueue | null = null;
-  private lastImpactAt = 0;
+  private readonly impactThrottler = new ImpactThrottler();
+  private rolls: RollVoices | null = null;
   private floorBodies: RAPIER.RigidBody[] = [];
   private floorGoal: string | null = "init";
   private saveTimer: number | null = null;
@@ -127,6 +131,7 @@ export class Game {
       () => {
         stepWorld(world, this.eventQueue);
         this.drainImpacts();
+        this.updateRolls();
       },
       PHYSICS.maxSubSteps,
     );
@@ -144,6 +149,9 @@ export class Game {
         }
       },
       onRescued: (body) => this.removeMarbleMesh(body),
+      // Run over: a soft cue only when the run ended without a goal (the
+      // plonk/chime cover success). Play itself never locks on settle.
+      onRunSettled: (reason) => playSettleCue(this.audioCtx, reason, this.sound?.isMuted ?? true),
     });
 
     const pieceGroup = new THREE.Group();
@@ -490,14 +498,39 @@ export class Game {
       this.sound.load("clack", "/sounds/clack.ogg"),
       this.sound.load("tick", "/sounds/tick.ogg"),
       this.sound.load("plonk", "/sounds/plonk.ogg"),
+      this.sound.load("roll", "/sounds/roll.ogg"),
     ]);
     this.sound.setMuted(!isSoundOn(localStorage));
+    this.rolls = new RollVoices({
+      create: () => {
+        const voice = this.sound?.loop("roll");
+        if (!voice) {
+          throw new Error("roll sample not loaded");
+        }
+        return voice;
+      },
+    });
+    this.rolls.setMuted(!isSoundOn(localStorage));
   }
 
   /** Mute toggle from the HUD; persists the preference. */
   setSoundOn(on: boolean): void {
     setSoundOn(on, localStorage);
     this.sound?.setMuted(!on);
+    this.rolls?.setMuted(!on);
+  }
+
+  /** Feeds the roll voices with current marble speeds (one voice per marble). */
+  private updateRolls(): void {
+    if (!this.marbles || !this.rolls) {
+      return;
+    }
+    const states = [];
+    for (const body of this.marbles.all()) {
+      const v = body.linvel();
+      states.push({ marble: body, speed: Math.hypot(v.x, v.y, v.z) });
+    }
+    this.rolls.update(states);
   }
 
   private drainImpacts(): void {
@@ -519,18 +552,23 @@ export class Game {
       if (!name) {
         return;
       }
-      // Relative speed at contact drives pitch and loudness.
+      // Relative speed at contact drives pitch and loudness; gentle
+      // low-speed ticks stay audible thanks to the lowered cutoff.
       const v1 = b1.linvel();
       const v2 = b2.linvel();
       const force = Math.hypot(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-      if (force < 1) {
+      if (force < MIN_IMPACT_FORCE) {
         return;
       }
+      // Per-marble voice throttling: one marble's click no longer mutes
+      // the others during pile-ups (spec FR2).
+      const involved = [b1, b2].filter((body) => marbles.has(body));
       const now = performance.now();
-      if (now - this.lastImpactAt < 60) {
-        return; // avoid machine-gunning during pile-ups
+      if (
+        !this.impactThrottler.shouldPlay(involved[0], now, IMPACT_COOLDOWN_MS, involved.slice(1))
+      ) {
+        return;
       }
-      this.lastImpactAt = now;
       this.sound?.play(name, impactParams(force));
     });
   }

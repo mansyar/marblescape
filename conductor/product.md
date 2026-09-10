@@ -38,7 +38,7 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 
 ## Known Risks
 
-1. **3D marble physics tuning** — marbles bouncing out of tracks. Mitigation: guard-railed pieces, generous damping, simplified collision shapes, raised board edges.
+1. **3D marble physics tuning** — marbles bouncing out of tracks. Mitigation: guard-railed pieces, rebalanced damping (0.3/0.45, track `physics-feel-polish_20260910`), simplified collision shapes, raised board edges. Verified by headless 20-drop reliability gate (every marble collected, zero escapes) plus the 4-viewport e2e matrix.
 2. **Dual-orientation support** — doubles layout/UI testing; camera framing adapts per aspect ratio.
 3. **Offline bundle size** — Rapier WASM + glTF assets (est. 3-5MB precache); needs a cache strategy early.
 4. **Collision shapes per piece** — grid-snapped 3D pieces need hand-authored collision shapes; small with 4 pieces, real cost if palette grows.

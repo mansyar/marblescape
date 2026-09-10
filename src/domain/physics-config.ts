@@ -16,13 +16,13 @@ export const PHYSICS = Object.freeze({
    */
   gravity: [0, -17.8, 2.5] as const,
 
-  /** Marbles roll, then settle — damping keeps runaway energy in check. */
-  linearDamping: 0.5,
-  angularDamping: 0.6,
+  /** Marbles roll with intent but can still slow on flats (feel iteration 2). */
+  linearDamping: 0.3,
+  angularDamping: 0.45,
 
   /** Bounciness. Kept < 1 so impacts always lose energy (reliability gate). */
-  marbleRestitution: 0.15,
-  boardRestitution: 0.08,
+  marbleRestitution: 0.3,
+  boardRestitution: 0.2,
 
   /** Ball-sphere collision shape radius, in world units (1 unit = 1 cell). */
   marbleRadius: 0.3,
@@ -30,8 +30,8 @@ export const PHYSICS = Object.freeze({
   /** Grid cell size in world units — 1 world unit per board cell. */
   cellSize: 1,
 
-  /** Drop height above the board surface (low: landing must not scatter). */
-  spawnHeight: 0.4,
+  /** Drop height above the board surface (audible entrance plonk). */
+  spawnHeight: 0.9,
 
   /** Marbles dropped per Play press (user preference: one at a time). */
   maxMarblesPerDrop: 1,
