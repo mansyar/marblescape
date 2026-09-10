@@ -13,8 +13,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Tests: emission caps, pool reuse (no per-event allocation after warm-up), expiry, coalescing window, reduced-motion fallback
 - [x] Task: Implement sparkle module to green; >80% coverage; `pnpm check` clean [37fe3c0]
 - [x] Task: Write failing tests + wire collect celebration into `Game` (burst at the goal cup world position); expose `burstCount` test hook [0efdc2e]
-- [~] Task: Implement wiring to green; verify sandbox + puzzle collects both fire; full unit suite green
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement wiring to green; verify sandbox + puzzle collects both fire; full unit suite green [d95b49e]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: d95b49e]
 
 ## Phase 2 — Solve celebration: confetti, overlay enrichments, instant replay (TDD)
 
