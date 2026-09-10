@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import RAPIER from "@dimforge/rapier3d-compat";
 import { PHYSICS } from "../domain/physics-config";
 import { colliderDescriptors } from "./piece-colliders";
@@ -78,7 +78,68 @@ describe("MarbleManager", () => {
       stepWorld(world);
       marbles.reap();
     }
-    expect(marbles.getRescued().length).toBe(1);
+    expect(marbles.getRescued()).toHaveLength(1);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("fires onRunSettled with 'all-done' once the marble is collected", () => {
+    const world = createPhysicsWorld();
+    placePiece(world, "goal", 0, 4, 4);
+    const onRunSettled = vi.fn();
+    const marbles = new MarbleManager(world, { onRunSettled });
+    marbles.setGoalCell(4, 4);
+    marbles.spawnDrop(4, 4);
+    for (let i = 0; i < 240 && onRunSettled.mock.calls.length === 0; i += 1) {
+      stepWorld(world);
+      marbles.reap();
+    }
+    expect(onRunSettled).toHaveBeenCalledTimes(1);
+    expect(onRunSettled).toHaveBeenCalledWith("all-done");
+    // Extra reaps after the run settled must never fire again.
+    marbles.reap();
+    marbles.reap();
+    expect(onRunSettled).toHaveBeenCalledTimes(1);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("reaps stalled marbles via the rescued path after the stall cap", () => {
+    const world = createPhysicsWorld();
+    // Cap reached after 3 steps; at-rest unreachable within the test window.
+    const marbles = new MarbleManager(world, {}, { settleSteps: 10_000, stallCapSeconds: 0.05 });
+    marbles.spawnAt(4, PHYSICS.spawnHeight, 4); // plain board: no goal, no edges
+    for (let i = 0; i < 20; i += 1) {
+      stepWorld(world);
+      marbles.reap();
+    }
+    expect(marbles.getRescued()).toHaveLength(1);
+    expect(marbles.count).toBe(0);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("fires exactly once per run; a fresh drop starts a new run", () => {
+    const world = createPhysicsWorld();
+    const onRunSettled = vi.fn();
+    // settleSpeed 1000 → any live marble counts as calm immediately.
+    const marbles = new MarbleManager(
+      world,
+      { onRunSettled },
+      { settleSteps: 2, settleSpeed: 1000, stallCapSeconds: 1000 },
+    );
+    marbles.spawnDrop(4, 4);
+    marbles.reap();
+    marbles.reap();
+    expect(onRunSettled).toHaveBeenCalledTimes(1);
+    expect(onRunSettled).toHaveBeenCalledWith("at-rest");
+    marbles.reap();
+    marbles.reap();
+    expect(onRunSettled).toHaveBeenCalledTimes(1);
+    marbles.spawnDrop(4, 4); // settled → fresh run
+    marbles.reap();
+    marbles.reap();
+    expect(onRunSettled).toHaveBeenCalledTimes(2);
     marbles.dispose();
     world.free();
   });
