@@ -1,11 +1,54 @@
 import type { PieceType } from "../domain/pieces";
+import type { LayoutMode } from "./layout";
 
-const LABELS: Record<PieceType, string> = {
+/** Kid-facing button labels, in canonical palette order (Ramp → Hole). */
+export const LABELS: Record<PieceType, string> = {
   straight: "Ramp",
   curved: "Curve",
   funnel: "Funnel",
   goal: "Hole",
 };
+
+const CONTAINER_PORTRAIT = [
+  "position:fixed;left:0;right:0;bottom:0",
+  "display:flex;justify-content:center;align-items:center",
+  "gap:10px;padding:10px",
+  "padding-bottom:max(10px, env(safe-area-inset-bottom))",
+  "flex-wrap:wrap",
+].join(";");
+
+const CONTAINER_LANDSCAPE = [
+  "position:fixed;top:0;right:0;bottom:0",
+  "display:flex;flex-direction:column;justify-content:center;align-items:center",
+  "gap:10px;padding:10px",
+  "padding-right:max(10px, env(safe-area-inset-right))",
+].join(";");
+
+const BUTTON_PORTRAIT = [
+  "flex:1 1 72px;max-width:110px;min-height:72px",
+  "font-size:19px;font-weight:700",
+  "border-radius:14px;border:3px solid #2c3e50;background:#fff",
+  "touch-action:none",
+].join(";");
+
+const BUTTON_LANDSCAPE = [
+  "flex:0 0 72px;width:72px;min-height:72px",
+  "font-size:19px;font-weight:700",
+  "border-radius:14px;border:3px solid #2c3e50;background:#fff",
+  "touch-action:none",
+].join(";");
+
+export interface PaletteLayout {
+  containerCss: string;
+  buttonCss: string;
+}
+
+/** Container/button styling for the palette in the given layout mode. */
+export function paletteLayout(mode: LayoutMode): PaletteLayout {
+  return mode === "landscape"
+    ? { containerCss: CONTAINER_LANDSCAPE, buttonCss: BUTTON_LANDSCAPE }
+    : { containerCss: CONTAINER_PORTRAIT, buttonCss: BUTTON_PORTRAIT };
+}
 
 /**
  * Bottom palette: one big (64px+) button per piece type. Dragging from a
@@ -16,26 +59,16 @@ export function createPalette(
   types: readonly PieceType[],
   onDrag: (type: PieceType, ndcX: number, ndcY: number | null) => void,
   onDrop: (type: PieceType, ndcX: number, ndcY: number | null) => void,
+  mode: LayoutMode,
 ): HTMLElement {
   const bar = document.createElement("div");
-  bar.style.cssText = [
-    "position:fixed;left:0;right:0;bottom:0",
-    "display:flex;justify-content:center;align-items:center",
-    "gap:10px;padding:10px",
-    "padding-bottom:max(10px, env(safe-area-inset-bottom))",
-    "flex-wrap:wrap",
-  ].join(";");
+  bar.style.cssText = paletteLayout(mode).containerCss;
 
   for (const type of types) {
     const btn = document.createElement("button");
     btn.textContent = LABELS[type];
     btn.dataset.pieceType = type;
-    btn.style.cssText = [
-      "flex:1 1 72px;max-width:110px;min-height:72px",
-      "font-size:19px;font-weight:700",
-      "border-radius:14px;border:3px solid #2c3e50;background:#fff",
-      "touch-action:none",
-    ].join(";");
+    btn.style.cssText = paletteLayout(mode).buttonCss;
 
     const ndcFromEvent = (e: PointerEvent): [number, number | null] => {
       const canvas = root.querySelector("canvas");

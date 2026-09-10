@@ -57,6 +57,7 @@ if (app) {
             game.place(type, cell.x, cell.y);
           }
         },
+        layoutMode(window.innerWidth, window.innerHeight).mode,
       );
       document.body.appendChild(paletteBar);
     };
