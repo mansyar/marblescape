@@ -1,7 +1,8 @@
 {
   "id": "celebration-juice_20260910",
   "type": "feature",
-  "status": "new",
+  "status": "completed",
   "description": "Celebration & interaction juice: pooled sparkle bursts at the goal cup on every collect, confetti + enriched solved overlay with instant replay of the same solved track, and tactile interaction feedback — reject wiggle, valid-drop snap-bounce, palette pickup, rotate tap animation. Reduced-motion fallbacks, existing CC0 samples only, no new dependencies; verified by unit tests, extended e2e hooks, and the existing 4-viewport matrix + reliability gate.",
-  "created": "2026-09-10T00:00:00Z"
+  "created": "2026-09-10T00:00:00Z",
+  "completed": "2026-09-11T00:00:00.000Z"
 }
