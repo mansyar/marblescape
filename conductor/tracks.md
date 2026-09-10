@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [ ] **Track: Physics Feel Polish** *Link: [./tracks/physics-feel-polish_20260910/index.md](./tracks/physics-feel-polish_20260910/index.md)*
+- [~] **Track: Physics Feel Polish** *Link: [./tracks/physics-feel-polish_20260910/index.md](./tracks/physics-feel-polish_20260910/index.md)*
 
 ## Archive
 
