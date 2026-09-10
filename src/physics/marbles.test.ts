@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import RAPIER from "@dimforge/rapier3d-compat";
+import { MARBLE_COLORS, type MarbleColor } from "../domain/colors";
 import { PHYSICS } from "../domain/physics-config";
 import { colliderDescriptors } from "./piece-colliders";
 import { MarbleManager } from "./marbles";
@@ -56,7 +57,7 @@ describe("MarbleManager", () => {
     const marbles = new MarbleManager(world);
     // Goal piece at cell (4,4): falling below the board there = collected
     placePiece(world, "goal", 0, 4, 4);
-    marbles.setGoalCell(4, 4);
+    marbles.setGoalCells([{ x: 4, z: 4, color: null }]);
     marbles.spawnDrop(4, 4);
     expect(marbles.getCollected()).toHaveLength(0);
 
@@ -88,7 +89,7 @@ describe("MarbleManager", () => {
     placePiece(world, "goal", 0, 4, 4);
     const onRunSettled = vi.fn();
     const marbles = new MarbleManager(world, { onRunSettled });
-    marbles.setGoalCell(4, 4);
+    marbles.setGoalCells([{ x: 4, z: 4, color: null }]);
     marbles.spawnDrop(4, 4);
     for (let i = 0; i < 240 && onRunSettled.mock.calls.length === 0; i += 1) {
       stepWorld(world);
@@ -140,6 +141,65 @@ describe("MarbleManager", () => {
     marbles.reap();
     marbles.reap();
     expect(onRunSettled).toHaveBeenCalledTimes(2);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("spawns with an explicit marble color without consuming the random sequence", () => {
+    const world = createPhysicsWorld();
+    const marbles = new MarbleManager(world);
+    marbles.spawnDrop(3, 3, "mint");
+    expect(marbles.colorOf(marbles.all()[0])).toBe("mint");
+    marbles.spawnDrop(4, 3);
+    expect(marbles.colorOf(marbles.all()[1])).toBe(MARBLE_COLORS[0]);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("collects only matching marbles in colored cups and reports the color", () => {
+    const world = createPhysicsWorld();
+    placePiece(world, "goal", 0, 4, 4);
+    const colors: MarbleColor[] = [];
+    const marbles = new MarbleManager(world, {
+      onCollected: (_body, color) => colors.push(color),
+    });
+    marbles.setGoalCells([{ x: 4, z: 4, color: "mint" }]);
+    marbles.spawnAt(4.5, 2, 4.5, "mint");
+    for (let i = 0; i < 240 && marbles.getCollected().length === 0; i += 1) {
+      stepWorld(world);
+      marbles.reap();
+    }
+    expect(marbles.getCollected()).toHaveLength(1);
+    expect(colors).toEqual(["mint"]);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("ignores mismatched marbles in colored cups while classic cups catch any color", () => {
+    const world = createPhysicsWorld();
+    placePiece(world, "goal", 0, 4, 4);
+    placePiece(world, "goal", 0, 2, 4);
+    const marbles = new MarbleManager(world);
+    marbles.setGoalCells([
+      { x: 4, z: 4, color: "mint" },
+      { x: 2, z: 4, color: null },
+    ]);
+    // Grape marble aimed at the mint cup: no collection; it falls through
+    // the open hole (the lid is a physics-layer concern) and is rescued.
+    marbles.spawnAt(4.5, 2, 4.5, "grape");
+    for (let i = 0; i < 240; i += 1) {
+      stepWorld(world);
+      marbles.reap();
+    }
+    expect(marbles.getCollected()).toHaveLength(0);
+    expect(marbles.getRescued()).toHaveLength(1);
+    // Grape marble aimed at the classic cup: caught regardless of color.
+    marbles.spawnAt(2.5, 2, 4.5, "grape");
+    for (let i = 0; i < 240 && marbles.getCollected().length === 0; i += 1) {
+      stepWorld(world);
+      marbles.reap();
+    }
+    expect(marbles.getCollected()).toHaveLength(1);
     marbles.dispose();
     world.free();
   });

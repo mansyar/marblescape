@@ -41,6 +41,7 @@ import {
   type PieceBodyEntry,
 } from "../physics/board-bodies";
 import { MarbleManager } from "../physics/marbles";
+import { colorHex } from "../domain/colors";
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
@@ -554,14 +555,8 @@ export class Game {
         this.floorBodies = syncFloorBodies(this.world, this.floorBodies, holes);
       }
     }
-    if (!this.marbles) {
-      return;
-    }
-    const first = goals[0];
-    if (first) {
-      this.marbles.setGoalCell(first.x, first.y);
-    } else {
-      this.marbles.setGoalCell(null);
+    if (this.marbles) {
+      this.marbles.setGoalCells(goals.map((p) => ({ x: p.x, z: p.y, color: p.color ?? null })));
     }
   }
 
@@ -669,7 +664,10 @@ export class Game {
       if (!mesh) {
         mesh = new THREE.Mesh(
           new THREE.SphereGeometry(PHYSICS.marbleRadius, 24, 16),
-          new THREE.MeshStandardMaterial({ color: this.marbles.colorOf(body), roughness: 0.15 }),
+          new THREE.MeshStandardMaterial({
+            color: colorHex(this.marbles.colorOf(body)),
+            roughness: 0.15,
+          }),
         );
         mesh.castShadow = true;
         this.marbleMeshes.set(body, mesh);

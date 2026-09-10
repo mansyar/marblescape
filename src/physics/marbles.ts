@@ -5,7 +5,7 @@ import {
   type RunSettleOptions,
   type SettleReason,
 } from "../domain/run-settle";
-import { MARBLE_PALETTE } from "../domain/colors";
+import { MARBLE_COLORS, type MarbleColor } from "../domain/colors";
 import { PHYSICS } from "../domain/physics-config";
 import type { World } from "./world";
 
@@ -13,8 +13,8 @@ const RESCUE_Y = -5; // below this, a marble has left the play area for good
 const COLLECT_Y = -0.5; // below board surface inside the goal hole = collected
 
 export interface MarbleEvents {
-  /** Called when a marble falls through the goal hole. */
-  onCollected?: (body: RAPIER.RigidBody) => void;
+  /** Called when a marble falls through an open cup; includes its color. */
+  onCollected?: (body: RAPIER.RigidBody, color: MarbleColor) => void;
   /** Called when a marble fell off the board and was rescued. */
   onRescued?: (body: RAPIER.RigidBody) => void;
   /** Called exactly once per run when it settles (all-done / at-rest / stall). */
@@ -31,9 +31,9 @@ export class MarbleManager {
   private readonly bodies: RAPIER.RigidBody[] = [];
   private readonly collected: RAPIER.RigidBody[] = [];
   private readonly rescued: RAPIER.RigidBody[] = [];
-  private readonly colors = new Map<RAPIER.RigidBody, string>();
+  private readonly colors = new Map<RAPIER.RigidBody, MarbleColor>();
   private nextColor = 0;
-  private goalCell: { x: number; z: number } | null = null;
+  private goalCells: Array<{ x: number; z: number; color: MarbleColor | null }> = [];
   private readonly world: World;
   private readonly events: MarbleEvents;
   private readonly detector: RunSettleDetector;
@@ -70,13 +70,13 @@ export class MarbleManager {
     return this.rescued;
   }
 
-  /** Sets the cell whose hole collects marbles (null disables collection). */
-  setGoalCell(x: number | null, z?: number): void {
-    this.goalCell = x === null || z === undefined ? null : { x, z };
+  /** Sets the cups that collect marbles; a null color collects any marble. */
+  setGoalCells(cells: ReadonlyArray<{ x: number; z: number; color: MarbleColor | null }>): void {
+    this.goalCells = cells.map((cell) => ({ ...cell }));
   }
 
-  /** Spawns one Play-button drop at the given cell. */
-  spawnDrop(cellX: number, cellZ: number): void {
+  /** Spawns one Play-button drop at the given cell, optionally forcing a color. */
+  spawnDrop(cellX: number, cellZ: number, color?: MarbleColor): void {
     // A drop after the previous run settled starts a fresh run; a drop while
     // marbles are still live extends the current run (no reset mid-flight).
     if (this.bodies.length === 0 || this.detector.isSettled) {
@@ -90,19 +90,29 @@ export class MarbleManager {
       // the chute's elevated rim, so a jittered spawn could wedge against
       // the end wall and stall (flaky on level runs). Center is clear of
       // both rims; the marble still has the full tile to build speed.
-      this.spawnAt(cellX + 0.5 + jitter, PHYSICS.spawnHeight + i * 0.8, cellZ + 0.5 + jitter * 0.8);
+      this.spawnAt(
+        cellX + 0.5 + jitter,
+        PHYSICS.spawnHeight + i * 0.8,
+        cellZ + 0.5 + jitter * 0.8,
+        color,
+      );
     }
   }
 
-  /** Candy color assigned to a marble (for rendering). */
-  colorOf(body: RAPIER.RigidBody): string {
-    return this.colors.get(body) ?? MARBLE_PALETTE[0];
+  /** Candy color assigned to a marble (for rendering and cup matching). */
+  colorOf(body: RAPIER.RigidBody): MarbleColor {
+    return this.colors.get(body) ?? MARBLE_COLORS[0];
   }
 
-  spawnAt(x: number, y: number, z: number): RAPIER.RigidBody {
+  spawnAt(x: number, y: number, z: number, color?: MarbleColor): RAPIER.RigidBody {
     this.runSpawned += 1;
-    const color = MARBLE_PALETTE[this.nextColor % MARBLE_PALETTE.length];
-    this.nextColor += 1;
+    let assigned = color;
+    if (assigned === undefined) {
+      // Explicit colors (scripted / previewed) don't consume the random
+      // sequence, so sandbox drops keep their cycling candy order.
+      assigned = MARBLE_COLORS[this.nextColor % MARBLE_COLORS.length];
+      this.nextColor += 1;
+    }
     const body = this.world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
         .setTranslation(x, y, z)
@@ -118,7 +128,7 @@ export class MarbleManager {
       RAPIER.ColliderDesc.ball(PHYSICS.marbleRadius).setRestitution(PHYSICS.marbleRestitution),
       body,
     );
-    this.colors.set(body, color);
+    this.colors.set(body, assigned);
     this.bodies.push(body);
     return body;
   }
@@ -146,14 +156,17 @@ export class MarbleManager {
     for (let i = this.bodies.length - 1; i >= 0; i -= 1) {
       const body = this.bodies[i];
       const t = body.translation();
-      const inGoal =
-        this.goalCell !== null &&
-        Math.abs(t.x - (this.goalCell.x + 0.5)) < 0.5 &&
-        Math.abs(t.z - (this.goalCell.z + 0.5)) < 0.5;
-      if (inGoal && t.y < COLLECT_Y) {
+      const color = this.colorOf(body);
+      const inOpenCup = this.goalCells.some(
+        (cup) =>
+          Math.abs(t.x - (cup.x + 0.5)) < 0.5 &&
+          Math.abs(t.z - (cup.z + 0.5)) < 0.5 &&
+          (cup.color === null || cup.color === color),
+      );
+      if (inOpenCup && t.y < COLLECT_Y) {
         this.bodies.splice(i, 1);
         this.collected.push(body);
-        this.events.onCollected?.(body);
+        this.events.onCollected?.(body, color);
       } else if (t.y < RESCUE_Y) {
         this.bodies.splice(i, 1);
         this.rescued.push(body);

@@ -29,7 +29,7 @@ describe("buildBoardBodies", () => {
     const world = createPhysicsWorld();
     buildBoardBodies(world, [{ x: 4, z: 0 }]);
     const marbles = new MarbleManager(world);
-    marbles.setGoalCell(4, 0);
+    marbles.setGoalCells([{ x: 4, z: 0, color: null }]);
     // Drop a marble straight above the goal cell.
     marbles.spawnAt(4.5, 2, 0.5);
     // Reap every step like the real game loop — tilted gravity carries the
@@ -46,7 +46,7 @@ describe("buildBoardBodies", () => {
     const world = createPhysicsWorld();
     buildBoardBodies(world, [{ x: 4, z: 0 }]);
     const marbles = new MarbleManager(world);
-    marbles.setGoalCell(4, 0);
+    marbles.setGoalCells([{ x: 4, z: 0, color: null }]);
     marbles.spawnAt(1.5, 2, 1.5);
     for (let i = 0; i < 240; i += 1) {
       stepWorld(world);
