@@ -181,6 +181,13 @@ if (app) {
         const cell = clientToCell(g.x, g.y);
         if (cell) {
           game.rotate(cell.x, cell.y);
+        } else {
+          const [ndcX, ndcY] = clientToNdc(g.x, g.y);
+          if (ndcY !== null) {
+            // The waiting marble floats above the board, so its screen spot
+            // lands off-board: route the tap by NDC for the raycast.
+            game.tapWaitingMarble(ndcX, ndcY);
+          }
         }
       } else if (g.type === "drag-end" && draggingFrom) {
         game.hideHighlight();

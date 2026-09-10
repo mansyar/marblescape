@@ -1,5 +1,7 @@
 import * as THREE from "three";
+import { colorHex, type MarbleColor } from "../domain/colors";
 import { CONNECTIONS, type PieceType, type Rotation } from "../domain/pieces";
+import type { TintTarget } from "./piece-juice";
 
 /** Cell (col,row) -> world position of the cell center on the board surface. */
 export function cellToWorld(x: number, y: number): [number, number, number] {
@@ -58,6 +60,7 @@ export class PieceRenderer {
       rotation: Rotation;
       x: number;
       y: number;
+      color?: MarbleColor;
     }>,
   ): void {
     const keep = new Set(pieces.map((p) => p.id));
@@ -88,7 +91,28 @@ export class PieceRenderer {
       const slope = CONNECTIONS[piece.type].slope ?? 0;
       mesh.rotation.x = slope;
       mesh.position.y += slope > 0 ? 0.48 * Math.sin(slope) : 0;
+      // Colored sorting cups wear their candy tint; classics stay as modeled.
+      if (piece.type === "goal" && piece.color !== undefined) {
+        PieceRenderer.tintCup(mesh, piece.color);
+      }
     }
+  }
+
+  /** Tints a colored cup's materials, cloning them so the template is safe. */
+  private static tintCup(mesh: THREE.Object3D, color: MarbleColor): void {
+    mesh.traverse((node) => {
+      const part = node as THREE.Mesh;
+      if (!part.isMesh) {
+        return;
+      }
+      let material = part.material as THREE.MeshStandardMaterial;
+      if (material.userData.msCupTint !== true) {
+        material = material.clone();
+        material.userData.msCupTint = true;
+        part.material = material;
+      }
+      material.color.set(colorHex(color));
+    });
   }
 
   private static placeholder(type: PieceType): THREE.Object3D {
@@ -100,4 +124,28 @@ export class PieceRenderer {
     mesh.position.y = 0.125;
     return mesh;
   }
+}
+
+/**
+ * Flash target for a cup's mesh: pulses the emissive channel so a tap
+ * visibly lights up the newly chosen tint.
+ */
+export function cupTintTarget(mesh: THREE.Object3D): TintTarget {
+  const materials: THREE.MeshStandardMaterial[] = [];
+  mesh.traverse((node) => {
+    const part = node as THREE.Mesh;
+    if (part.isMesh) {
+      const material = part.material as THREE.MeshStandardMaterial;
+      if (material.emissive) {
+        materials.push(material);
+      }
+    }
+  });
+  return {
+    setFlash(amount) {
+      for (const material of materials) {
+        material.emissive.setScalar(amount * 0.6);
+      }
+    },
+  };
 }

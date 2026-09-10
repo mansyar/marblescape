@@ -42,12 +42,12 @@ import {
   type PieceBodyEntry,
 } from "../physics/board-bodies";
 import { MarbleManager } from "../physics/marbles";
-import { colorHex, MARBLE_COLORS, type MarbleColor } from "../domain/colors";
+import { colorHex, MARBLE_COLORS, nextMarbleColor, type MarbleColor } from "../domain/colors";
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
 import { PieceJuice } from "../render/piece-juice";
-import { PieceRenderer, rotationYaw } from "../render/piece-view";
+import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
 import { SparkleSystem } from "../render/sparkles";
 import { createWaitingMarble, type WaitingMarble } from "../render/waiting-marble";
@@ -76,6 +76,9 @@ export class Game {
   /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
   private puzzle: PuzzleState | null = null;
   private sandboxBoard: BoardState | null = null;
+  /** Child-chosen sandbox marble color (tap the chute); null = natural cycle. */
+  private sandboxColor: MarbleColor | null = null;
+  private reducedMotion = false;
 
   /** Fired each time a marble lands in the goal cup while in level mode. */
   onLevelSolved: ((levelId: number) => void) | null = null;
@@ -141,9 +144,11 @@ export class Game {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.sparkles.setReducedMotion(reducedMotion.matches);
     this.waiting.setReducedMotion(reducedMotion.matches);
+    this.reducedMotion = reducedMotion.matches;
     reducedMotion.addEventListener("change", (event) => {
       this.sparkles?.setReducedMotion(event.matches);
       this.waiting?.setReducedMotion(event.matches);
+      this.reducedMotion = event.matches;
     });
 
     await initPhysics();
@@ -330,6 +335,16 @@ export class Game {
     }
     const piece = this.pieceAt(cellX, cellY);
     if (!piece) {
+      // Sandbox chute (the empty spawn cell): a tap cycles the waiting
+      // marble's color. In levels the chute is fixed furniture: no-op.
+      if (cellX === Math.floor(BOARD_COLS / 2) && cellY === 0) {
+        this.cyclePreviewColor();
+      }
+      return;
+    }
+    if (piece.type === "goal") {
+      // Colored cups are non-rotatable: a tap re-tints instead of spinning.
+      this.cycleCupColor(cellX, cellY);
       return;
     }
     const rotated: PlacedPiece = {
@@ -456,10 +471,14 @@ export class Game {
         color ?? scripted ?? undefined,
       );
     } else {
-      // Sandbox drops ride the natural random sequence: peekColor() is
+      // Sandbox drops ride the cycled color when the child picked one (tap
+      // on the chute), else the natural random sequence: peekColor() is
       // exactly this marble's color, so preview and drop never disagree.
-      // An explicit color (test hooks) drops without consuming it.
-      this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0, color);
+      this.marbles?.spawnDrop(
+        Math.floor(BOARD_COLS / 2),
+        0,
+        color ?? this.sandboxColor ?? undefined,
+      );
     }
     // A live marble changes which cups are compatible: refresh lids/floors.
     this.refreshCupState();
@@ -478,6 +497,59 @@ export class Game {
       this.board = removeTypedPiece(this.board, piece.x, piece.y);
     }
     this.syncPieces();
+  }
+
+  /**
+   * Sandbox chute tap: cycles the waiting marble's color (tick feedback).
+   * Levels script their own marbles, so this is a no-op there.
+   */
+  cyclePreviewColor(): MarbleColor | null {
+    if (this.puzzle || (this.marbles?.count ?? 0) > 0) {
+      return null;
+    }
+    const next = nextMarbleColor(this.nextDropColor());
+    this.sandboxColor = next;
+    this.sound?.play("tick", { rate: 1, volume: 0.4 });
+    this.syncWaiting();
+    return next;
+  }
+
+  /** Tap a placed colored cup: cycles its candy color with tint feedback. */
+  cycleCupColor(cellX: number, cellY: number): MarbleColor | null {
+    const piece = this.pieceAt(cellX, cellY);
+    if (piece?.type !== "goal" || piece.color === undefined) {
+      return null;
+    }
+    const next = nextMarbleColor(piece.color);
+    this.board = {
+      ...this.board,
+      pieces: this.board.pieces.map((p) => (p.id === piece.id ? { ...p, color: next } : p)),
+    };
+    this.syncPieces();
+    this.sound?.play("tick", { rate: 1, volume: 0.4 });
+    const mesh = this.pieceRenderer?.meshFor(piece.id);
+    if (mesh && !this.reducedMotion) {
+      this.juice.tintPulse(cupTintTarget(mesh));
+    }
+    return next;
+  }
+
+  /**
+   * Tap raycast for the floating waiting marble: it hovers above the board,
+   * so its screen spot lands past the board edge — cycle when it is hit.
+   */
+  tapWaitingMarble(ndcX: number, ndcY: number): boolean {
+    const handle = this.rendererHandle;
+    const waiting = this.waiting;
+    if (!handle || !waiting || this.puzzle || !waiting.isVisible()) {
+      return false;
+    }
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), handle.camera);
+    if (raycaster.intersectObject(waiting.mesh, false).length === 0) {
+      return false;
+    }
+    return this.cyclePreviewColor() !== null;
   }
 
   /** Live drag feedback: shows the highlight at a cell, tinted by validity. */
@@ -556,6 +628,11 @@ export class Game {
     return this.waiting?.isVisible() ? this.waiting.currentColor() : null;
   }
 
+  /** Placed cup color at a cell for the Playwright hooks. */
+  cupColorAt(cellX: number, cellY: number): MarbleColor | null {
+    return this.pieceAt(cellX, cellY)?.color ?? null;
+  }
+
   isPlaceable(cellX: number, cellY: number, type?: PieceType): boolean {
     if (this.puzzle) {
       // Drag feedback: an empty gap that accepts the dragged type (or any
@@ -622,7 +699,7 @@ export class Game {
     if (script) {
       return nextScriptedColor(script, this.collectedByColor) ?? MARBLE_COLORS[0];
     }
-    return this.marbles?.peekColor() ?? MARBLE_COLORS[0];
+    return this.sandboxColor ?? this.marbles?.peekColor() ?? MARBLE_COLORS[0];
   }
 
   /**

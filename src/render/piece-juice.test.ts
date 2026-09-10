@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { REJECT_WIGGLE_DURATION, ROTATE_TWEEN_DURATION, SNAP_BOUNCE_DURATION } from "./piece-anim";
+import {
+  REJECT_WIGGLE_DURATION,
+  ROTATE_TWEEN_DURATION,
+  SNAP_BOUNCE_DURATION,
+  TINT_PULSE_DURATION,
+} from "./piece-anim";
 import { PieceJuice } from "./piece-juice";
 
 interface FakeTarget {
@@ -84,6 +89,19 @@ describe("PieceJuice", () => {
     juice.wiggle(target);
     juice.update(50);
     expect(Number.isFinite(target.rotation.y)).toBe(true);
+    expect(juice.activeCount).toBe(0);
+  });
+
+  it("flashes a tint pulse and settles it back to rest", () => {
+    const juice = new PieceJuice();
+    const flashes: number[] = [];
+    const target = { setFlash: (amount: number) => flashes.push(amount) };
+    juice.tintPulse(target);
+    expect(flashes[0]).toBe(1); // starts at full flash on the tap
+    juice.update(TINT_PULSE_DURATION / 2);
+    expect(flashes[flashes.length - 1]).toBeCloseTo(0.5, 5);
+    juice.update(TINT_PULSE_DURATION / 2);
+    expect(flashes[flashes.length - 1]).toBe(0);
     expect(juice.activeCount).toBe(0);
   });
 });
