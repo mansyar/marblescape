@@ -1,10 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// PWA specs run against the PRODUCTION build (service workers only exist
-// in `pnpm build` output), served by `pnpm preview`.
+// All e2e specs run against the PRODUCTION build (service workers only exist
+// in `pnpm build` output), served by `pnpm preview`. The dev-server suite
+// (playwright.config.ts) remains for local development only.
 export default defineConfig({
   testDir: "tests",
-  testMatch: ["tests/pwa*.spec.ts"],
+  testMatch: ["tests/*.spec.ts"],
   timeout: 120_000,
   use: {
     baseURL: "http://localhost:4173",
