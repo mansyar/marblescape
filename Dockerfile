@@ -1,5 +1,5 @@
 # ---- Build stage: produce the static site with the exact pinned toolchain ----
-FROM node:24-alpine AS build
+FROM node:24.16.0-alpine AS build
 RUN corepack enable
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
@@ -8,7 +8,7 @@ COPY . .
 RUN pnpm build
 
 # ---- Runtime stage: nginx serving the static site ----
-FROM nginx:alpine AS runtime
+FROM nginx:1.29-alpine AS runtime
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

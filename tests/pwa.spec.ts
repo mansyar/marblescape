@@ -85,13 +85,10 @@ test.describe("PWA production build", () => {
     await page.evaluate(async () => {
       const reg = await navigator.serviceWorker.ready;
       if (reg.active?.state !== "activated") {
-        await new Promise<void>((resolve) => {
-          const poll = () => {
-            if (reg.active?.state === "activated") resolve();
-            else setTimeout(poll, 200);
-          };
-          poll();
-        });
+        for (let i = 0; i < 50; i += 1) {
+          if (reg.active?.state === "activated") return;
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
       }
     });
 
