@@ -254,9 +254,10 @@ export class Game {
 
   /**
    * Places a piece of the given type at a cell (drag-from-palette target).
+   * Colored goal cups accept an optional candy color; all other types ignore it.
    * Returns false when the cell is occupied or off-board (reject wiggle).
    */
-  place(type: PieceType, cellX: number, cellY: number): boolean {
+  place(type: PieceType, cellX: number, cellY: number, color?: MarbleColor): boolean {
     if (this.puzzle) {
       const next = puzzlePlace(this.puzzle, type, cellX, cellY);
       if (next === this.puzzle) {
@@ -278,6 +279,9 @@ export class Game {
       x: cellX,
       y: cellY,
     };
+    if (color !== undefined && type === "goal") {
+      piece.color = color;
+    }
     try {
       this.board = placeTypedPiece(this.board, piece);
     } catch {
@@ -430,19 +434,20 @@ export class Game {
   }
 
   /** Big Play button: drops a batch of marbles above the spawn cell. */
-  play(): void {
+  play(color?: MarbleColor): void {
     if (this.puzzle) {
       const script = this.puzzle.level.marbleColors;
-      const color = script ? nextScriptedColor(script, this.collectedByColor) : null;
+      const scripted = script ? nextScriptedColor(script, this.collectedByColor) : null;
       this.marbles?.spawnDrop(
         this.puzzle.level.spawn.x,
         this.puzzle.level.spawn.y,
-        color ?? undefined,
+        color ?? scripted ?? undefined,
       );
     } else {
       // Sandbox drops ride the natural random sequence: peekColor() is
       // exactly this marble's color, so preview and drop never disagree.
-      this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0);
+      // An explicit color (test hooks) drops without consuming it.
+      this.marbles?.spawnDrop(Math.floor(BOARD_COLS / 2), 0, color);
     }
     // A live marble changes which cups are compatible: refresh lids/floors.
     this.refreshCupState();
@@ -520,6 +525,14 @@ export class Game {
 
   rescuedCount(): number {
     return this.marbles?.getRescued().length ?? 0;
+  }
+
+  /** Live marble positions for the Playwright hooks. */
+  marblePositions(): Array<{ x: number; y: number; z: number }> {
+    return (this.marbles?.all() ?? []).map((body) => {
+      const t = body.translation();
+      return { x: t.x, y: t.y, z: t.z };
+    });
   }
 
   isPlaceable(cellX: number, cellY: number, type?: PieceType): boolean {
