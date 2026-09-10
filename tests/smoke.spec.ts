@@ -33,4 +33,9 @@ test("a scripted marble rolls, falls through the hole and is collected", async (
   await page.waitForFunction(() => (window.__marblescape?.collectedCount() ?? 0) >= 1, null, {
     timeout: 15_000,
   });
+
+  // Collect celebration (FR1): a sparkle burst fired at the cup.
+  await page.waitForFunction(() => (window.__marblescape?.burstCount() ?? 0) >= 1, null, {
+    timeout: 15_000,
+  });
 });

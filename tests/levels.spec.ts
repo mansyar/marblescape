@@ -74,6 +74,11 @@ for (const [idStr, gaps] of Object.entries(LEVEL_GAPS)) {
       { timeout: 45_000 },
     );
 
+    // Collect celebration (FR1): a sparkle burst fired at the cup.
+    await page.waitForFunction(() => (window.__marblescape?.burstCount() ?? 0) >= 1, null, {
+      timeout: 15_000,
+    });
+
     // Badge persisted.
     const badges = await page.evaluate(() =>
       JSON.parse(localStorage.getItem("marblescape.badges.v1") ?? "[]"),
