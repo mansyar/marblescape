@@ -46,7 +46,9 @@ import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
 import { PieceRenderer } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
+import { SparkleSystem } from "../render/sparkles";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
+import { cupBurstPosition } from "./celebration";
 
 /**
  * Game orchestrator: owns board state, physics world and rendering, and
@@ -63,6 +65,7 @@ export class Game {
   private marbleMeshes = new Map<object, THREE.Mesh>();
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
+  private sparkles: SparkleSystem | null = null;
   private board: BoardState;
   /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
   private puzzle: PuzzleState | null = null;
@@ -122,6 +125,15 @@ export class Game {
     const handle = startRenderer(this.container);
     this.rendererHandle = handle;
 
+    // Collect-celebration sparkles ride on the scene; reduced-motion users
+    // get the gentle pulse fallback and the setting is honored live.
+    this.sparkles = new SparkleSystem(handle.scene);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.sparkles.setReducedMotion(reducedMotion.matches);
+    reducedMotion.addEventListener("change", (event) => {
+      this.sparkles?.setReducedMotion(event.matches);
+    });
+
     await initPhysics();
     const world = createPhysicsWorld();
     this.world = world;
@@ -140,6 +152,10 @@ export class Game {
       onCollected: (body) => {
         this.removeMarbleMesh(body);
         this.sound?.play("plonk", { rate: 1, volume: 0.9 });
+        const cup = cupBurstPosition(this.board);
+        if (cup) {
+          this.sparkles?.burstAt(cup);
+        }
         if (this.puzzle) {
           // Goal cup reached in level mode: persist the badge (first solve
           // only), play the win chime, and let the UI pulse + show Home.
@@ -173,12 +189,15 @@ export class Game {
     handle.scene.add(this.highlight);
 
     handle.onFrame((elapsed) => {
+      const dt = this.lastElapsed >= 0 ? Math.min(elapsed - this.lastElapsed, 0.1) : 0;
+      this.lastElapsed = elapsed;
       if (this.ticker) {
         this.ticker.update(elapsed);
       }
       this.marbles?.reap();
       this.syncMarbleMeshes();
-      this.stepPopTweens(elapsed);
+      this.stepPopTweens(dt);
+      this.sparkles?.update(dt);
     });
   }
 
@@ -408,6 +427,11 @@ export class Game {
     this.showHighlight(null, false);
   }
 
+  /** Collect-celebration counter for the Playwright hooks. */
+  burstCount(): number {
+    return this.sparkles?.totalBurstCount ?? 0;
+  }
+
   /** Marble bookkeeping for the Playwright reliability gate. */
   marbleCount(): number {
     return this.marbles?.count ?? 0;
@@ -604,9 +628,7 @@ export class Game {
     }
   }
 
-  private stepPopTweens(elapsed: number): void {
-    const dt = this.lastElapsed >= 0 ? Math.min(elapsed - this.lastElapsed, 0.1) : 0;
-    this.lastElapsed = elapsed;
+  private stepPopTweens(dt: number): void {
     const done: Array<{ mesh: THREE.Object3D; t: number }> = [];
     for (const tween of this.popTweens) {
       tween.t += dt / 0.25;
