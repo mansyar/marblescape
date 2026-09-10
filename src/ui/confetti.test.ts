@@ -136,6 +136,15 @@ describe("createConfettiLayer", () => {
     expect(root.pieceNodes().length).toBe(first);
   });
 
+  it("records a cumulative burst counter on the layer dataset", () => {
+    const { layer, root } = mount();
+    expect(root.dataset.bursts).toBeUndefined();
+    layer.burst();
+    expect(root.dataset.bursts).toBe("1");
+    layer.burst();
+    expect(root.dataset.bursts).toBe("2");
+  });
+
   it("reduced motion yields a glow flash and no flying pieces", () => {
     vi.useFakeTimers();
     const { layer, root } = mount({ reducedMotion: true });

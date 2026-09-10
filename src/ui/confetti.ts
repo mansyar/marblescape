@@ -75,6 +75,7 @@ export function createConfettiLayer(
   const requestedCount = options.pieceCount ?? DEFAULT_PIECE_COUNT;
   let cleanupTimer: number | null = null;
   let effects: HTMLElement[] = [];
+  let bursts = 0;
 
   const el = document.createElement("div");
   el.dataset.testid = CONFETTI_TESTID;
@@ -103,6 +104,8 @@ export function createConfettiLayer(
   }
 
   function burst(): void {
+    bursts += 1;
+    el.dataset.bursts = String(bursts);
     clearEffects();
     if (reducedMotion) {
       const glow = document.createElement("div");
