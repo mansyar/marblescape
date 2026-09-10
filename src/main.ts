@@ -1,7 +1,8 @@
 import { Game } from "./game/game";
 import { createGestureTracker } from "./game/gestures";
 import { screenToCell } from "./game/picking";
-import { computeCameraFraming } from "./render/framing";
+import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./render/framing";
+import { layoutMode } from "./ui/layout";
 import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
 import { createUpdateBanner } from "./ui/update-banner";
@@ -26,7 +27,15 @@ if (app) {
       if (ndcY === null) {
         return null;
       }
-      return screenToCell(ndcX, ndcY, computeCameraFraming(aspect()), aspect());
+      const reserved = layoutMode(window.innerWidth, window.innerHeight).reservedWidth;
+      const framing = computeCameraFraming(
+        aspect(),
+        BOARD_COLS,
+        BOARD_ROWS,
+        CAMERA_FOV_DEG,
+        reserved,
+      );
+      return screenToCell(ndcX, ndcY, framing, aspect());
     };
 
     // Palette: drag new pieces onto the board. Rebuilt per mode so level
