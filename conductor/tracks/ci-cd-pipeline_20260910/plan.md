@@ -6,7 +6,7 @@
 
 - [x] Task: Create public GitHub repo `mansyar/marblescape` via `gh repo create`, wire `origin`, push current `master` — repo created + origin wired + master pushed (no code change)
 - [x] Task: Pin toolchain — `packageManager: "pnpm@11.24.0"` + `engines.node: "24.16.0"` in `package.json`; verify `pnpm install --frozen-lockfile` resolves clean — `b1bfc94`
-- [ ] Task: Phase Verification & Checkpoint
+- [x] Task: Phase Verification & Checkpoint — `[checkpoint: b1bfc94]`
 
 ## Phase 2 — CI workflow (PRs + master)
 
