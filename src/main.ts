@@ -80,7 +80,7 @@ if (app) {
       }
     });
 
-    // Level select: 7 tiles (sandbox + 6 levels), nothing locked.
+    // Level select: sandbox + every shipped level, nothing locked.
     const levelSelect = createLevelSelect(document.body, LEVELS, new Set(), (pick) => {
       hideLevelSelect(levelSelect);
       if (pick === "sandbox") {

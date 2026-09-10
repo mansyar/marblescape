@@ -44,11 +44,11 @@ describe("loadBadges", () => {
     expect(loadBadges(storage).size).toBe(0);
   });
 
-  it("filters out ids outside the level range", () => {
+  it("filters out ids outside the level range while keeping 7-9", () => {
     const storage = memoryStorage();
-    storage.setItem(BADGES_KEY, JSON.stringify([0, 7, "x", 2.5, 4]));
+    storage.setItem(BADGES_KEY, JSON.stringify([0, 7, "x", 2.5, 12, 4]));
     const badges = loadBadges(storage);
-    expect([...badges]).toEqual([4]);
+    expect([...badges].sort((a, b) => a - b)).toEqual([4, 7]);
   });
 });
 
@@ -75,9 +75,11 @@ describe("setBadge", () => {
     const storage = memoryStorage();
     setBadge(storage, 1);
     setBadge(storage, 6);
+    setBadge(storage, 9);
     const badges = loadBadges(storage);
     expect(badges.has(1)).toBe(true);
     expect(badges.has(6)).toBe(true);
+    expect(badges.has(9)).toBe(true);
   });
 
   it("merges with previously stored badges", () => {

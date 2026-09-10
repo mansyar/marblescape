@@ -1,4 +1,9 @@
+import { LEVELS } from "./levels";
+
 export const BADGES_KEY = "marblescape.badges.v1";
+
+/** Ids of levels that can earn a badge (the whole shipped catalog). */
+const KNOWN_LEVEL_IDS = new Set(LEVELS.map((level) => level.id));
 
 /** Solved puzzle levels are stored as a JSON array of level ids. */
 export function loadBadges(storage: Pick<Storage, "getItem">): Set<number> {
@@ -13,7 +18,7 @@ export function loadBadges(storage: Pick<Storage, "getItem">): Set<number> {
     }
     const ids = new Set<number>();
     for (const id of parsed) {
-      if (Number.isInteger(id) && id >= 1 && id <= 6) {
+      if (Number.isInteger(id) && KNOWN_LEVEL_IDS.has(id as number)) {
         ids.add(id as number);
       }
     }
