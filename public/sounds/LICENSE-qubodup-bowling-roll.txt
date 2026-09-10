@@ -1,0 +1,7 @@
+Bowling ball rolling (marble roll loop)
+Source: https://opengameart.org/content/bowling-ball-rolling
+Author: qubodup
+License: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
+File used: qubodup-bowling-roll/qubodup-bowling_roll-nofadeout.ogg -> roll.ogg
+
+No attribution required; credited here as good practice.

@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import RAPIER from "@dimforge/rapier3d-compat";
 import { impactParams, MIN_IMPACT_FORCE, selectImpactSound } from "../audio/impact-sounds";
 import { IMPACT_COOLDOWN_MS, ImpactThrottler } from "../audio/impact-throttle";
+import { RollVoices } from "../audio/roll";
 import { playChime } from "../audio/chime";
 import { isSoundOn, setSoundOn } from "../audio/prefs";
 import { SoundManager } from "../audio/sound-manager";
@@ -74,6 +75,7 @@ export class Game {
   private audioCtx: AudioContext | null = null;
   private eventQueue: RAPIER.EventQueue | null = null;
   private readonly impactThrottler = new ImpactThrottler();
+  private rolls: RollVoices | null = null;
   private floorBodies: RAPIER.RigidBody[] = [];
   private floorGoal: string | null = "init";
   private saveTimer: number | null = null;
@@ -128,6 +130,7 @@ export class Game {
       () => {
         stepWorld(world, this.eventQueue);
         this.drainImpacts();
+        this.updateRolls();
       },
       PHYSICS.maxSubSteps,
     );
@@ -491,14 +494,39 @@ export class Game {
       this.sound.load("clack", "/sounds/clack.ogg"),
       this.sound.load("tick", "/sounds/tick.ogg"),
       this.sound.load("plonk", "/sounds/plonk.ogg"),
+      this.sound.load("roll", "/sounds/roll.ogg"),
     ]);
     this.sound.setMuted(!isSoundOn(localStorage));
+    this.rolls = new RollVoices({
+      create: () => {
+        const voice = this.sound?.loop("roll");
+        if (!voice) {
+          throw new Error("roll sample not loaded");
+        }
+        return voice;
+      },
+    });
+    this.rolls.setMuted(!isSoundOn(localStorage));
   }
 
   /** Mute toggle from the HUD; persists the preference. */
   setSoundOn(on: boolean): void {
     setSoundOn(on, localStorage);
     this.sound?.setMuted(!on);
+    this.rolls?.setMuted(!on);
+  }
+
+  /** Feeds the roll voices with current marble speeds (one voice per marble). */
+  private updateRolls(): void {
+    if (!this.marbles || !this.rolls) {
+      return;
+    }
+    const states = [];
+    for (const body of this.marbles.all()) {
+      const v = body.linvel();
+      states.push({ marble: body, speed: Math.hypot(v.x, v.y, v.z) });
+    }
+    this.rolls.update(states);
   }
 
   private drainImpacts(): void {
