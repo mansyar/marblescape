@@ -26,6 +26,6 @@
 
 ## Phase 4 — Track completion
 
-- [ ] Task: Mark track complete — registry `[x]`, metadata `completed`
-- [ ] Task: Final certification — full suite green + docs sync (`tech-stack.md` CI/CD section, `tracks.md`)
+- [x] Task: Mark track complete — registry `[x]`, metadata `completed` — `4e0671f`
+- [x] Task: Final certification — full suite green + docs sync (`tech-stack.md` CI/CD section, `tracks.md`) — check ✅ 59 files, 223/223 unit, 16/16 prod e2e; docs synced `e0582c2`; certification note on `4e0671f`
 - [ ] Task: Phase Verification & Checkpoint
