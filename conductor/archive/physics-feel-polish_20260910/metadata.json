@@ -1,0 +1,8 @@
+{
+  "id": "physics-feel-polish_20260910",
+  "type": "feature",
+  "status": "completed",
+  "description": "Physics feel polish: motion retuning via centralized constants (gravity direction fixed), per-marble impact throttling + refined pitch/volume curves + CC0 roll sample, explicit run-settle detection with ~15s stall cap and soft final cue (Play never locks), verified by headless deterministic simulation tests plus the existing e2e viewport matrix.",
+  "created": "2026-09-10T00:00:00Z",
+  "completed": "2026-09-10T00:00:00.000Z"
+}
