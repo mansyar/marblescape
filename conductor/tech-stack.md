@@ -44,4 +44,8 @@ Version-checked against npm registry on 2026-09-08.
 
 ## Deployment
 
-Any static file host (Cloudflare Pages / Netlify / GitHub Pages — final choice open). The PWA must precache the app shell, Rapier WASM, glTF assets, and audio (est. 3-5MB).
+CI/CD (track `ci-cd-pipeline_20260910`, 2026-09-10):
+
+- **CI — GitHub Actions** (`.github/workflows/ci.yml`): PRs + master pushes. Exact toolchain (Node 24.16.0, pnpm 11.24.0 pinned via `packageManager` + `engines`), `pnpm install --frozen-lockfile`, `pnpm check`, unit tests (coverage report), production build, and the full 16-spec Playwright e2e suite against the production build; failure-only artifacts; pnpm/browser/Vite caching; cancel-in-progress.
+- **Release — tags `v*`** (`.github/workflows/release.yml`): full gates re-run, multi-arch (`linux/amd64` + `linux/arm64`) Docker image → GHCR public (`ghcr.io/mansyar/marblescape`), Coolify deploy webhook (bearer; secrets `COOLIFY_WEBHOOK_URL`/`COOLIFY_WEBHOOK_TOKEN`), auto-generated GitHub Release.
+- **Container:** multi-stage `Dockerfile` — `node:24-alpine` build → `nginx:alpine` (SPA fallback, PWA MIME types, gzip, healthcheck). PWA precache (app shell, Rapier WASM, glTF, audio) ships inside the image.

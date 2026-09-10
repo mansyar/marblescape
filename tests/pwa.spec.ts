@@ -80,6 +80,17 @@ test.describe("PWA production build", () => {
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
     });
+    // Ensure the SW is fully activated before cutting the network, so the
+    // offline reload is served from precache instead of hitting the network.
+    await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      if (reg.active?.state !== "activated") {
+        for (let i = 0; i < 50; i += 1) {
+          if (reg.active?.state === "activated") return;
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+      }
+    });
 
     await context.setOffline(true);
     await page.reload();

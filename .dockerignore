@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+test-results
+.git
+conductor
+.github
+playwright-report
+*.log
