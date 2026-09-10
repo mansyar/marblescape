@@ -7,6 +7,8 @@ import { cameraReservation, layoutMode, type LayoutMode } from "./ui/layout";
 import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
 import { createUpdateBanner } from "./ui/update-banner";
+import { createConfettiLayer } from "./ui/confetti";
+import { createSolvedOverlay } from "./ui/solved-overlay";
 import { registerSW } from "virtual:pwa-register";
 import { LEVELS } from "./domain/levels";
 import { createLevelSelect, hideLevelSelect, showLevelSelect } from "./ui/level-select";
@@ -100,34 +102,26 @@ if (app) {
       onOfflineReady: () => {},
     });
 
-    // Post-solve overlay: ✓ pulse + big Home button on the first successful run.
-    const solvedOverlay = document.createElement("div");
-    solvedOverlay.dataset.testid = "solved-overlay";
-    solvedOverlay.style.cssText =
-      "position:fixed;inset:0;z-index:18;display:none;align-items:center;justify-content:center;flex-direction:column;gap:24px;background:rgba(20,30,40,0.55)";
-    const solvedCheck = document.createElement("div");
-    solvedCheck.textContent = "✓";
-    solvedCheck.style.cssText =
-      "width:112px;height:112px;border-radius:50%;background:#06d6a0;color:#fff;font-size:64px;font-weight:800;display:flex;align-items:center;justify-content:center;animation:ms-pop 0.5s ease-out;box-shadow:0 8px 24px rgba(6,214,160,0.6)";
-    const solvedHome = document.createElement("button");
-    solvedHome.textContent = "🏠";
-    solvedHome.setAttribute("aria-label", "Back to level select");
-    solvedHome.style.cssText =
-      "min-width:112px;min-height:112px;font-size:52px;border-radius:24px;border:3px solid #2c3e50;background:#073b4c;touch-action:manipulation";
-    const solvedLabel = document.createElement("div");
-    solvedLabel.textContent = "Level solved!";
-    solvedLabel.style.cssText = "color:#f8f3e9;font-size:28px;font-weight:700";
-    solvedOverlay.append(solvedCheck, solvedLabel, solvedHome);
-    document.body.appendChild(solvedOverlay);
-    const hideSolved = () => {
-      solvedOverlay.style.display = "none";
-    };
-    solvedHome.addEventListener("click", () => {
-      hideSolved();
-      showLevelSelect(levelSelect);
+    // Solve celebration: confetti shower + ✓ pulse overlay with two big
+    // buttons — ▶ replays the same track instantly, 🏠 goes home.
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const confetti = createConfettiLayer(document.body, { reducedMotion: reducedMotion.matches });
+    reducedMotion.addEventListener("change", (event) => {
+      confetti.setReducedMotion(event.matches);
+    });
+    const solvedOverlay = createSolvedOverlay(document.body, {
+      onReplay: () => {
+        solvedOverlay.hide();
+        game.play();
+      },
+      onHome: () => {
+        solvedOverlay.hide();
+        showLevelSelect(levelSelect);
+      },
     });
     game.onLevelSolved = () => {
-      solvedOverlay.style.display = "flex";
+      confetti.burst();
+      solvedOverlay.show();
     };
     const style = document.createElement("style");
     style.textContent =
