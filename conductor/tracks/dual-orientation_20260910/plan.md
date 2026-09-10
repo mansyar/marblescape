@@ -42,7 +42,7 @@
 - [x] Task: Extend `playwright.pwa.config.ts` with four viewport projects (390×844, 844×390, 768×1024, 1024×768) running the full `tests/*.spec.ts` suite each (16 × 4 = 64 runs) against `vite preview` :4173 — `cbe3d47`
   - [ ] Deterministic: viewports via `use.viewport`, no fixed sleeps, workers:1 kept
 - [x] Task: Run the full matrix locally — 64/64 green; fix any flakes — `cbe3d47` (80 runs: 78 passed, 2 skipped landscape-only drag in portrait, 0 failed, 2.0m)
-- [ ] Task: Push branch, open PR, verify CI runs the full matrix green (64/64, check, unit ≥223)
+- [x] Task: Push branch, open PR, verify CI runs the full matrix green (64/64, check, unit ≥223) — PR #2, CI Verify pass 3m56s (80 runs, 2 landscape-only skips)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Track completion
