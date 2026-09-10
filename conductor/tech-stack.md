@@ -65,3 +65,13 @@ Celebration & Interaction Juice (track `celebration-juice_20260910`, 2026-09-11)
 - **Interaction juice:** pure curve helpers (`src/render/piece-anim.ts`: snap-bounce 0.22 s `0.85 → 1.06 → 1`, reject wiggle 0.32 s decaying ±0.18 rad, short-way rotate yaw 0.14 s) applied through `src/render/piece-juice.ts` (one tween per mesh, restores rest on cancel, huge-frame safe): valid drop snap-bounce, rejected drop wiggles the piece or the originating palette tile plus a soft low tick, palette tile lift on pickup, quarter-turn spin + tick on tap. Game state still changes immediately — visuals only.
 - **Reduced motion:** `prefers-reduced-motion: reduce` is honoured live via a `matchMedia` change listener — sparkles and confetti degrade to a single soft glow (no flying particles).
 - **Audio:** reuses the existing `tick`/`clack` samples; the persistent mute toggle governs every effect sound.
+
+## Color sorting
+
+Color Sorting (track `color-sorting_20260911`, 2026-09-11): **no new dependencies, assets, or precache entries** — colors, lids, and trophies are code-driven on existing primitives.
+
+- **Colors** (`src/domain/colors.ts`): six candy colors (names + hex), `nextMarbleColor` cycle, `isMarbleColor` guard; the marble palette moved out of `physics-config` (consumers updated).
+- **Persistence** (`src/domain/board.ts`): board schema v2 — goal cups carry an optional candy color; version-1 saves migrate losslessly under the stable `marblescape.board.v1` key; unknown colors degrade to the classic cup.
+- **Cup lids** (`src/physics/piece-colliders.ts`, `src/physics/board-bodies.ts`): `goalLid` open (hole ring) vs closed (flush full lid — no rolling step); floors skip every open hole; the lid state machine (`src/domain/cup-lids.ts` + `Game.refreshCupState`) opens only cups matching the collectible marble (live marble in flight, else the next previewed color) and re-syncs lids, floors, and marble targets together.
+- **Interaction** (`src/render/waiting-marble.ts`, `src/render/trophies.ts`, `src/render/piece-view.ts`, `src/render/piece-juice.ts`): the waiting marble shows the next drop color (tap-to-cycle in the sandbox); cups are tinted per color with a tint-pulse flash; collected marbles rest visibly in their cups as non-physics trophy meshes.
+- **Sorting levels** (`src/domain/levels.ts`, `src/domain/solve.ts`): catalog grew to 9 — levels 7-9 use colored cups with ordered `marbleColors` scripts; a level solves only when the full script is collected (`isLevelComplete`); badge ids validate against the shipped catalog (`src/domain/badges.ts`).
