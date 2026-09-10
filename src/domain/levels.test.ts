@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
+import type { MarbleColor } from "./colors";
 import {
   LEVELS,
   getLevel,
   isLevelSolvable,
+  isScriptComplete,
+  nextScriptedColor,
+  requiredMarbleCounts,
   validateLevel,
+  type FixedPiece,
   type GapSlot,
   type LevelDef,
 } from "./levels";
@@ -32,6 +37,33 @@ function level(overrides: Partial<LevelDef>): LevelDef {
   return { ...base, ...overrides };
 }
 
+function cup(color: MarbleColor, x: number, y: number): FixedPiece {
+  return { type: "goal", rotation: 0, x, y, color };
+}
+
+/** Valid sorting level: shared trunk, then a per-color final leg via the gap. */
+function sortingLevel(overrides: Partial<LevelDef> = {}): LevelDef {
+  const base: LevelDef = {
+    id: 7,
+    name: "Sort",
+    boardWidth: 8,
+    boardHeight: 6,
+    fixed: [
+      fixed("straight", 3, 0),
+      fixed("straight", 3, 1),
+      fixed("straight", 3, 3),
+      fixed("curved", 4, 2, 2),
+      cup("raspberry", 3, 4),
+      cup("mint", 4, 3),
+    ],
+    gaps: [gap(3, 2, ["straight", "curved"])],
+    palette: ["straight", "curved"],
+    spawn: { x: 3, y: 0 },
+    marbleColors: ["raspberry", "mint"],
+  };
+  return { ...base, ...overrides };
+}
+
 describe("level definition schema", () => {
   it("accepts a valid level", () => {
     expect(() => validateLevel(level({}))).not.toThrow();
@@ -43,7 +75,12 @@ describe("level definition schema", () => {
 
   it("rejects a non-integer or out-of-range id", () => {
     expect(() => validateLevel(level({ id: 0 }))).toThrow(/id/);
-    expect(() => validateLevel(level({ id: 7 }))).toThrow(/id/);
+    expect(() => validateLevel(level({ id: 10 }))).toThrow(/id/);
+  });
+
+  it("accepts ids 7 through 9", () => {
+    expect(() => validateLevel(level({ id: 7 }))).not.toThrow();
+    expect(() => validateLevel(sortingLevel({ id: 9 }))).not.toThrow();
   });
 
   it("rejects fixed pieces outside the board", () => {
@@ -147,10 +184,100 @@ describe("level definition schema", () => {
   });
 });
 
+describe("sorting level schema", () => {
+  it("accepts a valid sorting level", () => {
+    expect(() => validateLevel(sortingLevel())).not.toThrow();
+  });
+
+  it("rejects a colored cup in a classic level", () => {
+    const lvl = level({
+      fixed: [fixed("straight", 3, 0), fixed("straight", 3, 1), cup("mint", 3, 5)],
+    });
+    expect(() => validateLevel(lvl)).toThrow(/color/i);
+  });
+
+  it("rejects a classic goal cell on a sorting level", () => {
+    expect(() => validateLevel(sortingLevel({ goal: { x: 3, y: 5 } }))).toThrow(/goal/i);
+  });
+
+  it("rejects a colorless goal piece on a sorting level", () => {
+    const lvl = sortingLevel({
+      fixed: [
+        fixed("straight", 3, 0),
+        fixed("straight", 3, 1),
+        fixed("straight", 3, 3),
+        fixed("curved", 4, 2, 2),
+        cup("raspberry", 3, 4),
+        cup("mint", 4, 3),
+        fixed("goal", 5, 5),
+      ],
+    });
+    expect(() => validateLevel(lvl)).toThrow(/goal|color/i);
+  });
+
+  it("rejects a classic goal gap on a sorting level", () => {
+    const lvl = sortingLevel({ gaps: [gap(3, 2, ["goal"])], palette: ["goal"] });
+    expect(() => validateLevel(lvl)).toThrow(/goal/i);
+  });
+
+  it("requires at least two colored cups", () => {
+    const lvl = sortingLevel({
+      fixed: [fixed("straight", 3, 0), fixed("straight", 3, 1), cup("raspberry", 3, 4)],
+      gaps: [gap(3, 2, ["straight"])],
+      marbleColors: ["raspberry"],
+    });
+    expect(() => validateLevel(lvl)).toThrow(/cup/i);
+  });
+
+  it("requires unique cup colors", () => {
+    const lvl = sortingLevel({
+      fixed: [
+        fixed("straight", 3, 0),
+        fixed("straight", 3, 1),
+        fixed("straight", 3, 3),
+        cup("raspberry", 3, 4),
+        cup("raspberry", 4, 3),
+      ],
+    });
+    expect(() => validateLevel(lvl)).toThrow(/unique|duplicate/i);
+  });
+
+  it("requires a non-empty script whose colors all have cups", () => {
+    expect(() => validateLevel(sortingLevel({ marbleColors: [] }))).toThrow(/script|marble/i);
+    expect(() =>
+      validateLevel(sortingLevel({ marbleColors: ["raspberry", "mint", "grape"] })),
+    ).toThrow(/cup/i);
+  });
+
+  it("requires every cup color to appear in the script", () => {
+    expect(() => validateLevel(sortingLevel({ marbleColors: ["raspberry"] }))).toThrow(/script/i);
+  });
+
+  it("rejects unknown colors in scripts and on cups", () => {
+    expect(() =>
+      validateLevel(sortingLevel({ marbleColors: ["banana" as MarbleColor, "mint"] })),
+    ).toThrow(/color|unknown/i);
+    expect(() =>
+      validateLevel(
+        sortingLevel({
+          fixed: [
+            fixed("straight", 3, 0),
+            fixed("straight", 3, 1),
+            fixed("straight", 3, 3),
+            fixed("curved", 4, 2, 2),
+            cup("banana" as MarbleColor, 3, 4),
+            cup("mint", 4, 3),
+          ],
+        }),
+      ),
+    ).toThrow(/color|unknown/i);
+  });
+});
+
 describe("level catalog", () => {
-  it("exposes exactly 6 levels with unique sequential ids", () => {
-    expect(LEVELS).toHaveLength(6);
-    expect(LEVELS.map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 6]);
+  it("exposes exactly 9 levels with unique sequential ids", () => {
+    expect(LEVELS).toHaveLength(9);
+    expect(LEVELS.map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   it("exposes readable names for every level", () => {
@@ -171,8 +298,49 @@ describe("level catalog", () => {
   });
 });
 
+describe("sorting level catalog", () => {
+  const sortingLevels = LEVELS.filter((lvl) => lvl.marbleColors !== undefined);
+
+  it("ships sorting levels 7 through 9", () => {
+    expect(sortingLevels.map((lvl) => lvl.id)).toEqual([7, 8, 9]);
+  });
+
+  it("gives every sorting level unique colored cups fully covered by its script", () => {
+    for (const lvl of sortingLevels) {
+      const cups = lvl.fixed.filter((piece) => piece.type === "goal");
+      expect(cups.length, `${lvl.name} needs at least two cups`).toBeGreaterThanOrEqual(2);
+      const cupColors = cups.map((c) => c.color);
+      expect(new Set(cupColors).size).toBe(cupColors.length);
+      expect(new Set(cupColors)).toEqual(new Set(lvl.marbleColors ?? []));
+    }
+  });
+
+  it("teaches a single reroute in level 7", () => {
+    const lvl = getLevel(7);
+    expect(lvl?.gaps).toHaveLength(1);
+    expect(lvl?.gaps[0].accepted).toEqual(expect.arrayContaining(["straight", "curved"]));
+    expect(lvl?.marbleColors).toHaveLength(2);
+  });
+
+  it("drops through the funnel in level 8", () => {
+    const lvl = getLevel(8);
+    expect(lvl?.gaps.some((g) => g.accepted.includes("funnel"))).toBe(true);
+    expect(lvl?.palette).toContain("funnel");
+    expect(lvl?.marbleColors).toHaveLength(2);
+  });
+
+  it("builds a three-color finale in level 9", () => {
+    const lvl = getLevel(9);
+    const cups = lvl?.fixed.filter((piece) => piece.type === "goal") ?? [];
+    expect(cups).toHaveLength(3);
+    expect(lvl?.marbleColors).toHaveLength(3);
+    expect(lvl?.gaps.length).toBeGreaterThanOrEqual(2);
+    expect(lvl?.palette).toEqual(expect.arrayContaining(["straight", "curved", "funnel"]));
+  });
+});
+
 describe("solvability", () => {
-  it("declares all six shipped levels solvable with their restricted palettes", () => {
+  it("declares all nine shipped levels solvable with their restricted palettes", () => {
     for (const lvl of LEVELS) {
       expect(isLevelSolvable(lvl), `${lvl.name} should be solvable`).toBe(true);
     }
@@ -236,5 +404,60 @@ describe("solvability", () => {
       goal: { x: 3, y: 5 },
     });
     expect(isLevelSolvable(lvl)).toBe(true);
+  });
+});
+
+describe("sortability", () => {
+  it("accepts a sorting level where every scripted color reaches its cup", () => {
+    expect(isLevelSolvable(sortingLevel())).toBe(true);
+  });
+
+  it("rejects a sorting level when a scripted color cannot reach its cup", () => {
+    const blocked = sortingLevel({ gaps: [gap(3, 2, ["straight"])], palette: ["straight"] });
+    expect(isLevelSolvable(blocked)).toBe(false);
+  });
+
+  it("returns false for a sorting level with an empty script", () => {
+    expect(isLevelSolvable(sortingLevel({ marbleColors: [] }))).toBe(false);
+  });
+});
+
+describe("marble color scripts", () => {
+  it("counts required marbles per color", () => {
+    const required = requiredMarbleCounts(["raspberry", "mint", "raspberry"]);
+    expect(required.get("raspberry")).toBe(2);
+    expect(required.get("mint")).toBe(1);
+    expect(required.get("grape")).toBeUndefined();
+  });
+
+  it("drops the first scripted color whose count is unmet", () => {
+    const script = ["mint", "raspberry", "mint"] as const;
+    expect(nextScriptedColor(script, new Map())).toBe("mint");
+    expect(nextScriptedColor(script, new Map([["mint", 1]]))).toBe("mint");
+    expect(nextScriptedColor(script, new Map([["mint", 2]]))).toBe("raspberry");
+    expect(
+      nextScriptedColor(
+        script,
+        new Map([
+          ["mint", 2],
+          ["raspberry", 1],
+        ]),
+      ),
+    ).toBeNull();
+  });
+
+  it("reports completion only when every required count is met", () => {
+    const script: MarbleColor[] = ["mint", "raspberry"];
+    expect(isScriptComplete(script, new Map())).toBe(false);
+    expect(isScriptComplete(script, new Map([["mint", 1]]))).toBe(false);
+    expect(
+      isScriptComplete(
+        script,
+        new Map([
+          ["mint", 1],
+          ["raspberry", 1],
+        ]),
+      ),
+    ).toBe(true);
   });
 });

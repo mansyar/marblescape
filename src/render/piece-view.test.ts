@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { cellToWorld, PieceRenderer, rotationYaw } from "./piece-view";
+import { colorHex } from "../domain/colors";
+import { cellToWorld, cupTintTarget, PieceRenderer, rotationYaw } from "./piece-view";
 
 describe("cellToWorld", () => {
   it("maps cell (0,0) to the center of its cell", () => {
@@ -90,5 +91,83 @@ describe("PieceRenderer", () => {
     await renderer.loadTemplates();
     renderer.sync([{ id: "p1", type: "straight", rotation: 0, x: 0, y: 0 }]);
     expect(root.children).toHaveLength(1);
+  });
+});
+
+describe("cup tinting", () => {
+  function makeTintedRenderer() {
+    const root = new THREE.Group();
+    const templateMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const loader = {
+      loadAsync: async () => {
+        const scene = new THREE.Object3D();
+        scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), templateMaterial));
+        return { scene };
+      },
+    };
+    const renderer = new PieceRenderer(root, loader);
+    return { root, renderer, templateMaterial };
+  }
+
+  function firstMaterial(object: THREE.Object3D): THREE.MeshStandardMaterial {
+    let found: THREE.MeshStandardMaterial | null = null;
+    object.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!found && mesh.isMesh) {
+        found = mesh.material as THREE.MeshStandardMaterial;
+      }
+    });
+    if (!found) {
+      throw new Error("template has no mesh");
+    }
+    return found;
+  }
+
+  it("tints a colored cup without touching the shared template", async () => {
+    const { root, renderer, templateMaterial } = makeTintedRenderer();
+    await renderer.loadTemplates();
+    renderer.sync([{ id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 5, color: "mint" }]);
+    const material = firstMaterial(root.children[0]);
+    expect(material.color.getHex()).toBe(Number.parseInt(colorHex("mint").slice(1), 16));
+    expect(material).not.toBe(templateMaterial); // cloned before tinting
+    expect(templateMaterial.color.getHex()).toBe(0xffffff);
+  });
+
+  it("re-tints the cup when its color changes", async () => {
+    const { root, renderer } = makeTintedRenderer();
+    await renderer.loadTemplates();
+    const goal = {
+      id: "g1",
+      type: "goal" as const,
+      rotation: 0 as const,
+      x: 3,
+      y: 5,
+      color: "mint" as const,
+    };
+    renderer.sync([goal]);
+    renderer.sync([{ ...goal, color: "grape" as const }]);
+    const material = firstMaterial(root.children[0]);
+    expect(material.color.getHex()).toBe(Number.parseInt(colorHex("grape").slice(1), 16));
+  });
+
+  it("leaves a classic cup exactly as modeled", async () => {
+    const { root, renderer, templateMaterial } = makeTintedRenderer();
+    await renderer.loadTemplates();
+    renderer.sync([{ id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 5 }]);
+    const material = firstMaterial(root.children[0]);
+    expect(material).toBe(templateMaterial); // never cloned, never tinted
+    expect(material.color.getHex()).toBe(0xffffff);
+  });
+
+  it("flashes a cup's emissive for tap feedback", async () => {
+    const { root, renderer } = makeTintedRenderer();
+    await renderer.loadTemplates();
+    renderer.sync([{ id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 5, color: "mint" }]);
+    const material = firstMaterial(root.children[0]);
+    const target = cupTintTarget(root.children[0]);
+    target.setFlash(0.5);
+    expect(material.emissive.r).toBeCloseTo(0.3, 5);
+    target.setFlash(0);
+    expect(material.emissive.r).toBe(0);
   });
 });

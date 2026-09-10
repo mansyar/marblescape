@@ -1,4 +1,4 @@
-import { MARBLE_PALETTE } from "../domain/physics-config";
+import { MARBLE_PALETTE } from "../domain/colors";
 
 /** Hard cap on flying confetti pieces per shower (spec FR2). */
 export const CONFETTI_MAX_PIECES = 120;

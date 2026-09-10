@@ -2,7 +2,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
 import { PHYSICS } from "../domain/physics-config";
 import { MarbleManager } from "./marbles";
-import { buildBoardBodies, syncPieceBodies, type PieceBodyEntry } from "./board-bodies";
+import {
+  buildBoardBodies,
+  syncFloorBodies,
+  syncPieceBodies,
+  type PieceBodyEntry,
+} from "./board-bodies";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "./world";
 
 function countFixedBodies(world: World): number {
@@ -22,9 +27,9 @@ describe("buildBoardBodies", () => {
 
   it("opens a hole in the floor under the goal cell so marbles fall through", () => {
     const world = createPhysicsWorld();
-    buildBoardBodies(world, { x: 4, z: 0 });
+    buildBoardBodies(world, [{ x: 4, z: 0 }]);
     const marbles = new MarbleManager(world);
-    marbles.setGoalCell(4, 0);
+    marbles.setGoalCells([{ x: 4, z: 0, color: null }]);
     // Drop a marble straight above the goal cell.
     marbles.spawnAt(4.5, 2, 0.5);
     // Reap every step like the real game loop — tilted gravity carries the
@@ -39,9 +44,9 @@ describe("buildBoardBodies", () => {
 
   it("keeps marbles supported on cells outside the goal", () => {
     const world = createPhysicsWorld();
-    buildBoardBodies(world, { x: 4, z: 0 });
+    buildBoardBodies(world, [{ x: 4, z: 0 }]);
     const marbles = new MarbleManager(world);
-    marbles.setGoalCell(4, 0);
+    marbles.setGoalCells([{ x: 4, z: 0, color: null }]);
     marbles.spawnAt(1.5, 2, 1.5);
     for (let i = 0; i < 240; i += 1) {
       stepWorld(world);
@@ -49,6 +54,46 @@ describe("buildBoardBodies", () => {
     expect(marbles.getCollected().length).toBe(0);
     expect(marbles.getRescued().length).toBe(0);
     expect(marbles.all()[0].translation().y).toBeGreaterThan(0.2);
+  });
+
+  it("skips the floor under every open hole while closed cups keep theirs", () => {
+    const world = createPhysicsWorld();
+    const holes = [
+      { x: 4, z: 0 },
+      { x: 5, z: 0 },
+    ];
+    const floors = buildBoardBodies(world, holes);
+    expect(floors).toHaveLength(BOARD_COLS * BOARD_ROWS - holes.length);
+    const marbles = new MarbleManager(world);
+    const throughA = marbles.spawnAt(4.5, 1, 0.5);
+    const throughB = marbles.spawnAt(5.5, 1, 0.5);
+    const supported = marbles.spawnAt(6.5, 1, 0.5);
+    for (let i = 0; i < 120; i += 1) {
+      stepWorld(world);
+    }
+    expect(throughA.translation().y).toBeLessThan(-1);
+    expect(throughB.translation().y).toBeLessThan(-1);
+    expect(supported.translation().y).toBeGreaterThan(0.2);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("rebuilds the floor when the set of open holes changes", () => {
+    const world = createPhysicsWorld();
+    const first = buildBoardBodies(world, [{ x: 4, z: 0 }]);
+    expect(first).toHaveLength(BOARD_COLS * BOARD_ROWS - 1);
+    const second = syncFloorBodies(world, first, [{ x: 5, z: 0 }]);
+    expect(second).toHaveLength(BOARD_COLS * BOARD_ROWS - 1);
+    const marbles = new MarbleManager(world);
+    const refilled = marbles.spawnAt(4.5, 1, 0.5);
+    const opened = marbles.spawnAt(5.5, 1, 0.5);
+    for (let i = 0; i < 120; i += 1) {
+      stepWorld(world);
+    }
+    expect(refilled.translation().y).toBeGreaterThan(0.2);
+    expect(opened.translation().y).toBeLessThan(-1);
+    marbles.dispose();
+    world.free();
   });
 
   it("contains a marble rolling across an empty board", () => {
@@ -135,5 +180,49 @@ describe("syncPieceBodies", () => {
     expect(body.translation().x).toBeLessThan(BOARD_COLS + PHYSICS.marbleRadius);
     marbles.dispose();
     world.free();
+  });
+
+  it("rebuilds a goal cup when its lid state changes", () => {
+    const world = createPhysicsWorld();
+    const open = syncPieceBodies(world, new Map(), [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 3, lid: "open" as const },
+    ]);
+    const before = countFixedBodies(world);
+    syncPieceBodies(world, open, [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 3, y: 3, lid: "closed" as const },
+    ]);
+    // Open cup ring = 4 slabs; the closed lid adds the center plug.
+    expect(countFixedBodies(world)).toBe(before + 1);
+    world.free();
+  });
+
+  it("keeps a marble on a closed cup and drops it through an open one", () => {
+    const closed = createPhysicsWorld();
+    buildBoardBodies(closed, []);
+    syncPieceBodies(closed, new Map(), [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 4, y: 2, lid: "closed" as const },
+    ]);
+    const heldMarbles = new MarbleManager(closed);
+    const held = heldMarbles.spawnAt(4.5, 1, 2.5);
+    for (let i = 0; i < 120; i += 1) {
+      stepWorld(closed);
+    }
+    expect(held.translation().y).toBeGreaterThan(0.2);
+    heldMarbles.dispose();
+    closed.free();
+
+    const open = createPhysicsWorld();
+    buildBoardBodies(open, [{ x: 4, z: 2 }]);
+    syncPieceBodies(open, new Map(), [
+      { id: "g1", type: "goal", rotation: 0 as const, x: 4, y: 2, lid: "open" as const },
+    ]);
+    const droppedMarbles = new MarbleManager(open);
+    const dropped = droppedMarbles.spawnAt(4.5, 1, 2.5);
+    for (let i = 0; i < 120; i += 1) {
+      stepWorld(open);
+    }
+    expect(dropped.translation().y).toBeLessThan(-1);
+    droppedMarbles.dispose();
+    open.free();
   });
 });

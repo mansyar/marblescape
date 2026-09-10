@@ -51,6 +51,43 @@ describe("colliderDescriptors", () => {
     expect(colliderDescriptors("goal", 0)).toHaveLength(4);
   });
 
+  it("gives the open goal cup a hole ring with a free center", () => {
+    const desc = colliderDescriptors("goal", 0, "open");
+    expect(desc).toHaveLength(4);
+    for (const d of desc) {
+      const coversCenter =
+        d.offset[0] - d.hx <= 0 &&
+        d.offset[0] + d.hx >= 0 &&
+        d.offset[2] - d.hz <= 0 &&
+        d.offset[2] + d.hz >= 0;
+      expect(coversCenter).toBe(false);
+    }
+  });
+
+  it("gives the closed goal cup a full lid so marbles roll over", () => {
+    const desc = colliderDescriptors("goal", 0, "closed");
+    const coversCenter = desc.some(
+      (d) =>
+        d.offset[0] - d.hx <= 0 &&
+        d.offset[0] + d.hx >= 0 &&
+        d.offset[2] - d.hz <= 0 &&
+        d.offset[2] + d.hz >= 0,
+    );
+    expect(coversCenter).toBe(true);
+    for (const d of desc) {
+      expect(d.hx).toBeLessThanOrEqual(0.5);
+      expect(d.hz).toBeLessThanOrEqual(0.5);
+    }
+  });
+
+  it("keeps the closed lid flush with the open cup lip (no step for rolling marbles)", () => {
+    const open = colliderDescriptors("goal", 0, "open");
+    const closed = colliderDescriptors("goal", 0, "closed");
+    const openTop = Math.max(...open.map((d) => d.offset[1] + d.hy));
+    const closedTop = Math.max(...closed.map((d) => d.offset[1] + d.hy));
+    expect(closedTop).toBeCloseTo(openTop);
+  });
+
   it("rotating the funnel turns the channel east-west", () => {
     const descs = colliderDescriptors("funnel", 1);
     // Rails now run along x (long axis hx > hz)
@@ -143,5 +180,47 @@ describe("piece collider integration", () => {
     expect(exited).toBe(true);
     expect(body.translation().y).toBeGreaterThan(-1);
     world.free();
+  });
+
+  it("drops a marble through the open cup and holds it on the closed lid", async () => {
+    const place = (world: ReturnType<typeof createPhysicsWorld>, lid: "open" | "closed") => {
+      for (const d of colliderDescriptors("goal", 0, lid)) {
+        const body = world.createRigidBody(
+          RAPIER.RigidBodyDesc.fixed().setTranslation(
+            2.5 + d.offset[0],
+            d.offset[1],
+            2.5 + d.offset[2],
+          ),
+        );
+        world.createCollider(RAPIER.ColliderDesc.cuboid(d.hx, d.hy, d.hz), body);
+      }
+    };
+    const drop = (world: ReturnType<typeof createPhysicsWorld>) => {
+      const body = world.createRigidBody(
+        RAPIER.RigidBodyDesc.dynamic().setTranslation(2.5, 2, 2.5),
+      );
+      world.createCollider(RAPIER.ColliderDesc.ball(PHYSICS.marbleRadius), body);
+      return body;
+    };
+
+    const openWorld = createPhysicsWorld();
+    place(openWorld, "open");
+    const through = drop(openWorld);
+    for (let i = 0; i < 45; i += 1) {
+      stepWorld(openWorld);
+    }
+    expect(through.translation().y).toBeLessThan(-1); // fell through the hole
+    openWorld.free();
+
+    const closedWorld = createPhysicsWorld();
+    place(closedWorld, "closed");
+    const resting = drop(closedWorld);
+    for (let i = 0; i < 45; i += 1) {
+      stepWorld(closedWorld);
+    }
+    const y = resting.translation().y;
+    expect(y).toBeGreaterThan(0.2); // supported by the lid, not through it
+    expect(y).toBeLessThan(1); // resting on the lid surface
+    closedWorld.free();
   });
 });

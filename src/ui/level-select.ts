@@ -31,9 +31,9 @@ function tile(glyph: string, label: string, solved: boolean): HTMLButtonElement 
 }
 
 /**
- * Full-screen level select: a 7-tile grid (sandbox + 6 levels) with nothing
- * locked and a ✓ chip on solved levels. Icon-only tiles, big enough for small
- * fingers, portrait and landscape friendly.
+ * Full-screen level select: one tile per level (sandbox + all shipped
+ * levels) with nothing locked and a ✓ chip on solved levels. Icon-only
+ * tiles, big enough for small fingers, portrait and landscape friendly.
  */
 export function createLevelSelect(
   container: HTMLElement,

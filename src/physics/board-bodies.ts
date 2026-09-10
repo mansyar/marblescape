@@ -1,7 +1,7 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
 import { PHYSICS } from "../domain/physics-config";
-import { colliderDescriptors } from "./piece-colliders";
+import { colliderDescriptors, type GoalLid } from "./piece-colliders";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { cellToWorld } from "../render/piece-view";
 import type { World } from "./world";
@@ -16,7 +16,7 @@ const FLOOR_H = 0.15;
  */
 export function buildBoardBodies(
   world: World,
-  goalCell?: { x: number; z: number } | null,
+  openHoles: ReadonlyArray<{ x: number; z: number }> = [],
 ): RAPIER.RigidBody[] {
   const h = PHYSICS.wallHeight / 2;
   const walls: Array<[number, number, number, number, number, number]> = [
@@ -30,27 +30,29 @@ export function buildBoardBodies(
     const body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(x, y, z));
     world.createCollider(RAPIER.ColliderDesc.cuboid(hx, hy, hz), body);
   }
-  return syncFloorBodies(world, [], goalCell ?? null);
+  return syncFloorBodies(world, [], openHoles);
 }
 
 /**
  * Rebuilds the floor as one tile per cell (top surface exactly at y=0),
- * removing every body in `existing` first, skipping the goal cell so marbles
- * fall through the hole piece above it. Returns the fresh list of floor
- * bodies for later syncing — callers MUST keep it and pass it back.
+ * removing every body in `existing` first, skipping each open hole so
+ * marbles fall through the cup above it. Cup lids are rebuilt separately by
+ * the piece bodies, so closed cups keep their floor. Returns the fresh list
+ * of floor bodies for later syncing — callers MUST keep it and pass it back.
  */
 export function syncFloorBodies(
   world: World,
   existing: RAPIER.RigidBody[],
-  goalCell: { x: number; z: number } | null,
+  openHoles: ReadonlyArray<{ x: number; z: number }>,
 ): RAPIER.RigidBody[] {
   for (const body of existing) {
     world.removeRigidBody(body);
   }
+  const holes = new Set(openHoles.map((hole) => `${hole.x},${hole.z}`));
   const floors: RAPIER.RigidBody[] = [];
   for (let cy = 0; cy < BOARD_ROWS; cy += 1) {
     for (let cx = 0; cx < BOARD_COLS; cx += 1) {
-      if (goalCell && goalCell.x === cx && goalCell.z === cy) {
+      if (holes.has(`${cx},${cy}`)) {
         continue;
       }
       const body = world.createRigidBody(
@@ -78,7 +80,14 @@ export interface PieceBodyEntry {
 export function syncPieceBodies(
   world: World,
   existing: Map<string, PieceBodyEntry>,
-  pieces: ReadonlyArray<{ id: string; type: PieceType; rotation: Rotation; x: number; y: number }>,
+  pieces: ReadonlyArray<{
+    id: string;
+    type: PieceType;
+    rotation: Rotation;
+    x: number;
+    y: number;
+    lid?: GoalLid;
+  }>,
 ): Map<string, PieceBodyEntry> {
   const keep = new Set(pieces.map((p) => p.id));
   for (const [id, entry] of existing) {
@@ -92,7 +101,7 @@ export function syncPieceBodies(
 
   for (const piece of pieces) {
     const current = existing.get(piece.id);
-    const signature = `${piece.type}:${piece.rotation}:${piece.x}:${piece.y}`;
+    const signature = `${piece.type}:${piece.rotation}:${piece.x}:${piece.y}:${piece.lid ?? ""}`;
     if (current && current.sig === signature) {
       continue;
     }
@@ -102,7 +111,7 @@ export function syncPieceBodies(
       }
     }
     const [wx, , wz] = cellToWorld(piece.x, piece.y);
-    const bodies = colliderDescriptors(piece.type, piece.rotation).map((d) => {
+    const bodies = colliderDescriptors(piece.type, piece.rotation, piece.lid ?? "open").map((d) => {
       // Offsets arrive fully rotated from colliderDescriptors. Body
       // orientation = yaw (about Y, from piece rotation + deflector) then
       // pitch (about the piece-local X axis, for ramps): q = qYaw ⊗ qPitch.

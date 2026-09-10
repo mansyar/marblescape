@@ -23,6 +23,9 @@ export const REJECT_WIGGLE_CYCLES = 2.5;
 /** Quarter-turn tween length in seconds (spec FR3 ~140 ms). */
 export const ROTATE_TWEEN_DURATION = 0.14;
 
+/** Tap-cycle tint flash length in seconds (snappy acknowledgment). */
+export const TINT_PULSE_DURATION = 0.18;
+
 const TWO_PI = Math.PI * 2;
 
 function clamp01(t: number): number {
@@ -90,4 +93,12 @@ export function shortestAngleDelta(delta: number): number {
  */
 export function rotateYaw(from: number, to: number, t: number): number {
   return from + shortestAngleDelta(to - from) * clamp01(t);
+}
+
+/**
+ * Tap-cycle tint flash strength at normalised progress `t`: full glow on the
+ * tap, easing back to rest.
+ */
+export function tintPulseAmount(t: number): number {
+  return 1 - clamp01(t);
 }

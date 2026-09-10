@@ -9,6 +9,7 @@ import {
   toJSON,
   type BoardState,
 } from "./board";
+import type { MarbleColor } from "./colors";
 import type { Storage } from "./storage";
 
 function sampleBoard(): BoardState {
@@ -30,8 +31,9 @@ describe("serialization round-trip", () => {
   it("serializes to a versioned JSON string", () => {
     const json = toJSON(sampleBoard());
     const parsed = JSON.parse(json) as { version: number; pieces: unknown[] };
-    expect(parsed.version).toBe(1);
+    expect(parsed.version).toBe(2);
     expect(parsed.pieces).toHaveLength(1);
+    expect(parsed.pieces[0]).not.toHaveProperty("color");
   });
 
   it("round-trips piece data losslessly", () => {
@@ -44,6 +46,20 @@ describe("serialization round-trip", () => {
     const restored = fromJSON(toJSON(createBoard(8, 6)));
     expect(restored?.pieces).toEqual([]);
     expect(restored?.width).toBe(8);
+  });
+
+  it("round-trips a colored goal cup losslessly", () => {
+    const board = placeTypedPiece(createBoard(8, 6), {
+      id: "g1",
+      type: "goal",
+      rotation: 0,
+      x: 3,
+      y: 5,
+      color: "grape",
+    });
+    const restored = fromJSON(toJSON(board));
+    expect(restored).toEqual(board);
+    expect(restored?.pieces[0].color).toBe("grape");
   });
 });
 
@@ -72,6 +88,50 @@ describe("fromJSON validation", () => {
     expect(
       fromJSON('{"version":1,"pieces":[{"id":"a","type":"straight","rotation":0,"x":"x","y":0}]}'),
     ).toBeNull();
+  });
+
+  it("accepts v1 saves and migrates colorless goals to classic cups", () => {
+    const v1 = JSON.stringify({
+      version: 1,
+      width: 8,
+      height: 6,
+      pieces: [
+        { id: "p1", type: "straight", rotation: 0, x: 2, y: 3 },
+        { id: "g1", type: "goal", rotation: 0, x: 3, y: 5 },
+      ],
+    });
+    const restored = fromJSON(v1);
+    expect(restored).not.toBeNull();
+    expect(restored?.pieces).toEqual([
+      { id: "p1", type: "straight", rotation: 0, x: 2, y: 3 },
+      { id: "g1", type: "goal", rotation: 0, x: 3, y: 5 },
+    ]);
+    expect(restored?.pieces[1].color).toBeUndefined();
+  });
+
+  it("degrades an invalid color to a classic cup instead of rejecting the board", () => {
+    for (const bad of ["banana", 42, true, null]) {
+      const doc = JSON.stringify({
+        version: 2,
+        width: 8,
+        height: 6,
+        pieces: [{ id: "g1", type: "goal", rotation: 0, x: 3, y: 5, color: bad }],
+      });
+      const restored = fromJSON(doc);
+      expect(restored).not.toBeNull();
+      expect(restored?.pieces[0].color).toBeUndefined();
+    }
+  });
+
+  it("ignores colors on pieces that cannot carry them", () => {
+    const doc = JSON.stringify({
+      version: 2,
+      width: 8,
+      height: 6,
+      pieces: [{ id: "p1", type: "straight", rotation: 0, x: 2, y: 3, color: "mint" }],
+    });
+    const restored = fromJSON(doc);
+    expect(restored?.pieces[0]).toEqual({ id: "p1", type: "straight", rotation: 0, x: 2, y: 3 });
   });
 });
 
@@ -124,6 +184,21 @@ describe("localStorage persistence", () => {
     const storage = memoryStorage();
     storage.setItem(STORAGE_KEY, "garbage!!!");
     expect(loadBoard(storage)).toBeNull();
+  });
+});
+
+describe("goal cup colors", () => {
+  it("goal pieces can carry a candy color", () => {
+    const color: MarbleColor = "mint";
+    const placed = placeTypedPiece(createBoard(8, 6), {
+      id: "g1",
+      type: "goal",
+      rotation: 0,
+      x: 3,
+      y: 5,
+      color,
+    });
+    expect(placed.pieces[0].color).toBe("mint");
   });
 });
 

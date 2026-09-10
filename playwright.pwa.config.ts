@@ -14,22 +14,24 @@ export default defineConfig({
     baseURL: "http://localhost:4173",
     hasTouch: true,
   },
+  // Note: each project spreads `devices["Desktop Chrome"]`, which sets
+  // `hasTouch: false` — re-enable touch per project so `tap()` works.
   projects: [
     {
       name: "portrait-phone",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } },
+      use: { ...devices["Desktop Chrome"], hasTouch: true, viewport: { width: 390, height: 844 } },
     },
     {
       name: "landscape-phone",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 844, height: 390 } },
+      use: { ...devices["Desktop Chrome"], hasTouch: true, viewport: { width: 844, height: 390 } },
     },
     {
       name: "portrait-tablet",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 768, height: 1024 } },
+      use: { ...devices["Desktop Chrome"], hasTouch: true, viewport: { width: 768, height: 1024 } },
     },
     {
       name: "landscape-tablet",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 768 } },
+      use: { ...devices["Desktop Chrome"], hasTouch: true, viewport: { width: 1024, height: 768 } },
     },
   ],
   webServer: {

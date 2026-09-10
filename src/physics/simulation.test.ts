@@ -100,7 +100,7 @@ describe("headless simulation invariants (deterministic scripted runs)", () => {
     });
     // Goal cup at (4,4); the marble starts right above it.
     placePiece(world, "goal", 0, 4, 4);
-    marbles.setGoalCell(4, 4);
+    marbles.setGoalCells([{ x: 4, z: 4, color: null }]);
     marbles.spawnAt(4.5, PHYSICS.spawnHeight + 0.4, 4.5);
 
     let collectedAt = -1;

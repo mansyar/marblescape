@@ -113,13 +113,17 @@ export function reset(state: PuzzleState): PuzzleState {
 export function boardFor(state: PuzzleState): BoardState {
   let board = createBoard(state.level.boardWidth, state.level.boardHeight);
   for (const piece of state.level.fixed) {
-    board = placeTypedPiece(board, {
+    const placed: PlacedPiece = {
       id: `f${piece.x},${piece.y}`,
       type: piece.type,
       rotation: piece.rotation,
       x: piece.x,
       y: piece.y,
-    });
+    };
+    if (piece.color !== undefined) {
+      placed.color = piece.color;
+    }
+    board = placeTypedPiece(board, placed);
   }
   for (const piece of state.placements.values()) {
     board = placeTypedPiece(board, piece);

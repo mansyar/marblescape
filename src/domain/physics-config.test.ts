@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PHYSICS, MARBLE_PALETTE } from "./physics-config";
+import { PHYSICS } from "./physics-config";
 
 describe("PHYSICS tuning config", () => {
   it("uses a fixed 60Hz timestep with substepping", () => {
@@ -62,14 +62,5 @@ describe("PHYSICS tuning config", () => {
 
   it("drops from high enough for an audible entrance", () => {
     expect(PHYSICS.spawnHeight).toBeGreaterThanOrEqual(0.8);
-  });
-});
-
-describe("MARBLE_PALETTE", () => {
-  it("offers several candy colors for random marble assignment", () => {
-    expect(MARBLE_PALETTE.length).toBeGreaterThanOrEqual(4);
-    for (const color of MARBLE_PALETTE) {
-      expect(color).toMatch(/^#[0-9a-fA-F]{6}$/);
-    }
   });
 });

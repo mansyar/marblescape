@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
+import { colorHex, type MarbleColor } from "../domain/colors";
+import type { PieceType } from "../domain/pieces";
 import {
+  colorSwatchCss,
   LABELS,
+  normalizePaletteItems,
   PALETTE_REJECT_ANIMATION,
+  type PaletteItem,
   paletteLayout,
   palettePickupTransform,
   paletteRejectKeyframes,
   pulseReject,
 } from "./palette";
-import type { PieceType } from "../domain/pieces";
 
 const ALL_TYPES: readonly PieceType[] = ["straight", "curved", "funnel", "goal"];
 
@@ -98,5 +102,45 @@ describe("paletteLayout landscape (right rail)", () => {
     expect(buttonCss).toContain("touch-action:none");
     // Fixed-size rail buttons instead of growing flex items.
     expect(buttonCss).toContain("flex:0 0 72px");
+  });
+});
+
+describe("palette items", () => {
+  it("normalizes legacy string palettes into typed items", () => {
+    expect(normalizePaletteItems(["straight", "goal"])).toEqual([
+      { type: "straight" },
+      { type: "goal" },
+    ]);
+  });
+
+  it("keeps item objects (with colors) untouched, in order", () => {
+    const items: PaletteItem[] = [{ type: "straight" }, { type: "goal", color: "mint" }];
+    expect(normalizePaletteItems(items)).toEqual(items);
+  });
+
+  it("accepts mixed legacy and item entries", () => {
+    const mixed: Array<PieceType | PaletteItem> = ["curved", { type: "goal", color: "grape" }];
+    expect(normalizePaletteItems(mixed)).toEqual([
+      { type: "curved" },
+      { type: "goal", color: "grape" },
+    ]);
+  });
+});
+
+describe("color swatch", () => {
+  it("paints the candy color on a kid-sized dot", () => {
+    const css = colorSwatchCss("tangerine");
+    expect(css).toContain(colorHex("tangerine"));
+    expect(css).toContain("18px");
+    expect(css).toContain("border-radius:50%");
+  });
+
+  it("swatches every candy color distinctly", () => {
+    const colors: MarbleColor[] = ["raspberry", "tangerine", "lemon", "mint", "blueberry", "grape"];
+    const seen = new Set<string>();
+    for (const color of colors) {
+      seen.add(colorSwatchCss(color));
+    }
+    expect(seen.size).toBe(6);
   });
 });

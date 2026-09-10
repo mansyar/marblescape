@@ -75,6 +75,11 @@ export const CONNECTIONS: Record<PieceType, PieceDef> = {
 
 export const PIECE_TYPES: PieceType[] = ["straight", "curved", "funnel", "goal"];
 
+/** Candy colors belong to goal cups only; every other piece is color-free. */
+export function canCarryColor(type: PieceType): boolean {
+  return type === "goal";
+}
+
 export function assertValidRotation(type: PieceType, rotation: Rotation): void {
   if (!Number.isInteger(rotation) || rotation < 0 || rotation > 3) {
     throw new Error(`Invalid rotation ${rotation} for piece type ${type}`);

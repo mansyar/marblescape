@@ -2,9 +2,11 @@ import {
   REJECT_WIGGLE_DURATION,
   ROTATE_TWEEN_DURATION,
   SNAP_BOUNCE_DURATION,
+  TINT_PULSE_DURATION,
   rejectWiggleAngle,
   rotateYaw,
   snapBounceScale,
+  tintPulseAmount,
 } from "./piece-anim";
 
 /** Anything with a 3-axis scale and a Y rotation (a three.js Object3D does). */
@@ -13,15 +15,22 @@ export interface JuiceTarget {
   rotation: { y: number };
 }
 
+/** Anything whose tint can flash on and back off (a cup's materials). */
+export interface TintTarget {
+  setFlash(amount: number): void;
+}
+
 type Tween =
   | { kind: "bounce"; target: JuiceTarget; t: number }
   | { kind: "wiggle"; target: JuiceTarget; t: number; baseYaw: number }
-  | { kind: "rotate"; target: JuiceTarget; t: number; from: number; to: number };
+  | { kind: "rotate"; target: JuiceTarget; t: number; from: number; to: number }
+  | { kind: "tint"; target: TintTarget; t: number };
 
 const DURATIONS: Record<Tween["kind"], number> = {
   bounce: SNAP_BOUNCE_DURATION,
   wiggle: REJECT_WIGGLE_DURATION,
   rotate: ROTATE_TWEEN_DURATION,
+  tint: TINT_PULSE_DURATION,
 };
 
 /**
@@ -56,6 +65,13 @@ export class PieceJuice {
     this.tweens.push({ kind: "rotate", target, t: 0, from, to });
   }
 
+  /** Tap-cycle: flash the tint toward white, then settle back to rest. */
+  tintPulse(target: TintTarget): void {
+    this.cancel(target);
+    this.tweens.push({ kind: "tint", target, t: 0 });
+    this.apply(this.tweens[this.tweens.length - 1]);
+  }
+
   /** Advances every tween; completed ones are settled exactly at rest. */
   update(dt: number): void {
     const done: Tween[] = [];
@@ -85,6 +101,9 @@ export class PieceJuice {
       case "rotate":
         tween.target.rotation.y = rotateYaw(tween.from, tween.to, tween.t);
         break;
+      case "tint":
+        tween.target.setFlash(tintPulseAmount(tween.t));
+        break;
     }
   }
 
@@ -99,11 +118,14 @@ export class PieceJuice {
       case "rotate":
         tween.target.rotation.y = tween.to;
         break;
+      case "tint":
+        tween.target.setFlash(0);
+        break;
     }
   }
 
   /** Drops a target's live tween, restoring the state it owned. */
-  private cancel(target: JuiceTarget): void {
+  private cancel(target: JuiceTarget | TintTarget): void {
     const cancelled = this.tweens.filter((t) => t.target === target);
     for (const tween of cancelled) {
       if (tween.kind === "bounce") {

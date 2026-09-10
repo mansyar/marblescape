@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { markSolved } from "./solve";
+import { isLevelComplete, markSolved } from "./solve";
 import { loadBadges } from "./badges";
+import type { MarbleColor } from "./colors";
 
 class MemoryStorage {
   private data = new Map<string, string>();
@@ -51,5 +52,48 @@ describe("markSolved", () => {
     }
     expect(loadBadges(reloaded).has(5)).toBe(true);
     expect(markSolved(reloaded, 5)).toBe(false);
+  });
+});
+
+describe("isLevelComplete", () => {
+  it("treats classic levels as solved by any collection", () => {
+    expect(isLevelComplete({}, new Map())).toBe(true);
+  });
+
+  it("keeps sorting levels open until every scripted color is collected", () => {
+    const script: MarbleColor[] = ["raspberry", "mint"];
+    expect(isLevelComplete({ marbleColors: script }, new Map())).toBe(false);
+    expect(isLevelComplete({ marbleColors: script }, new Map([["raspberry", 1]]))).toBe(false);
+    expect(
+      isLevelComplete(
+        { marbleColors: script },
+        new Map([
+          ["raspberry", 1],
+          ["mint", 1],
+        ]),
+      ),
+    ).toBe(true);
+  });
+
+  it("requires the scripted multiplicity of repeated colors", () => {
+    const script: MarbleColor[] = ["mint", "mint", "grape"];
+    expect(
+      isLevelComplete(
+        { marbleColors: script },
+        new Map([
+          ["mint", 1],
+          ["grape", 1],
+        ]),
+      ),
+    ).toBe(false);
+    expect(
+      isLevelComplete(
+        { marbleColors: script },
+        new Map([
+          ["mint", 2],
+          ["grape", 1],
+        ]),
+      ),
+    ).toBe(true);
   });
 });
