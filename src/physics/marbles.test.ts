@@ -145,6 +145,31 @@ describe("MarbleManager", () => {
     world.free();
   });
 
+  it("quietly clears settled leftovers when a fresh run starts", () => {
+    const world = createPhysicsWorld();
+    const lost: RAPIER.RigidBody[] = [];
+    // settleSpeed 1000 → the wandered marble counts as calm right away.
+    const marbles = new MarbleManager(
+      world,
+      { onLost: (body) => lost.push(body) },
+      { settleSteps: 2, settleSpeed: 1000, stallCapSeconds: 1000 },
+    );
+    marbles.spawnDrop(4, 4);
+    for (let i = 0; i < 10; i += 1) {
+      stepWorld(world);
+      marbles.reap();
+    }
+    expect(marbles.count).toBe(1); // wandered marble still rests on the board
+
+    // The next Play replaces it: gone quietly, no rescue counted.
+    marbles.spawnDrop(4, 4);
+    expect(lost).toHaveLength(1);
+    expect(marbles.getRescued()).toHaveLength(0);
+    expect(marbles.count).toBe(1); // only the fresh marble stays live
+    marbles.dispose();
+    world.free();
+  });
+
   it("spawns with an explicit marble color without consuming the random sequence", () => {
     const world = createPhysicsWorld();
     const marbles = new MarbleManager(world);

@@ -17,6 +17,8 @@ export interface MarbleEvents {
   onCollected?: (body: RAPIER.RigidBody, color: MarbleColor) => void;
   /** Called when a marble fell off the board and was rescued. */
   onRescued?: (body: RAPIER.RigidBody) => void;
+  /** Called when a settled leftover is quietly replaced by a fresh run. */
+  onLost?: (body: RAPIER.RigidBody) => void;
   /** Called exactly once per run when it settles (all-done / at-rest / stall). */
   onRunSettled?: (reason: SettleReason) => void;
 }
@@ -80,6 +82,14 @@ export class MarbleManager {
     // A drop after the previous run settled starts a fresh run; a drop while
     // marbles are still live extends the current run (no reset mid-flight).
     if (this.bodies.length === 0 || this.detector.isSettled) {
+      // A fresh run replaces wandered leftovers quietly: they leave the
+      // board without counting as rescues (no escapes, no body leak).
+      for (const body of this.bodies) {
+        this.world.removeRigidBody(body);
+        this.colors.delete(body);
+        this.events.onLost?.(body);
+      }
+      this.bodies.length = 0;
       this.detector.reset();
       this.runSpawned = 0;
     }

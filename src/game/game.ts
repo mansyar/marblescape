@@ -19,7 +19,7 @@ import {
 } from "../domain/board";
 import { openCupKeys } from "../domain/cup-lids";
 import { getLevel, nextScriptedColor } from "../domain/levels";
-import { markSolved } from "../domain/solve";
+import { isLevelComplete, markSolved } from "../domain/solve";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { CONNECTIONS, rotate } from "../domain/pieces";
 import { PIECE_TYPES } from "../domain/pieces";
@@ -50,9 +50,10 @@ import { PieceJuice } from "../render/piece-juice";
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
 import { SparkleSystem } from "../render/sparkles";
+import { createTrophyTray, type TrophyTray } from "../render/trophies";
 import { createWaitingMarble, type WaitingMarble } from "../render/waiting-marble";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
-import { cupBurstPosition } from "./celebration";
+import { CUP_BURST_HEIGHT } from "./celebration";
 
 /**
  * Game orchestrator: owns board state, physics world and rendering, and
@@ -71,6 +72,7 @@ export class Game {
   private highlight: THREE.Mesh | null = null;
   private sparkles: SparkleSystem | null = null;
   private waiting: WaitingMarble | null = null;
+  private trophies: TrophyTray | null = null;
   private readonly juice = new PieceJuice();
   private board: BoardState;
   /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
@@ -143,6 +145,7 @@ export class Game {
     // The waiting marble (the next drop, hovering at the chute) also honors
     // reduced motion: it bobs gently, or stands perfectly still.
     this.waiting = createWaitingMarble(handle.scene);
+    this.trophies = createTrophyTray(handle.scene);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.sparkles.setReducedMotion(reducedMotion.matches);
     this.waiting.setReducedMotion(reducedMotion.matches);
@@ -171,17 +174,24 @@ export class Game {
       onCollected: (body, color) => {
         this.removeMarbleMesh(body);
         this.sound?.play("plonk", { rate: 1, volume: 0.9 });
-        const cup = cupBurstPosition(this.board);
+        const cup = this.collectedCup(body);
         if (cup) {
-          this.sparkles?.burstAt(cup);
+          this.sparkles?.burstAt({ x: cup.x + 0.5, y: CUP_BURST_HEIGHT, z: cup.y + 0.5 });
+          if (this.puzzle) {
+            // The marble rests visibly in the cup it actually reached.
+            this.trophies?.add({ x: cup.x, z: cup.y }, color);
+          }
         }
         this.collectedByColor.set(color, (this.collectedByColor.get(color) ?? 0) + 1);
         if (this.puzzle) {
-          // Goal cup reached in level mode: persist the badge (first solve
-          // only), play the win chime, and let the UI pulse + show Home.
-          markSolved(localStorage, this.puzzle.level.id);
-          playChime(this.audioCtx);
-          this.onLevelSolved?.(this.puzzle.level.id);
+          // Sorting levels solve when their script is fully collected;
+          // classic levels (no script) solve on any catch. Persist the
+          // badge on the first solve; repeat solves celebrate again.
+          if (isLevelComplete(this.puzzle.level, this.collectedByColor)) {
+            markSolved(localStorage, this.puzzle.level.id);
+            playChime(this.audioCtx);
+            this.onLevelSolved?.(this.puzzle.level.id);
+          }
         }
         // The collectible color advances: refresh which cups are open.
         this.refreshCupState();
@@ -191,6 +201,8 @@ export class Game {
         // The board is empty again (rescue or stall): show the next marble.
         this.refreshCupState();
       },
+      // A wandered leftover replaced by a fresh run retires its mesh too.
+      onLost: (body) => this.removeMarbleMesh(body),
       // Run over: a soft cue only when the run ended without a goal (the
       // plonk/chime cover success). Play itself never locks on settle.
       onRunSettled: (reason) => playSettleCue(this.audioCtx, reason, this.sound?.isMuted ?? true),
@@ -258,6 +270,7 @@ export class Game {
     this.board = this.sandboxBoard ?? this.board;
     this.sandboxBoard = null;
     this.collectedByColor.clear();
+    this.trophies?.clear();
     this.syncPieces();
   }
 
@@ -494,6 +507,9 @@ export class Game {
     if (this.puzzle) {
       this.puzzle = puzzleReset(this.puzzle);
       this.board = boardFor(this.puzzle);
+      // Reset starts the level over: trophies and progress clear with it.
+      this.trophies?.clear();
+      this.collectedByColor.clear();
       this.syncPieces();
       return;
     }
@@ -737,6 +753,19 @@ export class Game {
     this.waiting.setCell(spawn.x, spawn.y);
     this.waiting.setColor(this.nextDropColor());
     this.waiting.setVisible(true);
+  }
+
+  /** The cup the marble actually fell into (sparkle + trophy anchor). */
+  private collectedCup(body: RAPIER.RigidBody): PlacedPiece | null {
+    const t = body.translation();
+    return (
+      this.board.pieces.find(
+        (p) =>
+          p.type === "goal" &&
+          Math.abs(t.x - (p.x + 0.5)) < 0.5 &&
+          Math.abs(t.z - (p.y + 0.5)) < 0.5,
+      ) ?? null
+    );
   }
 
   /** Opens holes under the open cups and points collection at them. */
