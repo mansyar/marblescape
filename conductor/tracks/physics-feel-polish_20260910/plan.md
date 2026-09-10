@@ -6,10 +6,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Run-settle detection (pure domain, TDD)
 
-- [ ] Task: Write failing tests for the run-settle detector
-  - [ ] New module `src/domain/run-settle.ts` (pure): fed per-step marble states (collected/rescued/velocity)
-  - [ ] Tests: settle when all marbles reaped; settle after N consecutive sub-threshold steps; no settle while any marble fast; event fires exactly once per run; stall cap (~15 s) declares finish
-- [ ] Task: Implement detector to green; verify >80% coverage
+- [x] Task: Write failing tests for the run-settle detector [f571e52]
+  - [x] New module `src/domain/run-settle.ts` (pure): fed per-step marble states (collected/rescued/velocity)
+  - [x] Tests: settle when all marbles reaped; settle after N consecutive sub-threshold steps; no settle while any marble fast; event fires exactly once per run; stall cap (~15 s) declares finish
+- [x] Task: Implement detector to green; verify >80% coverage [f571e52]
 - [ ] Task: Write failing tests + implement stall-cap reap policy in `MarbleManager` (timeout → rescued path, quietly)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
