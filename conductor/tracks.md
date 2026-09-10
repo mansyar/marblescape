@@ -2,10 +2,11 @@
 
 ## Tracks
 
-- [~] **Track: Color Sorting** *Link: [./tracks/color-sorting_20260911/index.md](./tracks/color-sorting_20260911/index.md)*
+_No active tracks._
 
 ## Archive
 
+- [x] **Track: Color Sorting** *Link: [./archive/color-sorting_20260911/index.md](./archive/color-sorting_20260911/index.md)* *(completed - merged to `master` @ `4cf11ea`)*
 - [x] **Track: Celebration & Interaction Juice** *Link: [./archive/celebration-juice_20260910/index.md](./archive/celebration-juice_20260910/index.md)* *(completed - merged to `master` @ `d5a668f`)*
 - [x] **Track: Physics Feel Polish** *Link: [./archive/physics-feel-polish_20260910/index.md](./archive/physics-feel-polish_20260910/index.md)* *(completed - merged to `master` @ `8780ab0`)*
 - [x] **Track: Dual-Orientation & Responsive Layout** *Link: [./archive/dual-orientation_20260910/index.md](./archive/dual-orientation_20260910/index.md)* *(completed - merged to `master` @ `d3725aa`)*

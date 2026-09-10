@@ -71,10 +71,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Manual feel pass (portrait + landscape): lid readability, cycle affordance, color clarity (incl. color-blind spot check) [39aed00]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 39aed00]
 
-## Phase 5 — Track completion
+## Phase 5 — Track completion [checkpoint: 4cf11ea]
 
 - [x] Task: Docs sync (`tech-stack.md`: colors/lids/preview/schema v2, no new deps/assets; `product.md`: color sorting moves from non-goals to shipped scope) [d97c5c0]
 - [x] Task: Run full 4-viewport e2e matrix locally against the production build (incl. reliability + colored runs) [b2177f8]
-- [~] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e)
-- [ ] Task: Merge to `master`, archive track, update tracks registry
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e) [4cf11ea]
+- [x] Task: Merge to `master`, archive track, update tracks registry [4cf11ea]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 4cf11ea]
