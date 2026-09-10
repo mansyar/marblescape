@@ -6,12 +6,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Collect celebration: sparkle burst (TDD)
 
-- [~] Task: Write failing tests for the sparkle burst module (pooling, caps, lifecycle)
-  - [ ] New module `src/render/sparkles.ts`: pooled burst emitter anchored at a world position
-  - [ ] Hard cap ≤64 live particles per burst; bounded slot reuse/coalescing for rapid collects; auto-expire ≤1 s
-  - [ ] Reduced-motion branch yields a non-flying glow pulse
-  - [ ] Tests: emission caps, pool reuse (no per-event allocation after warm-up), expiry, coalescing window, reduced-motion fallback
-- [ ] Task: Implement sparkle module to green; >80% coverage; `pnpm check` clean
+- [x] Task: Write failing tests for the sparkle burst module (pooling, caps, lifecycle) [37fe3c0]
+  - [x] New module `src/render/sparkles.ts`: pooled burst emitter anchored at a world position
+  - [x] Hard cap ≤64 live particles per burst; bounded slot reuse/coalescing for rapid collects; auto-expire ≤1 s
+  - [x] Reduced-motion branch yields a non-flying glow pulse
+  - [x] Tests: emission caps, pool reuse (no per-event allocation after warm-up), expiry, coalescing window, reduced-motion fallback
+- [x] Task: Implement sparkle module to green; >80% coverage; `pnpm check` clean [37fe3c0]
 - [ ] Task: Write failing tests + wire collect celebration into `Game` (burst at the goal cup world position); expose `burstCount` test hook
 - [ ] Task: Implement wiring to green; verify sandbox + puzzle collects both fire; full unit suite green
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
