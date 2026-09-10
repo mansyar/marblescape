@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { impactParams, selectImpactSound } from "./impact-sounds";
+import { impactParams, MIN_IMPACT_FORCE, selectImpactSound } from "./impact-sounds";
 import { impactToPlayback, impactToVolume, MAX_FORCE } from "./pitch";
 
 describe("selectImpactSound", () => {
@@ -37,5 +37,12 @@ describe("impactParams", () => {
     expect(medium.rate).toBeGreaterThan(gentle.rate);
     expect(medium.rate).toBeLessThan(violent.rate);
     expect(medium.volume).toBeGreaterThan(gentle.volume);
+  });
+
+  it("the gentle-impact cutoff admits soft ticks the old gate muted", () => {
+    // The old code dropped everything below force 1; the new cutoff must
+    // sit clearly lower so low-speed clicks still sound (spec FR2).
+    expect(MIN_IMPACT_FORCE).toBeGreaterThan(0);
+    expect(MIN_IMPACT_FORCE).toBeLessThan(1);
   });
 });

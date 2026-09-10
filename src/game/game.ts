@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import RAPIER from "@dimforge/rapier3d-compat";
-import { impactParams, selectImpactSound } from "../audio/impact-sounds";
+import { impactParams, MIN_IMPACT_FORCE, selectImpactSound } from "../audio/impact-sounds";
+import { IMPACT_COOLDOWN_MS, ImpactThrottler } from "../audio/impact-throttle";
 import { playChime } from "../audio/chime";
 import { isSoundOn, setSoundOn } from "../audio/prefs";
 import { SoundManager } from "../audio/sound-manager";
@@ -72,7 +73,7 @@ export class Game {
   private sound: SoundManager | null = null;
   private audioCtx: AudioContext | null = null;
   private eventQueue: RAPIER.EventQueue | null = null;
-  private lastImpactAt = 0;
+  private readonly impactThrottler = new ImpactThrottler();
   private floorBodies: RAPIER.RigidBody[] = [];
   private floorGoal: string | null = "init";
   private saveTimer: number | null = null;
@@ -519,18 +520,23 @@ export class Game {
       if (!name) {
         return;
       }
-      // Relative speed at contact drives pitch and loudness.
+      // Relative speed at contact drives pitch and loudness; gentle
+      // low-speed ticks stay audible thanks to the lowered cutoff.
       const v1 = b1.linvel();
       const v2 = b2.linvel();
       const force = Math.hypot(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-      if (force < 1) {
+      if (force < MIN_IMPACT_FORCE) {
         return;
       }
+      // Per-marble voice throttling: one marble's click no longer mutes
+      // the others during pile-ups (spec FR2).
+      const involved = [b1, b2].filter((body) => marbles.has(body));
       const now = performance.now();
-      if (now - this.lastImpactAt < 60) {
-        return; // avoid machine-gunning during pile-ups
+      if (
+        !this.impactThrottler.shouldPlay(involved[0], now, IMPACT_COOLDOWN_MS, involved.slice(1))
+      ) {
+        return;
       }
-      this.lastImpactAt = now;
       this.sound?.play(name, impactParams(force));
     });
   }
