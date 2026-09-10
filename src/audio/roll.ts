@@ -16,6 +16,8 @@ export const ROLL_MAX_GAIN = 0.4;
 
 const BASE_RATE = 0.8;
 const RATE_SPAN = 0.4;
+/** Loudness grows with speed, but rolls stay behind impact clacks. */
+const GAIN_EXPONENT = 0.8;
 
 /** A single looping roll sound owned by one marble. */
 export interface RollVoice {
@@ -61,7 +63,7 @@ export class RollVoices {
         this.voices.set(marble, voice);
       }
       const t = Math.min(speed / ROLL_MAX_SPEED, 1);
-      voice.setGain(ROLL_MAX_GAIN * t ** 0.8);
+      voice.setGain(ROLL_MAX_GAIN * t ** GAIN_EXPONENT);
       voice.setRate(BASE_RATE + RATE_SPAN * t);
     }
     for (const [marble, voice] of this.voices) {

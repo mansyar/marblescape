@@ -562,6 +562,7 @@ export class Game {
       }
       // Per-marble voice throttling: one marble's click no longer mutes
       // the others during pile-ups (spec FR2).
+      // Non-empty: name !== null above guarantees at least one marble.
       const involved = [b1, b2].filter((body) => marbles.has(body));
       const now = performance.now();
       if (
