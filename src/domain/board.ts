@@ -1,9 +1,11 @@
-import type { MarbleColor } from "./colors";
+import { isMarbleColor, type MarbleColor } from "./colors";
 import { createGrid, placePiece, type GridState, isInside } from "./grid";
-import { CONNECTIONS, PIECE_TYPES, type PieceType, type Rotation } from "./pieces";
+import { canCarryColor, CONNECTIONS, PIECE_TYPES, type PieceType, type Rotation } from "./pieces";
 import type { Storage } from "./storage";
 
-export const SCHEMA_VERSION = 1;
+/** Bumped to 2 for colored goal cups; version 1 saves still load (see fromJSON). */
+export const SCHEMA_VERSION = 2;
+/** Stable storage key — schema migration is handled by the payload's `version` field. */
 export const STORAGE_KEY = "marblescape.board.v1";
 
 export interface PlacedPiece {
@@ -49,6 +51,7 @@ interface SerializedPiece {
   rotation: number;
   x: number;
   y: number;
+  color?: string;
 }
 
 interface SerializedBoard {
@@ -63,13 +66,19 @@ export function toJSON(board: BoardState): string {
     version: SCHEMA_VERSION,
     width: board.width,
     height: board.height,
-    pieces: board.pieces.map((p) => ({
-      id: p.id,
-      type: p.type,
-      rotation: p.rotation,
-      x: p.x,
-      y: p.y,
-    })),
+    pieces: board.pieces.map((p) => {
+      const entry: SerializedPiece = {
+        id: p.id,
+        type: p.type,
+        rotation: p.rotation,
+        x: p.x,
+        y: p.y,
+      };
+      if (p.color !== undefined) {
+        entry.color = p.color;
+      }
+      return entry;
+    }),
   };
   return JSON.stringify(doc);
 }
@@ -81,7 +90,8 @@ export function fromJSON(json: string): BoardState | null {
   } catch {
     return null;
   }
-  if (!isRecord(doc) || doc.version !== SCHEMA_VERSION) {
+  // Version 1 saves (pre-color) migrate losslessly.
+  if (!isRecord(doc) || (doc.version !== 1 && doc.version !== SCHEMA_VERSION)) {
     return null;
   }
   const { width, height, pieces } = doc;
@@ -104,7 +114,7 @@ function parsePiece(entry: unknown): PlacedPiece | null {
   if (!isRecord(entry)) {
     return null;
   }
-  const { id, type, rotation, x, y } = entry;
+  const { id, type, rotation, x, y, color } = entry;
   if (typeof id !== "string" || id.length === 0) {
     return null;
   }
@@ -121,7 +131,13 @@ function parsePiece(entry: unknown): PlacedPiece | null {
   const validRotation: Rotation = CONNECTIONS[type as PieceType].rotatable
     ? (rotation as Rotation)
     : 0;
-  return { id, type: type as PieceType, rotation: validRotation, x, y };
+  const piece: PlacedPiece = { id, type: type as PieceType, rotation: validRotation, x, y };
+  // Colors belong to goal cups only; an unknown or misplaced value degrades
+  // to a classic cup rather than discarding the child's whole board.
+  if (canCarryColor(piece.type) && isMarbleColor(color)) {
+    piece.color = color;
+  }
+  return piece;
 }
 
 function canOccupy(board: BoardState, x: number, y: number): boolean {
