@@ -26,7 +26,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 - [x] Task: Write failing tests + wire `onRunSettled` into `Game`: soft final cue, Play never locked [670039c]
 - [x] Task: Headless deterministic simulation tests (seeded boards, scripted fixed-step runs): no-escape beyond rescue, no stall beyond cap, every marble accounted for, settle fires within bounds [978819a]
-- [ ] Task: Retune `PHYSICS` constants (damping, restitution, spawn) — gravity direction fixed
+- [x] Task: Retune `PHYSICS` constants (damping, restitution, spawn) — gravity direction fixed [5ed8b30]
 - [ ] Task: Manual feel pass on dev build (portrait + landscape); iterate constants once
 - [ ] Task: Run full e2e viewport matrix locally against production build; update only intentionally-tuned expectations
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
