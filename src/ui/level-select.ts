@@ -50,7 +50,7 @@ export function createLevelSelect(
 
   const grid = document.createElement("div");
   grid.style.cssText = [
-    "display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:16px",
+    "display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:16px",
     "max-width:min(520px,92vw);padding:20px;border-radius:24px;background:#f8f3e9",
   ].join(";");
 
