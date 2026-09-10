@@ -50,6 +50,7 @@ import { PieceJuice } from "../render/piece-juice";
 import { PieceRenderer, rotationYaw } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
 import { SparkleSystem } from "../render/sparkles";
+import { createWaitingMarble, type WaitingMarble } from "../render/waiting-marble";
 import { BOARD_COLS, BOARD_ROWS } from "../render/framing";
 import { cupBurstPosition } from "./celebration";
 
@@ -69,6 +70,7 @@ export class Game {
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private sparkles: SparkleSystem | null = null;
+  private waiting: WaitingMarble | null = null;
   private readonly juice = new PieceJuice();
   private board: BoardState;
   /** Non-null while a puzzle level is loaded; the sandbox board is parked in sandboxBoard. */
@@ -133,10 +135,15 @@ export class Game {
     // Collect-celebration sparkles ride on the scene; reduced-motion users
     // get the gentle pulse fallback and the setting is honored live.
     this.sparkles = new SparkleSystem(handle.scene);
+    // The waiting marble (the next drop, hovering at the chute) also honors
+    // reduced motion: it bobs gently, or stands perfectly still.
+    this.waiting = createWaitingMarble(handle.scene);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.sparkles.setReducedMotion(reducedMotion.matches);
+    this.waiting.setReducedMotion(reducedMotion.matches);
     reducedMotion.addEventListener("change", (event) => {
       this.sparkles?.setReducedMotion(event.matches);
+      this.waiting?.setReducedMotion(event.matches);
     });
 
     await initPhysics();
@@ -172,7 +179,11 @@ export class Game {
         // The collectible color advances: refresh which cups are open.
         this.refreshCupState();
       },
-      onRescued: (body) => this.removeMarbleMesh(body),
+      onRescued: (body) => {
+        this.removeMarbleMesh(body);
+        // The board is empty again (rescue or stall): show the next marble.
+        this.refreshCupState();
+      },
       // Run over: a soft cue only when the run ended without a goal (the
       // plonk/chime cover success). Play itself never locks on settle.
       onRunSettled: (reason) => playSettleCue(this.audioCtx, reason, this.sound?.isMuted ?? true),
@@ -207,6 +218,7 @@ export class Game {
       this.stepPopTweens(dt);
       this.juice.update(dt);
       this.sparkles?.update(dt);
+      this.waiting?.update(elapsed);
     });
   }
 
@@ -535,6 +547,15 @@ export class Game {
     });
   }
 
+  /** Waiting-marble state for the Playwright hooks. */
+  waitingVisible(): boolean {
+    return this.waiting?.isVisible() ?? false;
+  }
+
+  waitingColor(): MarbleColor | null {
+    return this.waiting?.isVisible() ? this.waiting.currentColor() : null;
+  }
+
   isPlaceable(cellX: number, cellY: number, type?: PieceType): boolean {
     if (this.puzzle) {
       // Drag feedback: an empty gap that accepts the dragged type (or any
@@ -582,6 +603,7 @@ export class Game {
       this.pieceBodies = syncPieceBodies(this.world, this.pieceBodies, pieces);
     }
     this.syncGoalBodies(openKeys);
+    this.syncWaiting();
   }
 
   /** The color the next collection can match: live marble, else next drop. */
@@ -601,6 +623,25 @@ export class Game {
       return nextScriptedColor(script, this.collectedByColor) ?? MARBLE_COLORS[0];
     }
     return this.marbles?.peekColor() ?? MARBLE_COLORS[0];
+  }
+
+  /**
+   * Shows the waiting marble at the chute wearing the next drop's color
+   * while no marble is live; hides it during a run.
+   */
+  private syncWaiting(): void {
+    if (!this.waiting) {
+      return;
+    }
+    const marbles = this.marbles;
+    if (!marbles || marbles.count > 0) {
+      this.waiting.setVisible(false);
+      return;
+    }
+    const spawn = this.puzzle ? this.puzzle.level.spawn : { x: Math.floor(BOARD_COLS / 2), y: 0 };
+    this.waiting.setCell(spawn.x, spawn.y);
+    this.waiting.setColor(this.nextDropColor());
+    this.waiting.setVisible(true);
   }
 
   /** Opens holes under the open cups and points collection at them. */
