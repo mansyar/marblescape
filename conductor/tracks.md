@@ -2,7 +2,7 @@
 
 ## Tracks
 
-_No active tracks._
+- [ ] **Track: Color Sorting** *Link: [./tracks/color-sorting_20260911/index.md](./tracks/color-sorting_20260911/index.md)*
 
 ## Archive
 

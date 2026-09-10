@@ -1,0 +1,7 @@
+{
+  "id": "color-sorting_20260911",
+  "type": "feature",
+  "status": "new",
+  "description": "Color sorting: colored goal cups accept only their matching candy-color marble (mismatch rolls over a closed lid — no fail states); a waiting marble at the chute previews the next drop (tap to cycle in sandbox); puzzle levels 7–9 use scripted color sequences solved by collecting every color; the sandbox palette gains a tap-to-cycle color cup. Board schema v2 with lossless v1 migration; code-driven visuals, no new dependencies or assets; verified by unit tests, scripted e2e level solves, and the 4-viewport matrix + reliability gate.",
+  "created": "2026-09-11T00:00:00Z"
+}
