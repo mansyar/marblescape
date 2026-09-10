@@ -17,7 +17,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 - [x] Task: Write failing tests for per-marble impact throttling (replaces global 60 ms gate) [214c296]
 - [x] Task: Implement per-marble throttle + lowered gentle-impact cutoff; green [214c296]
-- [ ] Task: Write failing tests for refined pitch/volume curves; implement (musical band kept)
+- [x] Task: Write failing tests for refined pitch/volume curves; implement (musical band kept) [dfb2c3c]
 - [ ] Task: Write failing tests for roll-voice module (`src/audio/roll.ts`): speed→gain/rate mapping, start/stop lifecycle, mute honored, no voice leaks on reap
 - [ ] Task: Implement roll module; source + add CC0 roll sample asset (Kenney audio or equivalent) to precache
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
