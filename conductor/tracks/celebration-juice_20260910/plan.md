@@ -32,8 +32,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Write failing tests + wire reject feedback: invalid drop (occupied/off-board/not-accepted) wiggles the involved piece or originating palette tile + soft low-pitched tick (existing sample) [a0583ab]
 - [x] Task: Write failing tests + wire valid-drop snap-bounce (palette → board and re-place moves) [a0583ab]
 - [x] Task: Write failing tests + implement palette pickup feedback (tile lift/squish on drag start, reset on pointerup) and rotate tap animation (quarter-turn tween + existing tick) [a0583ab]
-- [~] Task: Manual feel pass on dev build (portrait + landscape); iterate timings once
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Manual feel pass on dev build (portrait + landscape); iterate timings once [a0583ab]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: a0583ab]
 
 ## Phase 4 — Track completion
 
