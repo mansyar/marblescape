@@ -39,7 +39,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [ ] Open holes = cups compatible with the collectible marble (live marble in flight, else next previewed color); classic cup always open
   - [ ] Re-evaluated on spawn/collect, cup place/move/remove/cycle, level enter/exit; wired through `syncPieces`
 - [x] Task: Implement lid state machine to green; wire floor + marble goal updates together [3db26de]
-- [~] Task: Extend e2e reliability: 20 matching colored drops (all collected, zero rescues) + mismatch roll-over run (no collection, no escapes, no body leak)
+- [x] Task: Extend e2e reliability: 20 matching colored drops (all collected, zero rescues) + mismatch roll-over run (no collection, no escapes, no body leak) [479b2cf]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Interaction & UI: waiting marble, tap-to-cycle, palette (TDD)
