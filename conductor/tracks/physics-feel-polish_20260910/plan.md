@@ -25,7 +25,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 ## Phase 3 — Motion retuning & game integration
 
 - [x] Task: Write failing tests + wire `onRunSettled` into `Game`: soft final cue, Play never locked [670039c]
-- [ ] Task: Headless deterministic simulation tests (seeded boards, scripted fixed-step runs): no-escape beyond rescue, no stall beyond cap, every marble accounted for, settle fires within bounds
+- [x] Task: Headless deterministic simulation tests (seeded boards, scripted fixed-step runs): no-escape beyond rescue, no stall beyond cap, every marble accounted for, settle fires within bounds [978819a]
 - [ ] Task: Retune `PHYSICS` constants (damping, restitution, spawn) — gravity direction fixed
 - [ ] Task: Manual feel pass on dev build (portrait + landscape); iterate constants once
 - [ ] Task: Run full e2e viewport matrix locally against production build; update only intentionally-tuned expectations
