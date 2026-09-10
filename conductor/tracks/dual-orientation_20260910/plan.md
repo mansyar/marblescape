@@ -14,7 +14,7 @@
   - [ ] New `src/render/resize.ts` contract: register callback + debounce (~100 ms), coalesces bursts, fires once after quiet window, returns teardown that removes the listener
   - [ ] `orientationchange`-style events handled via the same resize path
 - [ ] Task: Implement `src/render/resize.ts` — make tests green
-- [ ] Task: Wire re-frame into the game: on debounced resize, recompute `computeCameraFraming` (passing landscape rail reservation) and re-apply camera transform; board state untouched (no reload, no re-init)
+- [x] Task: Wire re-frame into the game: on debounced resize, recompute `computeCameraFraming` (passing landscape rail reservation) and re-apply camera transform; board state untouched (no reload, no re-init) — `9795ed1`
   - [ ] Unit test: layout-mode helper (`src/ui/layout.ts`) maps viewport size → mode (portrait/landscape) + reserved rail fraction
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
