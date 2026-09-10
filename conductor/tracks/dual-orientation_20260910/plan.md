@@ -47,6 +47,6 @@
 
 ## Phase 4 — Track completion
 
-- [ ] Task: Mark track complete — registry `[x]`, metadata.json `completed`
+- [x] Task: Mark track complete — registry `[x]`, metadata.json `completed` — `c2ec3f3`
 - [ ] Task: Final certification — full suite (check, unit, 64/64 prod e2e, dev suite) + docs sync (tech-stack.md note, tracks.md)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
