@@ -16,9 +16,9 @@ export const PHYSICS = Object.freeze({
    */
   gravity: [0, -17.8, 2.5] as const,
 
-  /** Marbles roll, then settle — low damping keeps momentum (feel retune). */
-  linearDamping: 0.15,
-  angularDamping: 0.3,
+  /** Marbles roll with intent but can still slow on flats (feel iteration 2). */
+  linearDamping: 0.3,
+  angularDamping: 0.45,
 
   /** Bounciness. Kept < 1 so impacts always lose energy (reliability gate). */
   marbleRestitution: 0.3,

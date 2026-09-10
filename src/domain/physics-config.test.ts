@@ -48,11 +48,11 @@ describe("PHYSICS tuning config", () => {
     expect(PHYSICS.gravity[2]).toBeGreaterThan(1.5); // south pull preserved
   });
 
-  it("keeps momentum longer than the v1 mud-band (damping lowered)", () => {
+  it("keeps momentum between the v1 mud-band and the too-fast extreme", () => {
     expect(PHYSICS.linearDamping).toBeGreaterThan(0); // still settles
-    expect(PHYSICS.linearDamping).toBeLessThan(0.3);
+    expect(PHYSICS.linearDamping).toBeLessThan(0.45);
     expect(PHYSICS.angularDamping).toBeGreaterThan(0);
-    expect(PHYSICS.angularDamping).toBeLessThan(0.45);
+    expect(PHYSICS.angularDamping).toBeLessThan(0.6);
   });
 
   it("bounces livelier than v1 for click-clack drama", () => {
