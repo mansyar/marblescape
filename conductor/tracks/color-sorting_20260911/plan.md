@@ -6,11 +6,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Domain: colors, schema v2, scripts, levels 7–9 (TDD)
 
-- [ ] Task: Write failing tests for the color model (`src/domain/colors.ts`) and goal-piece color field
-  - [ ] `MarbleColor` union derived from `MARBLE_PALETTE` (6 candy colors); cycle helper (tap order); color→hex lookup
-  - [ ] `PlacedPiece` gains optional `color` (goal pieces only); non-goal pieces stay color-free by type
-  - [ ] Tests: cycle wraps all 6; unknown color rejected
-- [ ] Task: Implement the color model to green; >80% coverage
+- [x] Task: Write failing tests for the color model (`src/domain/colors.ts`) and goal-piece color field [1518768]
+  - [x] `MarbleColor` union derived from `MARBLE_PALETTE` (6 candy colors); cycle helper (tap order); color→hex lookup
+  - [x] `PlacedPiece` gains optional `color` (goal pieces only); non-goal pieces stay color-free by type
+  - [x] Tests: cycle wraps all 6; unknown color rejected
+- [x] Task: Implement the color model to green; >80% coverage [1518768]
 - [ ] Task: Write failing tests for board schema v2 (`src/domain/board.ts`)
   - [ ] `SCHEMA_VERSION → 2`; `toJSON`/`fromJSON` handle optional `color` with strict validation (known value, goal-only)
   - [ ] v1 fixture migrates losslessly (colorless goal = classic cup); corrupt data still → null
