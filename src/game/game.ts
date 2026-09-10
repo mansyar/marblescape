@@ -5,6 +5,7 @@ import { impactParams, MIN_IMPACT_FORCE, selectImpactSound } from "../audio/impa
 import { IMPACT_COOLDOWN_MS, ImpactThrottler } from "../audio/impact-throttle";
 import { RollVoices } from "../audio/roll";
 import { playChime } from "../audio/chime";
+import { playSettleCue } from "../audio/settle-cue";
 import { isSoundOn, setSoundOn } from "../audio/prefs";
 import { SoundManager } from "../audio/sound-manager";
 import {
@@ -148,6 +149,9 @@ export class Game {
         }
       },
       onRescued: (body) => this.removeMarbleMesh(body),
+      // Run over: a soft cue only when the run ended without a goal (the
+      // plonk/chime cover success). Play itself never locks on settle.
+      onRunSettled: (reason) => playSettleCue(this.audioCtx, reason, this.sound?.isMuted ?? true),
     });
 
     const pieceGroup = new THREE.Group();

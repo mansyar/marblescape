@@ -83,6 +83,14 @@ describe("SoundManager", () => {
     expect(started).toHaveLength(0);
   });
 
+  it("exposes the current mute state via isMuted", async () => {
+    const { ctx } = makeMockContext();
+    const manager = new SoundManager(ctx, async () => new ArrayBuffer(8));
+    expect(manager.isMuted).toBe(false);
+    manager.setMuted(true);
+    expect(manager.isMuted).toBe(true);
+  });
+
   it("stays silent while muted and resumes after unmute", async () => {
     const { ctx, started } = makeMockContext();
     const manager = new SoundManager(ctx, async () => new ArrayBuffer(8));

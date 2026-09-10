@@ -34,6 +34,11 @@ export class SoundManager {
     this.buffers.set(name, await this.ctx.decodeAudioData(data));
   }
 
+  /** True while the manager should produce no sound. */
+  get isMuted(): boolean {
+    return this.muted;
+  }
+
   setMuted(muted: boolean): void {
     this.muted = muted;
   }
