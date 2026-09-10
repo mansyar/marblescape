@@ -73,7 +73,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 5 — Track completion
 
-- [ ] Task: Docs sync (`tech-stack.md`: colors/lids/preview/schema v2, no new deps/assets; `product.md`: color sorting moves from non-goals to shipped scope)
+- [x] Task: Docs sync (`tech-stack.md`: colors/lids/preview/schema v2, no new deps/assets; `product.md`: color sorting moves from non-goals to shipped scope) [d97c5c0]
 - [ ] Task: Run full 4-viewport e2e matrix locally against the production build (incl. reliability + colored runs)
 - [ ] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e)
 - [ ] Task: Merge to `master`, archive track, update tracks registry
