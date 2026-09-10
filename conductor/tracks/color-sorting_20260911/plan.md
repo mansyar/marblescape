@@ -56,7 +56,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [ ] Palette items become `{type, color?}`; cup tile tap-vs-drag discrimination (tap cycles swatch, drag places colored cup)
   - [ ] `Game.place`/`currentPalette` carry optional color; level palettes normalized (legacy string entries keep working)
 - [x] Task: Implement palette changes to green; both orientations fit 5 tiles; existing palette e2e selectors updated [eff080a]
-- [ ] Task: e2e: sandbox cycle → Play drops exactly the previewed color; colored cup place + retint flow
+- [x] Task: e2e: sandbox cycle → Play drops exactly the previewed color; colored cup place + retint flow [19fcf27]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Sorting levels: solve flow & visible progress (TDD)
