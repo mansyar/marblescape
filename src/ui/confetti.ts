@@ -42,7 +42,7 @@ export function confettiPieces(count: number, rng: () => number = Math.random): 
       dy: 70 + rng() * 50,
       rotation: (rng() - 0.5) * 1080,
       delayMs: rng() * 250,
-      durationMs: 1800 + rng() * 600,
+      durationMs: 1500 + rng() * 700, // ≤2.2 s so delay + duration fits the cleanup window
       color: MARBLE_PALETTE[Math.floor(rng() * MARBLE_PALETTE.length)] ?? "#ffffff",
     });
   }
@@ -90,7 +90,8 @@ export function createConfettiLayer(
   const styleEl = document.createElement("style");
   styleEl.textContent = [
     "@keyframes ms-confetti-fall{from{transform:translate(0,0) rotate(0deg);opacity:1}",
-    "to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0.9}}",
+    "85%{opacity:1}",
+    "to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}",
     "@keyframes ms-confetti-glow{from{opacity:0.55;transform:scale(1)}to{opacity:0;transform:scale(1.35)}}",
   ].join("");
   el.appendChild(styleEl);
@@ -150,7 +151,7 @@ export function createConfettiLayer(
     cleanupTimer = setTimeout(() => {
       cleanupTimer = null;
       clearEffects();
-    }, CONFETTI_DURATION_MS) as unknown as number;
+    }, CONFETTI_DURATION_MS) as unknown as number; // Node types say Timeout; the browser returns a numeric id
   }
 
   return {

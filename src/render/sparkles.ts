@@ -45,6 +45,22 @@ interface PulseSlot {
   age: number;
 }
 
+/** Options are caller-supplied: keep particle allocation finite and inside the spec cap. */
+function clampParticleCount(requested: number | undefined): number {
+  if (requested === undefined || !Number.isFinite(requested)) {
+    return SPARKLE_MAX_PARTICLES_PER_BURST;
+  }
+  return Math.max(0, Math.min(SPARKLE_MAX_PARTICLES_PER_BURST, Math.floor(requested)));
+}
+
+/** A burst needs at least one reusable slot; junk pool sizes fall back to the default. */
+function clampSlotCount(requested: number | undefined): number {
+  if (requested === undefined || !Number.isFinite(requested)) {
+    return SPARKLE_POOL_SIZE;
+  }
+  return Math.max(1, Math.floor(requested));
+}
+
 /**
  * Pooled celebration sparkles: short bursts anchored at a world position.
  *
@@ -70,14 +86,11 @@ export class SparkleSystem {
 
   constructor(parent: THREE.Object3D, options: SparkleOptions = {}) {
     this.parent = parent;
-    this.particleCount = Math.min(
-      options.particleCount ?? SPARKLE_MAX_PARTICLES_PER_BURST,
-      SPARKLE_MAX_PARTICLES_PER_BURST,
-    );
+    this.particleCount = clampParticleCount(options.particleCount);
     this.burstDuration = options.burstDuration ?? SPARKLE_BURST_DURATION;
     this.coalesceWindow = options.coalesceWindow ?? SPARKLE_COALESCE_WINDOW;
     this.reducedMotion = options.reducedMotion ?? false;
-    const poolSize = Math.max(1, options.poolSize ?? SPARKLE_POOL_SIZE);
+    const poolSize = clampSlotCount(options.poolSize);
 
     for (let i = 0; i < poolSize; i += 1) {
       this.flying.push(this.createFlyingSlot());
@@ -211,6 +224,7 @@ export class SparkleSystem {
         : this.pickFlyingSlot();
     this.lastFlying = slot;
 
+    // BufferAttribute.array is a union type; these two attributes are always Float32Array.
     const positions = slot.positions.array as Float32Array;
     const colors = slot.colors.array as Float32Array;
     const velocities = slot.velocities;
@@ -297,6 +311,7 @@ export class SparkleSystem {
         slot.material.opacity = 0;
         continue;
       }
+      // Same Float32Array attributes as the emit path.
       const positions = slot.positions.array as Float32Array;
       const velocities = slot.velocities;
       for (let i = 0; i < this.particleCount; i += 1) {

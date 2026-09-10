@@ -78,6 +78,13 @@ describe("confettiPieces", () => {
       expect(piece.durationMs).toBeLessThanOrEqual(CONFETTI_DURATION_MS);
     }
   });
+
+  it("finishes every piece before the cleanup deadline", () => {
+    // rng() === 1 is the longest animation any piece can be given.
+    for (const piece of confettiPieces(3, () => 1)) {
+      expect(piece.durationMs + piece.delayMs).toBeLessThanOrEqual(CONFETTI_DURATION_MS);
+    }
+  });
 });
 
 describe("createConfettiLayer", () => {

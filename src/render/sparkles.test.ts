@@ -105,6 +105,18 @@ describe("SparkleSystem", () => {
     expect(visibleByMode(parent, "flying").length).toBeGreaterThan(0);
   });
 
+  it("clamps a nonsensical particle count instead of throwing", () => {
+    const negative = makeSystem({ particleCount: -5 });
+    expect(() => negative.sparkles.burstAt({ x: 0, y: 0, z: 0 })).not.toThrow();
+    const negativePoints = visibleByMode(negative.parent, "flying")[0] as THREE.Points;
+    expect(negativePoints.geometry.getAttribute("position").count).toBe(0);
+
+    const nan = makeSystem({ particleCount: Number.NaN });
+    expect(() => nan.sparkles.burstAt({ x: 0, y: 0, z: 0 })).not.toThrow();
+    const nanPoints = visibleByMode(nan.parent, "flying")[0] as THREE.Points;
+    expect(nanPoints.geometry.getAttribute("position").count).toBe(SPARKLE_MAX_PARTICLES_PER_BURST);
+  });
+
   it("update is safe with no active bursts", () => {
     const { sparkles } = makeSystem();
     expect(() => sparkles.update(0.016)).not.toThrow();
