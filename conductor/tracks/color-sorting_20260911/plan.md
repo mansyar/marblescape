@@ -35,11 +35,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] `spawnDrop(cellX, cellZ, color?)` — explicit color overrides the random candy sequence; `setGoalCells([{x,z,color|null}])` [8dfe104]
   - [x] Match: classic cup collects any color; colored cup only its own; `onCollected` carries the marble's color [8dfe104]
 - [x] Task: Implement colored spawn & collection to green; >80% coverage [8dfe104]
-- [~] Task: Write failing tests for the lid state machine (`src/game/game.ts`)
+- [x] Task: Write failing tests for the lid state machine (`src/game/game.ts`) [3db26de]
   - [ ] Open holes = cups compatible with the collectible marble (live marble in flight, else next previewed color); classic cup always open
   - [ ] Re-evaluated on spawn/collect, cup place/move/remove/cycle, level enter/exit; wired through `syncPieces`
-- [ ] Task: Implement lid state machine to green; wire floor + marble goal updates together
-- [ ] Task: Extend e2e reliability: 20 matching colored drops (all collected, zero rescues) + mismatch roll-over run (no collection, no escapes, no body leak)
+- [x] Task: Implement lid state machine to green; wire floor + marble goal updates together [3db26de]
+- [~] Task: Extend e2e reliability: 20 matching colored drops (all collected, zero rescues) + mismatch roll-over run (no collection, no escapes, no body leak)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Interaction & UI: waiting marble, tap-to-cycle, palette (TDD)
