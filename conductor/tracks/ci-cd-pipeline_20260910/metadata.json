@@ -1,8 +1,8 @@
 {
   "id": "ci-cd-pipeline_20260910",
   "type": "chore",
-  "status": "new",
+  "status": "completed",
   "description": "CI/CD pipeline: GitHub Actions CI on PRs + master pushes (full verification against the production build), tag-based releases building a multi-arch nginx Docker image pushed to GHCR (public) and deployed to Coolify via webhook + bearer token, with auto-generated GitHub Releases.",
   "created": "2026-09-10T00:00:00.000Z",
-  "completed": null
+  "completed": "2026-09-10T00:00:00.000Z"
 }
