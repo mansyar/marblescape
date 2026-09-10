@@ -5,11 +5,11 @@
 
 ## Phase 1 — Framing math & live re-frame plumbing
 
-- [ ] Task: Write failing unit tests for `computeCameraFraming` reserved-space extension
+- [x] Task: Write failing unit tests for `computeCameraFraming` reserved-space extension — `8da87a1`
   - [ ] `src/render/framing.test.ts`: reserved width only, reserved height only, both
   - [ ] Wide / tall aspect extremes keep the board inside the remaining region with margin
   - [ ] No reserved space → identical output to today (backward compatibility)
-- [ ] Task: Implement reserved-space extension in `src/render/framing.ts` (pure function, optional `reservedWidth`/`reservedHeight` fractions) — make tests green
+- [x] Task: Implement reserved-space extension in `src/render/framing.ts` (pure function, optional `reservedWidth`/`reservedHeight` fractions) — make tests green — `8da87a1`
 - [ ] Task: Write failing unit tests for a debounced viewport-resize module (fake timers)
   - [ ] New `src/render/resize.ts` contract: register callback + debounce (~100 ms), coalesces bursts, fires once after quiet window, returns teardown that removes the listener
   - [ ] `orientationchange`-style events handled via the same resize path
