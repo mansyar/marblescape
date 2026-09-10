@@ -662,9 +662,10 @@ export class Game {
     return this.waiting?.isVisible() ? this.waiting.currentColor() : null;
   }
 
-  /** Placed cup color at a cell for the Playwright hooks. */
+  /** Cup color at a cell for the Playwright hooks (level furniture included). */
   cupColorAt(cellX: number, cellY: number): MarbleColor | null {
-    return this.pieceAt(cellX, cellY)?.color ?? null;
+    const piece = this.board.pieces.find((p) => p.x === cellX && p.y === cellY);
+    return piece?.type === "goal" ? (piece.color ?? null) : null;
   }
 
   isPlaceable(cellX: number, cellY: number, type?: PieceType): boolean {
