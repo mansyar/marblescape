@@ -29,7 +29,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Retune `PHYSICS` constants (damping, restitution, spawn) — gravity direction fixed [5ed8b30]
 - [x] Task: Manual feel pass on dev build (portrait + landscape); iterate constants once [c0d07cd]
 - [x] Task: Run full e2e viewport matrix locally against production build; update only intentionally-tuned expectations [c0d07cd]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Track completion
 
