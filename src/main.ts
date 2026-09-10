@@ -1,7 +1,9 @@
 import { Game } from "./game/game";
 import { createGestureTracker } from "./game/gestures";
 import { screenToCell } from "./game/picking";
-import { computeCameraFraming } from "./render/framing";
+import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./render/framing";
+import { registerViewportResize } from "./render/resize";
+import { cameraReservation, layoutMode, type LayoutMode } from "./ui/layout";
 import { createHud } from "./ui/hud";
 import { createPalette } from "./ui/palette";
 import { createUpdateBanner } from "./ui/update-banner";
@@ -26,14 +28,24 @@ if (app) {
       if (ndcY === null) {
         return null;
       }
-      return screenToCell(ndcX, ndcY, computeCameraFraming(aspect()), aspect());
+      const reserved = cameraReservation(window.innerWidth, window.innerHeight);
+      const framing = computeCameraFraming(
+        aspect(),
+        BOARD_COLS,
+        BOARD_ROWS,
+        CAMERA_FOV_DEG,
+        reserved,
+      );
+      return screenToCell(ndcX, ndcY, framing, aspect());
     };
 
     // Palette: drag new pieces onto the board. Rebuilt per mode so level
     // palettes stay restricted to the pieces that solve that level.
     let paletteBar: HTMLElement | null = null;
+    let paletteMode: LayoutMode = "portrait";
     const buildPalette = () => {
       paletteBar?.remove();
+      paletteMode = layoutMode(window.innerWidth, window.innerHeight).mode;
       paletteBar = createPalette(
         app,
         game.currentPalette(),
@@ -48,10 +60,19 @@ if (app) {
             game.place(type, cell.x, cell.y);
           }
         },
+        layoutMode(window.innerWidth, window.innerHeight).mode,
       );
       document.body.appendChild(paletteBar);
     };
     buildPalette();
+
+    // Re-lay the palette when the viewport crosses the portrait/landscape
+    // boundary (FR3): the camera already re-frames via scene.ts's watcher.
+    registerViewportResize(window, () => {
+      if (layoutMode(window.innerWidth, window.innerHeight).mode !== paletteMode) {
+        buildPalette();
+      }
+    });
 
     // Level select: 7 tiles (sandbox + 6 levels), nothing locked.
     const levelSelect = createLevelSelect(document.body, LEVELS, new Set(), (pick) => {

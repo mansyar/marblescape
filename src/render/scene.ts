@@ -1,12 +1,15 @@
 import * as THREE from "three";
 import { addLighting, buildBoard } from "./board";
 import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./framing";
+import { registerViewportResize } from "./resize";
+import { cameraReservation } from "../ui/layout";
 
 /**
- * Boots the fixed-camera diorama: renderer, perspective camera and a resize
- * handler that re-frames the board whenever the viewport changes.
+ * Boots the fixed-camera diorama: renderer, perspective camera and a
+ * debounced viewport watcher that re-frames the board whenever the window
+ * resizes or rotates (including iPad Split View).
  * The camera never moves during play (spec FR-4); only distance re-computes
- * on viewport resize so the board always fits.
+ * on viewport resize so the board always fits the space left by UI chrome.
  */
 export function startRenderer(container: HTMLElement): {
   scene: THREE.Scene;
@@ -39,15 +42,21 @@ export function startRenderer(container: HTMLElement): {
     const height = container.clientHeight || 1;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    const framing = computeCameraFraming(camera.aspect);
+    const reserved = cameraReservation(width, height);
+    const framing = computeCameraFraming(
+      camera.aspect,
+      BOARD_COLS,
+      BOARD_ROWS,
+      CAMERA_FOV_DEG,
+      reserved,
+    );
     camera.position.set(...framing.position);
     camera.lookAt(...framing.lookAt);
     camera.updateProjectionMatrix();
   };
   applyFraming();
 
-  const observer = new ResizeObserver(applyFraming);
-  observer.observe(container);
+  const teardownResize = registerViewportResize(window, applyFraming);
 
   const frameCallbacks: Array<(elapsed: number) => void> = [];
   const clock = new THREE.Clock();
@@ -64,7 +73,7 @@ export function startRenderer(container: HTMLElement): {
     camera,
     getAspect: () => camera.aspect,
     dispose: () => {
-      observer.disconnect();
+      teardownResize();
       renderer.setAnimationLoop(null);
       renderer.dispose();
       canvas.remove();

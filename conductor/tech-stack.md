@@ -46,6 +46,10 @@ Version-checked against npm registry on 2026-09-08.
 
 CI/CD (track `ci-cd-pipeline_20260910`, 2026-09-10):
 
-- **CI — GitHub Actions** (`.github/workflows/ci.yml`): PRs + master pushes. Exact toolchain (Node 24.16.0, pnpm 11.24.0 pinned via `packageManager` + `engines`), `pnpm install --frozen-lockfile`, `pnpm check`, unit tests (coverage report), production build, and the full 16-spec Playwright e2e suite against the production build; failure-only artifacts; pnpm/browser/Vite caching; cancel-in-progress.
+- **CI — GitHub Actions** (`.github/workflows/ci.yml`): PRs + master pushes. Exact toolchain (Node 24.16.0, pnpm 11.24.0 pinned via `packageManager` + `engines`), `pnpm install --frozen-lockfile`, `pnpm check`, unit tests (coverage report), production build, and the full Playwright e2e suite across 4 viewport projects (80 runs) against the production build; failure-only artifacts; pnpm/browser/Vite caching; cancel-in-progress.
 - **Release — tags `v*`** (`.github/workflows/release.yml`): full gates re-run, multi-arch (`linux/amd64` + `linux/arm64`) Docker image → GHCR public (`ghcr.io/mansyar/marblescape`), Coolify deploy webhook (bearer; secrets `COOLIFY_WEBHOOK_URL`/`COOLIFY_WEBHOOK_TOKEN`), auto-generated GitHub Release.
-- **Container:** multi-stage `Dockerfile` — `node:24-alpine` build → `nginx:alpine` (SPA fallback, PWA MIME types, gzip, healthcheck). PWA precache (app shell, Rapier WASM, glTF, audio) ships inside the image.
+- **Container:** multi-stage `Dockerfile` — `node:24.16.0-alpine` build → `nginx:1.29-alpine` (SPA fallback, PWA MIME types, gzip, healthcheck). PWA precache (app shell, Rapier WASM, glTF, audio) ships inside the image.
+
+## Responsive layout
+
+Dual-orientation (track `dual-orientation_20260910`, 2026-09-10): `computeCameraFraming` accepts reserved width/height fractions (pure, unit-tested); `src/ui/layout.ts` classifies viewport (portrait/landscape; landscape rail reserves 18% viewport width); debounced ~100 ms resize watcher (`src/render/resize.ts`, resize + orientationchange) re-frames live without reload or state loss; landscape palette is a right-side rail reusing the portrait drag contract; level-select uses an auto-fit `minmax(96px, 1fr)` grid; safe-area insets respected. E2E: 4 viewport projects (390×844, 844×390, 768×1024, 1024×768) × full production-build suite.
