@@ -38,7 +38,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 ## Phase 4 — Track completion
 
 - [x] Task: Docs sync (tech-stack.md: effects design, reduced-motion, no new deps/assets) [1a44f92]
-- [~] Task: Run full e2e viewport matrix locally against production build (incl. reliability gate with effects enabled)
-- [ ] Task: Push branch, open PR, verify CI (unit + 4-viewport e2e green)
+- [x] Task: Run full e2e viewport matrix locally against production build (incl. reliability gate with effects enabled) [c891d7e]
+- [~] Task: Push branch, open PR, verify CI (unit + 4-viewport e2e green)
 - [ ] Task: Merge to `master`, archive track, update tracks registry
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
