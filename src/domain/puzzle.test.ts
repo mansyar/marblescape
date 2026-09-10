@@ -22,6 +22,24 @@ function level(id: number): LevelDef {
   return lvl;
 }
 
+/** Colored-cup sorting level used for board merge checks. */
+const sortingLevelFixture: LevelDef = {
+  id: 7,
+  name: "Sort",
+  boardWidth: 8,
+  boardHeight: 6,
+  fixed: [
+    { type: "straight", rotation: 0, x: 3, y: 0 },
+    { type: "straight", rotation: 0, x: 3, y: 1 },
+    { type: "goal", rotation: 0, x: 3, y: 4, color: "raspberry" },
+    { type: "goal", rotation: 0, x: 4, y: 4, color: "mint" },
+  ],
+  gaps: [{ x: 3, y: 2, accepted: ["straight"] }],
+  palette: ["straight"],
+  spawn: { x: 3, y: 0 },
+  marbleColors: ["raspberry", "mint"],
+};
+
 describe("createPuzzle", () => {
   it("holds the level and starts with no placements", () => {
     const lvl = level(1);
@@ -187,6 +205,20 @@ describe("boardFor", () => {
     const board = boardFor(createPuzzle(level(1)));
     const fixed = board.pieces.filter((piece) => piece.id.startsWith("f"));
     expect(fixed.map((piece) => piece.id)).toEqual(["f3,0", "f3,1", "f3,3", "f3,4", "f3,5"]);
+  });
+
+  it("carries fixed cup colors into the merged board", () => {
+    const board = boardFor(createPuzzle(sortingLevelFixture));
+    const cups = board.pieces.filter((piece) => piece.type === "goal");
+    expect(cups).toHaveLength(2);
+    expect(cups.map((piece) => piece.color).sort()).toEqual(["mint", "raspberry"]);
+  });
+
+  it("keeps classic goals and child placements colorless", () => {
+    const classic = boardFor(createPuzzle(level(2)));
+    expect(classic.pieces.find((piece) => piece.type === "goal")?.color).toBeUndefined();
+    const placed = boardFor(place(createPuzzle(sortingLevelFixture), "straight", 3, 2));
+    expect(placed.pieces.find((piece) => piece.id === "q3,2")?.color).toBeUndefined();
   });
 });
 

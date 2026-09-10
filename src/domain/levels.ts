@@ -1,3 +1,4 @@
+import { isMarbleColor, type MarbleColor } from "./colors";
 import { CONNECTIONS, PIECE_TYPES, type PieceType, type Rotation, type Side } from "./pieces";
 
 /** A piece pre-placed on a level board (furniture: immovable, unrotatable). */
@@ -6,6 +7,8 @@ export interface FixedPiece {
   rotation: Rotation;
   x: number;
   y: number;
+  /** Colored goal cup (sorting levels); absent = classic catch-all cup. */
+  color?: MarbleColor;
 }
 
 /** An empty slot the child must bridge with a piece from the palette. */
@@ -29,8 +32,10 @@ export interface LevelDef {
   palette: PieceType[];
   /** Drop cell (start chute). */
   spawn: { x: number; y: number };
-  /** Goal cell — the cup that collects marbles. */
-  goal: { x: number; y: number };
+  /** Classic catch-all goal cell; absent on sorting levels (colored cups only). */
+  goal?: { x: number; y: number };
+  /** Sorting levels: ordered marble queue (shared colors repeat = required count). */
+  marbleColors?: MarbleColor[];
 }
 
 const SIDE_ORDER: Side[] = ["north", "east", "south", "west"];
@@ -63,11 +68,55 @@ function gapAccepts(gap: GapSlot, side: Side): boolean {
   );
 }
 
+// --- Marble color scripts ---
+
+/** Required marble count per color for a script (occurrences in the queue). */
+export function requiredMarbleCounts(script: readonly MarbleColor[]): Map<MarbleColor, number> {
+  const counts = new Map<MarbleColor, number>();
+  for (const color of script) {
+    counts.set(color, (counts.get(color) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
+ * The next marble to drop: the first scripted color whose collected count is
+ * still below its required count (a wandered marble is simply re-droppable).
+ * Returns null when the script is complete.
+ */
+export function nextScriptedColor(
+  script: readonly MarbleColor[],
+  collected: ReadonlyMap<MarbleColor, number>,
+): MarbleColor | null {
+  const required = requiredMarbleCounts(script);
+  for (const color of script) {
+    if ((collected.get(color) ?? 0) < (required.get(color) ?? 0)) {
+      return color;
+    }
+  }
+  return null;
+}
+
+/** True when every scripted color has reached its required count. */
+export function isScriptComplete(
+  script: readonly MarbleColor[],
+  collected: ReadonlyMap<MarbleColor, number>,
+): boolean {
+  return nextScriptedColor(script, collected) === null;
+}
+
 // --- Validation ---
 
 export function validateLevel(level: LevelDef): void {
-  if (!Number.isInteger(level.id) || level.id < 1 || level.id > 6) {
-    throw new Error(`Level id must be an integer in 1..6, got ${level.id}`);
+  if (!Number.isInteger(level.id) || level.id < 1 || level.id > 9) {
+    throw new Error(`Level id must be an integer in 1..9, got ${level.id}`);
+  }
+  const sorting = level.marbleColors !== undefined;
+  if (sorting && level.goal !== undefined) {
+    throw new Error(`Sorting levels must not define a classic goal cell`);
+  }
+  if (!sorting && level.goal === undefined) {
+    throw new Error(`Classic levels must define a goal cell`);
   }
   if (typeof level.name !== "string" || level.name.length === 0) {
     throw new Error(`Level name must be a non-empty string`);
@@ -103,8 +152,9 @@ export function validateLevel(level: LevelDef): void {
   const inside = (x: number, y: number) =>
     x >= 0 && x < level.boardWidth && y >= 0 && y < level.boardHeight;
 
-  // Fixed pieces: bounds, valid type/rotation, no overlaps, at most one goal.
+  // Fixed pieces: bounds, valid type/rotation, no overlaps, valid cup colors.
   let goalPieces = 0;
+  const cupColors: MarbleColor[] = [];
   for (const piece of level.fixed) {
     if (!inside(piece.x, piece.y)) {
       throw new Error(`Fixed piece outside board at (${piece.x}, ${piece.y})`);
@@ -125,11 +175,32 @@ export function validateLevel(level: LevelDef): void {
       throw new Error(`Fixed pieces overlap at (${piece.x}, ${piece.y})`);
     }
     occupied.add(k);
+    if (piece.color !== undefined) {
+      if (piece.type !== "goal") {
+        throw new Error(
+          `Only goal cups can carry a color, found on ${piece.type} at (${piece.x}, ${piece.y})`,
+        );
+      }
+      if (!isMarbleColor(piece.color)) {
+        throw new Error(`Unknown cup color '${String(piece.color)}' at (${piece.x}, ${piece.y})`);
+      }
+    }
     if (piece.type === "goal") {
       goalPieces += 1;
+      if (piece.color === undefined) {
+        if (sorting) {
+          throw new Error(
+            `Sorting levels cannot contain a classic goal piece at (${piece.x}, ${piece.y})`,
+          );
+        }
+      } else if (!sorting) {
+        throw new Error(`Classic levels cannot contain a colored cup at (${piece.x}, ${piece.y})`);
+      } else {
+        cupColors.push(piece.color);
+      }
     }
   }
-  if (goalPieces > 1) {
+  if (!sorting && goalPieces > 1) {
     throw new Error(`Level must contain at most one goal piece, found ${goalPieces}`);
   }
 
@@ -146,13 +217,17 @@ export function validateLevel(level: LevelDef): void {
     );
   }
 
-  // Goal cell must be inside and hold exactly one goal piece (fixed or gap).
-  if (!inside(level.goal.x, level.goal.y)) {
-    throw new Error(`Goal cell outside board at (${level.goal.x}, ${level.goal.y})`);
+  // Classic goal cell must be inside the board; sorting levels have no single cell.
+  const goalCell = level.goal;
+  if (!sorting && goalCell !== undefined) {
+    if (!inside(goalCell.x, goalCell.y)) {
+      throw new Error(`Goal cell outside board at (${goalCell.x}, ${goalCell.y})`);
+    }
   }
-  const fixedGoalAtGoal = level.fixed.some(
-    (p) => p.type === "goal" && p.x === level.goal.x && p.y === level.goal.y,
-  );
+  const fixedGoalAtGoal =
+    !sorting && goalCell !== undefined
+      ? level.fixed.some((p) => p.type === "goal" && p.x === goalCell.x && p.y === goalCell.y)
+      : false;
 
   // Gaps: bounds, no overlap with furniture/spawn, valid accepted types.
   const gapCells = new Set<string>();
@@ -186,22 +261,56 @@ export function validateLevel(level: LevelDef): void {
       }
     }
     if (gap.accepted.includes("goal")) {
+      if (sorting) {
+        throw new Error(`Sorting levels cannot use a classic goal gap at (${gap.x}, ${gap.y})`);
+      }
       goalGap += 1;
     }
   }
 
+  if (sorting) {
+    if (goalPieces < 2) {
+      throw new Error(`Sorting levels need at least two colored cups, found ${goalPieces}`);
+    }
+    if (new Set(cupColors).size !== cupColors.length) {
+      throw new Error(`Sorting cups must use unique colors`);
+    }
+    const script = level.marbleColors ?? [];
+    if (script.length === 0) {
+      throw new Error(`Sorting levels need a non-empty marble script`);
+    }
+    for (const color of script) {
+      if (!isMarbleColor(color)) {
+        throw new Error(`Unknown marble color '${String(color)}' in script`);
+      }
+    }
+    const scriptColors = new Set(script);
+    for (const color of cupColors) {
+      if (!scriptColors.has(color)) {
+        throw new Error(`Cup color '${color}' has no marble in the script`);
+      }
+    }
+    for (const color of scriptColors) {
+      if (!cupColors.includes(color)) {
+        throw new Error(`Scripted color '${color}' has no cup`);
+      }
+    }
+    return;
+  }
   if (goalPieces + goalGap !== 1) {
     throw new Error(
       `Level goal must be exactly one goal piece (fixed or gap), found ${goalPieces + goalGap}`,
     );
   }
   if (goalPieces === 1 && !fixedGoalAtGoal) {
-    throw new Error(
-      `Fixed goal piece must sit on the goal cell (${level.goal.x}, ${level.goal.y})`,
-    );
+    throw new Error(`Fixed goal piece must sit on the goal cell (${goalCell?.x}, ${goalCell?.y})`);
   }
-  if (goalGap === 1 && !level.gaps.some((g) => g.x === level.goal.x && g.y === level.goal.y)) {
-    throw new Error(`Goal gap must sit on the goal cell (${level.goal.x}, ${level.goal.y})`);
+  if (
+    goalGap === 1 &&
+    goalCell !== undefined &&
+    !level.gaps.some((g) => g.x === goalCell.x && g.y === goalCell.y)
+  ) {
+    throw new Error(`Goal gap must sit on the goal cell (${goalCell.x}, ${goalCell.y})`);
   }
 }
 
@@ -214,6 +323,31 @@ export function validateLevel(level: LevelDef): void {
  * the mouth-graph guarantee required by the spec.
  */
 export function isLevelSolvable(level: LevelDef): boolean {
+  if (level.marbleColors !== undefined) {
+    if (level.marbleColors.length === 0) {
+      return false;
+    }
+    const cups = level.fixed.filter((piece) => piece.type === "goal");
+    for (const color of new Set(level.marbleColors)) {
+      const cup = cups.find((candidate) => candidate.color === color);
+      if (!cup || !hasRoute(level, cup)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (!level.goal) {
+    return false;
+  }
+  return hasRoute(level, level.goal);
+}
+
+/**
+ * Mouth-graph BFS from the spawn chute to one catch cell. On sorting levels
+ * every colored cup catches from any side (open lid) and can also be rolled
+ * over (closed lid), so cups behave as passable catch nodes.
+ */
+function hasRoute(level: LevelDef, target: { x: number; y: number }): boolean {
   const key = (x: number, y: number) => `${x},${y}`;
   const inside = (x: number, y: number) =>
     x >= 0 && x < level.boardWidth && y >= 0 && y < level.boardHeight;
@@ -227,14 +361,19 @@ export function isLevelSolvable(level: LevelDef): boolean {
     gapAt.set(key(gap.x, gap.y), gap);
   }
 
-  const isGoal = (x: number, y: number) => x === level.goal.x && y === level.goal.y;
+  const isCatchable = (x: number, y: number) => {
+    if (level.marbleColors !== undefined) {
+      return fixedAt.get(key(x, y))?.type === "goal";
+    }
+    return level.goal !== undefined && x === level.goal.x && y === level.goal.y;
+  };
   const isNode = (x: number, y: number) =>
-    isGoal(x, y) || fixedAt.has(key(x, y)) || gapAt.has(key(x, y));
+    isCatchable(x, y) || fixedAt.has(key(x, y)) || gapAt.has(key(x, y));
 
   /** Can a marble exit cell (x,y) toward `side`, or enter it from `side`? */
   const acceptsFrom = (x: number, y: number, side: Side): boolean => {
-    if (isGoal(x, y)) {
-      return true; // the cup catches marbles from any side
+    if (isCatchable(x, y)) {
+      return true; // cups catch marbles from any side
     }
     const fixed = fixedAt.get(key(x, y));
     if (fixed) {
@@ -257,7 +396,7 @@ export function isLevelSolvable(level: LevelDef): boolean {
   while (queue.length > 0) {
     const [x, y] = queue[0];
     queue.shift();
-    if (isGoal(x, y)) {
+    if (x === target.x && y === target.y) {
       found = true;
       break;
     }
@@ -288,7 +427,7 @@ export function isLevelSolvable(level: LevelDef): boolean {
   // that covers every side the path uses (e.g. a curved gap needing north
   // + west must be the single curved rotation that opens both).
   const used = new Map<string, Side[]>();
-  let current: [number, number] | null = [level.goal.x, level.goal.y];
+  let current: [number, number] | null = [target.x, target.y];
   let prev = parent.get(key(current[0], current[1])) ?? null;
   while (current && prev) {
     const side = sideBetween(prev, current);
