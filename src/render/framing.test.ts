@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BOARD_COLS, BOARD_ROWS, computeCameraFraming, CAMERA_ELEVATION_DEG } from "./framing";
+import {
+  BOARD_COLS,
+  BOARD_ROWS,
+  computeCameraFraming,
+  CAMERA_ELEVATION_DEG,
+  FRAMING_MARGIN,
+} from "./framing";
 
 describe("board dimensions", () => {
   it("pins an 8x6 cell board", () => {
@@ -58,5 +64,52 @@ describe("computeCameraFraming", () => {
     const halfH = BOARD_ROWS / 2;
     const noMargin = halfH / Math.tan(((60 / 2) * Math.PI) / 180);
     expect(f.distance).toBeGreaterThan(noMargin);
+  });
+});
+
+describe("computeCameraFraming reserved space", () => {
+  const FOV = 45;
+  const fovRad = (FOV * Math.PI) / 180;
+  const fitHeight = BOARD_ROWS / 2 / Math.tan(fovRad / 2);
+  const marginFit = (fit: number) => fit * FRAMING_MARGIN;
+
+  it("keeps today's exact output when nothing is reserved (backward compatible)", () => {
+    expect(computeCameraFraming(16 / 9, 8, 6, 45, 0, 0)).toEqual(
+      computeCameraFraming(16 / 9, 8, 6, 45),
+    );
+  });
+
+  it("zooms out in landscape when the right rail reserves width", () => {
+    const baseline = computeCameraFraming(16 / 9);
+    const reserved = computeCameraFraming(16 / 9, 8, 6, 45, 0.4);
+    expect(reserved.distance).toBeGreaterThan(baseline.distance);
+  });
+
+  it("zooms out in portrait when width is reserved", () => {
+    const baseline = computeCameraFraming(9 / 16);
+    const reserved = computeCameraFraming(9 / 16, 8, 6, 45, 0.25);
+    expect(reserved.distance).toBeGreaterThan(baseline.distance);
+  });
+
+  it("moves closer in portrait when height is reserved (aspect widens)", () => {
+    const baseline = computeCameraFraming(9 / 16);
+    const reserved = computeCameraFraming(9 / 16, 8, 6, 45, 0, 0.25);
+    expect(reserved.distance).toBeLessThan(baseline.distance);
+  });
+
+  it("solves the exact fit distance at the aspect equilibrium", () => {
+    // Reserving 25% width at 16:9 yields an effective aspect of 4:3, where
+    // the vertical and horizontal constraints are exactly equal.
+    const f = computeCameraFraming(16 / 9, 8, 6, 45, 0.25);
+    expect(f.distance).toBeCloseTo(marginFit(fitHeight), 10);
+  });
+
+  it("combines reserved width and height multiplicatively", () => {
+    // Equal fractions cancel: 0.75/0.75 = 1 -> identical to no reservation.
+    const both = computeCameraFraming(16 / 9, 8, 6, 45, 0.25, 0.25);
+    expect(both.distance).toBeCloseTo(computeCameraFraming(16 / 9).distance, 10);
+    // Width-dominant reservation zooms out.
+    const wide = computeCameraFraming(16 / 9, 8, 6, 45, 0.5, 0.25);
+    expect(wide.distance).toBeGreaterThan(computeCameraFraming(16 / 9).distance);
   });
 });

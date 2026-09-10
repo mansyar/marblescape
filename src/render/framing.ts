@@ -28,12 +28,19 @@ export function computeCameraFraming(
   cols: number = BOARD_COLS,
   rows: number = BOARD_ROWS,
   fovDeg: number = CAMERA_FOV_DEG,
+  reservedWidth: number = 0,
+  reservedHeight: number = 0,
 ): CameraFraming {
   const fovRad = (fovDeg * Math.PI) / 180;
 
+  // UI chrome (e.g. the landscape palette rail) reserves a fraction of the
+  // viewport; the board must fit the remaining region, so the effective
+  // aspect narrows (or widens) accordingly.
+  const effectiveAspect = (aspect * (1 - reservedWidth)) / (1 - reservedHeight);
+
   // Distance needed to fit each axis, then take the tighter constraint.
   const fitHeight = rows / 2 / Math.tan(fovRad / 2);
-  const fitWidth = cols / 2 / (Math.tan(fovRad / 2) * aspect);
+  const fitWidth = cols / 2 / (Math.tan(fovRad / 2) * effectiveAspect);
   const distance = Math.max(fitHeight, fitWidth) * FRAMING_MARGIN;
 
   const lookAt: [number, number, number] = [cols / 2, 0, rows / 2];
