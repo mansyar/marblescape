@@ -17,13 +17,14 @@ Version-checked against npm registry on 2026-09-08.
 > - **Lint & format:** Biome 2.5.12 (user directive) — replaces ESLint/Prettier.
 > - **TypeScript:** 6.0.3 instead of 7.0.2. At scaffold time, TS 7's release postdates several lint toolchain peer ranges; pinned to 6.0.3 for toolchain compatibility. Revisit upgrade when the lint toolchain ecosystem fully supports TS 7.
 > - **PWA wiring (2026-09-09, track `pwa-offline_20260909`):** vite-plugin-pwa activated in `vite.config.ts` — Workbox `generateSW` precaches the full offline bundle (JS/CSS, Rapier WASM, 4 piece GLBs, 3 OGGs, icons, favicon) with `navigateFallback: 'index.html'`; `registerType: 'prompt'` shows a non-blocking "New version ready — Update" banner; manifest served at `/manifest.webmanifest`; icons generated to `public/icons/` (192/512/maskable/apple-touch).
+> - **Audio & physics feel (2026-09-10, track `physics-feel-polish_20260910`):** per-marble impact throttling replaces the global 60 ms gate; gentle-impact cutoff lowered (force 1 → 0.35); eased pitch/volume curves; looping roll voice per marble (`public/sounds/roll.ogg`, CC0 qubodup — 4th precached OGG); soft run-settle cue when a run ends away from the goal (stall-capped at 15 s, quiet reap). Physics tunables rebalanced (linear/angular damping 0.3/0.45, restitution 0.3/0.2, spawn height 0.9) — gravity direction fixed.
 
 ## Art & Audio
 
 | Component | Choice |
 |---|---|
 | 3D models | Kenney Marble Kit (CC0, glTF) |
-| Audio | Web Audio API + CC0 samples (Kenney audio), velocity-based pitch-shifting |
+| Audio | Web Audio API + CC0 samples (Kenney impact sounds + qubodup bowling-roll loop), velocity-based pitch/gain, per-marble impact throttle (60 ms voice each), one looping roll voice per marble, soft run-settle cue |
 | Icons/UI art | Kenney UI packs (CC0) |
 
 ## Data & Persistence
