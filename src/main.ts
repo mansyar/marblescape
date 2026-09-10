@@ -5,7 +5,7 @@ import { BOARD_COLS, BOARD_ROWS, CAMERA_FOV_DEG, computeCameraFraming } from "./
 import { registerViewportResize } from "./render/resize";
 import { cameraReservation, layoutMode, type LayoutMode } from "./ui/layout";
 import { createHud } from "./ui/hud";
-import { createPalette } from "./ui/palette";
+import { createPalette, pulseReject } from "./ui/palette";
 import { createUpdateBanner } from "./ui/update-banner";
 import { createConfettiLayer } from "./ui/confetti";
 import { createSolvedOverlay } from "./ui/solved-overlay";
@@ -55,11 +55,14 @@ if (app) {
           const cell = cellFromNdc(ndcX, ndcY);
           game.showHighlight(cell, cell ? game.isPlaceable(cell.x, cell.y, _type) : false);
         },
-        (type, ndcX, ndcY) => {
+        (type, ndcX, ndcY, button) => {
           game.hideHighlight();
           const cell = cellFromNdc(ndcX, ndcY);
-          if (cell) {
-            game.place(type, cell.x, cell.y);
+          if (!cell || !game.place(type, cell.x, cell.y)) {
+            // Rejected (occupied, off-board, or not accepted here): the tile
+            // shakes and the toy answers with a soft low tick.
+            pulseReject(button);
+            game.rejectPiece(cell);
           }
         },
         layoutMode(window.innerWidth, window.innerHeight).mode,
@@ -182,9 +185,13 @@ if (app) {
       } else if (g.type === "drag-end" && draggingFrom) {
         game.hideHighlight();
         const cell = clientToCell(g.x, g.y);
-        if (cell) {
-          game.move(draggingFrom.x, draggingFrom.y, cell.x, cell.y);
-        } else {
+        const sameCell = cell?.x === draggingFrom.x && cell?.y === draggingFrom.y;
+        if (cell && !sameCell) {
+          if (!game.move(draggingFrom.x, draggingFrom.y, cell.x, cell.y)) {
+            // Occupied/off-limits target: the piece wiggles + answers low.
+            game.rejectPiece(draggingFrom);
+          }
+        } else if (!cell) {
           // Released off the board: the piece pops back to the palette.
           game.popOut(draggingFrom.x, draggingFrom.y);
         }

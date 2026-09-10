@@ -50,6 +50,37 @@ export function paletteLayout(mode: LayoutMode): PaletteLayout {
     : { containerCss: CONTAINER_PORTRAIT, buttonCss: BUTTON_PORTRAIT };
 }
 
+/** One-shot shake applied to a tile whose drop the board rejected. */
+export const PALETTE_REJECT_ANIMATION = "ms-palette-reject 0.32s ease-in-out";
+
+/** Keyframes for the rejected-drop tile shake. */
+export function paletteRejectKeyframes(): string {
+  return [
+    "@keyframes ms-palette-reject{",
+    "0%,100%{transform:translateX(0)}",
+    "20%{transform:translateX(-6px)}",
+    "40%{transform:translateX(6px)}",
+    "60%{transform:translateX(-4px)}",
+    "80%{transform:translateX(4px)}",
+    "}",
+  ].join("");
+}
+
+/** Plays the reject shake on a tile, restarting it on rapid rejected drops. */
+export function pulseReject(tile: HTMLElement): void {
+  tile.style.animation = "none";
+  void tile.offsetWidth; // reflow so the same animation can restart
+  tile.style.animation = PALETTE_REJECT_ANIMATION;
+}
+
+/** Tile transition for the pickup lift and its release. */
+export const PALETTE_PICKUP_TRANSITION = "transform 120ms ease-out";
+
+/** Tile transform while a drag is in progress (lifted) or released (rest). */
+export function palettePickupTransform(dragging: boolean): string {
+  return dragging ? "translateY(-4px)" : "";
+}
+
 /**
  * Bottom palette: one big (64px+) button per piece type. Dragging from a
  * button streams NDC coordinates into the given callbacks until release.
@@ -58,11 +89,15 @@ export function createPalette(
   root: HTMLElement,
   types: readonly PieceType[],
   onDrag: (type: PieceType, ndcX: number, ndcY: number | null) => void,
-  onDrop: (type: PieceType, ndcX: number, ndcY: number | null) => void,
+  onDrop: (type: PieceType, ndcX: number, ndcY: number | null, button: HTMLButtonElement) => void,
   mode: LayoutMode,
 ): HTMLElement {
   const bar = document.createElement("div");
   bar.style.cssText = paletteLayout(mode).containerCss;
+
+  const style = document.createElement("style");
+  style.textContent = paletteRejectKeyframes();
+  bar.appendChild(style);
 
   for (const type of types) {
     const btn = document.createElement("button");
@@ -91,6 +126,9 @@ export function createPalette(
 
     btn.addEventListener("pointerdown", (e) => {
       btn.setPointerCapture(e.pointerId);
+      // Pickup feedback: the tile lifts while the child drags its piece out.
+      btn.style.transition = PALETTE_PICKUP_TRANSITION;
+      btn.style.transform = palettePickupTransform(true);
     });
     btn.addEventListener("pointermove", (e) => {
       if (!btn.hasPointerCapture(e.pointerId)) {
@@ -103,8 +141,9 @@ export function createPalette(
       if (!btn.hasPointerCapture(e.pointerId)) {
         return;
       }
+      btn.style.transform = palettePickupTransform(false);
       const [ndcX, ndcY] = ndcFromEvent(e);
-      onDrop(type, ndcX, ndcY);
+      onDrop(type, ndcX, ndcY, btn);
     });
     bar.appendChild(btn);
   }
