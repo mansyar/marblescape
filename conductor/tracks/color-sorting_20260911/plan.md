@@ -21,8 +21,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] `validateLevel`: sorting levels need ≥2 unique colored cups, no classic goal, non-empty script whose colors all have cups
   - [x] `isLevelSolvable`: each scripted color independently routable from spawn to its matching cup (classic check preserved)
 - [x] Task: Implement sorting-level domain to green; >80% coverage [2782ed0]
-- [ ] Task: Write failing tests + author levels 7–9 (L7 two colors/one reroute · L8 funnel combo · L9 three-color finale); validation + solvability must pass
-- [ ] Task: Implement levels 7–9 to green; `pnpm check` clean
+- [x] Task: Write failing tests + author levels 7–9 (L7 two colors/one reroute · L8 funnel combo · L9 three-color finale); validation + solvability must pass [479bd63]
+- [x] Task: Implement levels 7–9 to green; `pnpm check` clean [479bd63]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Physics: cup lids & colored collection (TDD)
