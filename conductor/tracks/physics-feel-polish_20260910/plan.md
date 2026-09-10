@@ -10,7 +10,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] New module `src/domain/run-settle.ts` (pure): fed per-step marble states (collected/rescued/velocity)
   - [x] Tests: settle when all marbles reaped; settle after N consecutive sub-threshold steps; no settle while any marble fast; event fires exactly once per run; stall cap (~15 s) declares finish
 - [x] Task: Implement detector to green; verify >80% coverage [f571e52]
-- [ ] Task: Write failing tests + implement stall-cap reap policy in `MarbleManager` (timeout → rescued path, quietly)
+- [x] Task: Write failing tests + implement stall-cap reap policy in `MarbleManager` (timeout → rescued path, quietly) [35ef45d]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Audio feel (TDD)
