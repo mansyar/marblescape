@@ -46,6 +46,7 @@ import { colorHex, MARBLE_COLORS, nextMarbleColor, type MarbleColor } from "../d
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
+import { CupGlow, glowIntensityFor } from "../render/cup-glow";
 import { disposeFadeMesh, MarbleFader } from "../render/marble-fade";
 import { MarbleGleam } from "../render/marble-gleam";
 import { MarbleShadows } from "../render/marble-shadow";
@@ -74,6 +75,9 @@ export class Game {
   private readonly marbleFades = new MarbleFader();
   private shadows: MarbleShadows | null = null;
   private gleam: MarbleGleam | null = null;
+  private cupGlow: CupGlow | null = null;
+  /** Last glow intensity per cup cell — Playwright hook only, never rendered. */
+  private readonly cupGlowNow = new Map<number, number>();
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private sparkles: SparkleSystem | null = null;
@@ -154,6 +158,7 @@ export class Game {
     this.trophies = createTrophyTray(handle.scene);
     this.shadows = new MarbleShadows(handle.scene);
     this.gleam = new MarbleGleam(handle.scene);
+    this.cupGlow = new CupGlow();
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.sparkles.setReducedMotion(reducedMotion.matches);
     this.waiting.setReducedMotion(reducedMotion.matches);
@@ -247,6 +252,7 @@ export class Game {
       this.syncMarbleMeshes();
       this.shadows?.update();
       this.gleam?.update(handle.camera);
+      this.updateCupGlow(elapsed);
       this.stepPopTweens(dt);
       this.marbleFades.update(dt);
       this.juice.update(dt);
@@ -692,6 +698,11 @@ export class Game {
     return piece?.type === "goal" ? (piece.color ?? null) : null;
   }
 
+  /** Last glow intensity applied to a cup (Playwright hook). */
+  cupGlowAt(cellX: number, cellY: number): number {
+    return this.cupGlowNow.get(cellY * this.board.width + cellX) ?? 0;
+  }
+
   isPlaceable(cellX: number, cellY: number, type?: PieceType): boolean {
     if (this.puzzle) {
       // Drag feedback: an empty gap that accepts the dragged type (or any
@@ -750,6 +761,51 @@ export class Game {
       return marbles.colorOf(live);
     }
     return this.nextDropColor();
+  }
+
+  /**
+   * Cup anticipation glow (spec FR4): compatible cups pulse softly and
+   * brighten as a matching marble nears, peaking as it drops in. Same
+   * compatibility rule as the lids; visual-only emissive writes per frame.
+   */
+  private updateCupGlow(elapsed: number): void {
+    const glow = this.cupGlow;
+    const marbles = this.marbles;
+    const renderer = this.pieceRenderer;
+    if (!glow || !marbles || !renderer) {
+      return;
+    }
+    const collectible = this.collectibleColor();
+    const live = marbles.all();
+    const seen: THREE.Object3D[] = [];
+    for (const piece of this.board.pieces) {
+      if (piece.type !== "goal") {
+        continue;
+      }
+      const mesh = renderer.meshFor(piece.id);
+      if (!mesh) {
+        continue;
+      }
+      seen.push(mesh);
+      const compatible = piece.color === undefined || piece.color === collectible;
+      let distance: number | null = null;
+      if (compatible) {
+        for (const body of live) {
+          if (piece.color !== undefined && marbles.colorOf(body) !== piece.color) {
+            continue;
+          }
+          const t = body.translation();
+          const d = Math.hypot(t.x - (piece.x + 0.5), t.z - (piece.y + 0.5));
+          if (distance === null || d < distance) {
+            distance = d;
+          }
+        }
+      }
+      const amount = glowIntensityFor(compatible, distance, elapsed, this.reducedMotion);
+      glow.apply(mesh, amount);
+      this.cupGlowNow.set(piece.y * this.board.width + piece.x, amount);
+    }
+    glow.retain(seen);
   }
 
   /** The color the next Play drops (scripted in levels, cycle in sandbox). */
