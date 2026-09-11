@@ -2,7 +2,7 @@
 
 ## Tracks
 
-_No active tracks._
+- [ ] **Track: First-Run Onboarding** *Link: [./tracks/first-run-onboarding_20260912/index.md](./tracks/first-run-onboarding_20260912/index.md)*
 
 ## Archive
 
