@@ -1,7 +1,8 @@
 {
   "id": "marble-sheen-glow_20260911",
   "type": "feature",
-  "status": "new",
+  "status": "completed",
   "description": "Marble Sheen, Cup Glow & Table Limit: closes the twice-deferred sheen/anticipation-glow item and adds a calm-table rule — at most five active marbles, where each new Play press recycles the oldest with a quick silent fade (never a fail, never a count). Code-driven glass sheen, soft contact shadows, and match+approach cup glow; no new dependencies, assets, or precache entries; verified by unit tests, e2e recycling/regression runs, and the 4-viewport matrix + reliability gates.",
-  "created": "2026-09-11T00:00:00Z"
+  "created": "2026-09-11T00:00:00Z",
+  "completed": "2026-09-11T00:00:00Z"
 }
