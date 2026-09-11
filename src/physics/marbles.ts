@@ -19,6 +19,8 @@ export interface MarbleEvents {
   onRescued?: (body: RAPIER.RigidBody) => void;
   /** Called when a settled leftover is quietly replaced by a fresh run. */
   onLost?: (body: RAPIER.RigidBody) => void;
+  /** Called when the table cap recycles the oldest live marble (spec FR1). */
+  onRecycled?: (body: RAPIER.RigidBody) => void;
   /** Called exactly once per run when it settles (all-done / at-rest / stall). */
   onRunSettled?: (reason: SettleReason) => void;
 }
@@ -28,6 +30,8 @@ export interface MarbleEvents {
  * rescuing escaped marbles so the sandbox can never leak physics bodies.
  * Also tracks the run-settle lifecycle (spec FR3): a stalled run is capped
  * and lingering marbles are quietly reaped via the rescued path.
+ * The table holds at most `PHYSICS.maxMarblesOnTable` live marbles — a drop
+ * beyond the cap quietly recycles the oldest (spec FR1).
  */
 export class MarbleManager {
   private readonly bodies: RAPIER.RigidBody[] = [];
@@ -41,6 +45,8 @@ export class MarbleManager {
   private readonly detector: RunSettleDetector;
   /** Marbles spawned in the current run (for settle bookkeeping). */
   private runSpawned = 0;
+  /** Cap-driven recycles this session (distinct from quiet leftover clears). */
+  private recycledTotal = 0;
 
   constructor(world: World, events: MarbleEvents = {}, settleOptions: RunSettleOptions = {}) {
     this.world = world;
@@ -70,6 +76,11 @@ export class MarbleManager {
 
   getRescued(): RAPIER.RigidBody[] {
     return this.rescued;
+  }
+
+  /** Number of marbles recycled by the table cap (spec FR1). */
+  get recycledCount(): number {
+    return this.recycledTotal;
   }
 
   /** Sets the cups that collect marbles; a null color collects any marble. */
@@ -106,6 +117,12 @@ export class MarbleManager {
         cellZ + 0.5 + jitter * 0.8,
         color,
       );
+    }
+    // The table holds at most maxMarblesOnTable live marbles: beyond the
+    // cap the oldest quietly leaves so the newest always drops (spec FR1 —
+    // not collected, not rescued, no body leak).
+    while (this.bodies.length > PHYSICS.maxMarblesOnTable) {
+      this.recycleOldest();
     }
   }
 
@@ -199,6 +216,18 @@ export class MarbleManager {
         this.events.onRescued?.(body);
       }
     }
+  }
+
+  /** Quietly removes the oldest live marble (table-cap recycling, spec FR1). */
+  private recycleOldest(): void {
+    const body = this.bodies.shift();
+    if (body === undefined) {
+      return;
+    }
+    this.world.removeRigidBody(body);
+    this.colors.delete(body);
+    this.recycledTotal += 1;
+    this.events.onRecycled?.(body);
   }
 
   /** Removes all marble bodies (reset button). */
