@@ -44,10 +44,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Manual feel pass (both orientations; reduced motion): anticipation reads, no hue confusion [6a9bbc8]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 6a9bbc8]
 
-## Phase 4 — Track completion
+## Phase 4 — Track completion [checkpoint: 1dde4a3]
 
 - [x] Task: Docs sync (`product.md`: table marble rule; `tech-stack.md`: dated no-new-deps feature note) [891267a]
-- [ ] Task: Run the full 4-viewport e2e matrix locally against the production build (incl. reliability gates)
-- [ ] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e)
-- [ ] Task: Merge to `master`, archive track, update tracks registry
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Run the full 4-viewport e2e matrix locally against the production build (incl. reliability gates) [6a9bbc8]
+- [x] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e) [1dde4a3]
+- [x] Task: Merge to `master`, archive track, update tracks registry [1dde4a3]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 1dde4a3]
