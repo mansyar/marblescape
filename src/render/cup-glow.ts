@@ -69,10 +69,9 @@ export class CupGlow {
   }
 
   /** Resets and forgets every cup mesh not present in `cups` this frame. */
-  retain(cups: Iterable<THREE.Object3D>): void {
-    const keep = new Set(cups);
-    for (const mesh of [...this.entries.keys()]) {
-      if (!keep.has(mesh)) {
+  retain(cups: ReadonlyArray<THREE.Object3D>): void {
+    for (const mesh of this.entries.keys()) {
+      if (!cups.includes(mesh)) {
         this.detach(mesh);
       }
     }

@@ -78,6 +78,8 @@ export class Game {
   private cupGlow: CupGlow | null = null;
   /** Last glow intensity per cup cell — Playwright hook only, never rendered. */
   private readonly cupGlowNow = new Map<number, number>();
+  /** Reused per-frame buffer for glow retain calls (no allocations). */
+  private readonly cupGlowSeen: THREE.Object3D[] = [];
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private sparkles: SparkleSystem | null = null;
@@ -777,7 +779,10 @@ export class Game {
     }
     const collectible = this.collectibleColor();
     const live = marbles.all();
-    const seen: THREE.Object3D[] = [];
+    // Reused buffer + cleared map: the per-frame glow path allocates nothing.
+    const seen = this.cupGlowSeen;
+    seen.length = 0;
+    this.cupGlowNow.clear();
     for (const piece of this.board.pieces) {
       if (piece.type !== "goal") {
         continue;
@@ -994,10 +999,9 @@ export class Game {
   private removeMarbleMesh(body: object): void {
     const mesh = this.marbleMeshes.get(body);
     if (mesh) {
-      mesh.parent?.remove(mesh);
       this.shadows?.detach(mesh);
       this.gleam?.detach(mesh);
-      mesh.geometry.dispose();
+      disposeFadeMesh(mesh);
       this.marbleMeshes.delete(body);
     }
   }
