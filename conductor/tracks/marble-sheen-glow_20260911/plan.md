@@ -46,7 +46,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 4 — Track completion
 
-- [ ] Task: Docs sync (`product.md`: table marble rule; `tech-stack.md`: dated no-new-deps feature note)
+- [x] Task: Docs sync (`product.md`: table marble rule; `tech-stack.md`: dated no-new-deps feature note) [891267a]
 - [ ] Task: Run the full 4-viewport e2e matrix locally against the production build (incl. reliability gates)
 - [ ] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e)
 - [ ] Task: Merge to `master`, archive track, update tracks registry
