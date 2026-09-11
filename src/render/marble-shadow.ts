@@ -7,11 +7,11 @@ export const SHADOW_SURFACE_Y = 0.02;
 export const SHADOW_FADE_HEIGHT = 2.4;
 
 /** Quad diameter at rest and at the fade height (monotonic growth). */
-export const SHADOW_BASE_SCALE = 0.8;
-export const SHADOW_MAX_SCALE = 1.7;
+export const SHADOW_BASE_SCALE = 0.9;
+export const SHADOW_MAX_SCALE = 1.9;
 
 /** Blob opacity at rest; falls to zero by SHADOW_FADE_HEIGHT. */
-export const SHADOW_BASE_OPACITY = 0.32;
+export const SHADOW_BASE_OPACITY = 0.5;
 
 /** Faded quads skip the draw call entirely ("no-op above max height"). */
 const MIN_VISIBLE_OPACITY = 0.001;
