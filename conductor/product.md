@@ -12,8 +12,8 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 - **Interaction loop**: drag piece from palette → snap to grid slot → press Play → marbles run → collect → play again. Child-driven, no gestures to learn beyond drag and tap.
 - **Tilted table**: gravity leans ~8° toward the player — every surface drains south and ramps accelerate. Marbles never sit still; the board itself is the first toy.
 - **Sound-first**: every marble event has a satisfying sampled sound, pitch-shifted by marble speed. Prominent, persistent mute toggle.
-- **Marbles**: 1 marble per run, glass-look in six candy colors. The next marble waits visibly at the chute — tap it in the sandbox to pick its color; puzzle levels script the order. Calm cause-and-effect: one press, one marble, one story.
-- **Color sorting (post-v1)**: tinted goal cups — a matching marble drops through the open lid, a mismatch rolls over the closed lid and keeps going (never a fail). Collected marbles rest visibly in their cups.
+- **Marbles**: Up to 5 live marbles — each press drops one; pressing again while the table is full quietly fades the oldest (no waiting, never a fail). Glass-look in six candy colors with a moving catch-light and a soft contact shadow so each marble reads as real and grounded. The next marble waits visibly at the chute — tap it in the sandbox to pick its color; puzzle levels script the order. Calm cause-and-effect: one press, one marble, one story.
+- **Color sorting (v1)**: tinted goal cups — a matching marble drops through the open lid, a mismatch rolls over the closed lid and keeps going (never a fail). The compatible cup softly pulses and brightens as its marble approaches; collected marbles rest visibly in their cups.
 
 ## v1 Scope
 

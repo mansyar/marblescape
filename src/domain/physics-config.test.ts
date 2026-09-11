@@ -36,6 +36,11 @@ describe("PHYSICS tuning config", () => {
     expect(PHYSICS.maxMarblesPerDrop).toBe(1);
   });
 
+  it("caps the table at five live marbles (spec FR1)", () => {
+    expect(PHYSICS.maxMarblesOnTable).toBe(5);
+    expect(PHYSICS.maxMarblesOnTable).toBeGreaterThan(PHYSICS.maxMarblesPerDrop);
+  });
+
   it("is frozen against accidental runtime mutation", () => {
     expect(Object.isFrozen(PHYSICS)).toBe(true);
     expect(() => {

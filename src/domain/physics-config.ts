@@ -36,6 +36,13 @@ export const PHYSICS = Object.freeze({
   /** Marbles dropped per Play press (user preference: one at a time). */
   maxMarblesPerDrop: 1,
 
+  /**
+   * Live marbles allowed on the table at once. A drop beyond the cap
+   * recycles the oldest marble — a quiet fade, never a collect/rescue
+   * (spec FR1: the newest drop always arrives, zero pressure).
+   */
+  maxMarblesOnTable: 5,
+
   /** Extra clearance used by guard rails / edge walls. */
   wallHeight: 0.75,
 });

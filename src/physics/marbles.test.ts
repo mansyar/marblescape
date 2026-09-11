@@ -239,4 +239,76 @@ describe("MarbleManager", () => {
     marbles.dispose();
     world.free();
   });
+
+  it("recycles the oldest marble once the table cap is exceeded (FIFO)", () => {
+    const world = createPhysicsWorld();
+    const recycled: RAPIER.RigidBody[] = [];
+    const marbles = new MarbleManager(world, {
+      onRecycled: (body) => recycled.push(body),
+    });
+    const spawned: RAPIER.RigidBody[] = [];
+    for (let i = 0; i < PHYSICS.maxMarblesOnTable + 1; i += 1) {
+      marbles.spawnDrop(4, 4);
+      spawned.push(marbles.all()[marbles.all().length - 1]);
+    }
+
+    expect(marbles.count).toBe(PHYSICS.maxMarblesOnTable);
+    expect(recycled).toHaveLength(1);
+    expect(recycled[0]).toBe(spawned[0]);
+    expect(marbles.has(spawned[0])).toBe(false);
+    expect(marbles.has(spawned[spawned.length - 1])).toBe(true);
+    expect(marbles.getCollected()).toHaveLength(0);
+    expect(marbles.getRescued()).toHaveLength(0);
+    expect(marbles.recycledCount).toBe(1);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("counts cap-driven recycles separately from fresh-run leftover clears", () => {
+    const world = createPhysicsWorld();
+    const lost: RAPIER.RigidBody[] = [];
+    const marbles = new MarbleManager(
+      world,
+      { onLost: (body) => lost.push(body) },
+      { settleSteps: 2, settleSpeed: 1000, stallCapSeconds: 1000 },
+    );
+    marbles.spawnDrop(4, 4);
+    marbles.reap();
+    marbles.reap(); // settles at-rest
+
+    // The next drop starts a fresh run: the leftover is cleared quietly,
+    // which is NOT a table-cap recycle.
+    marbles.spawnDrop(4, 4);
+    expect(lost).toHaveLength(1);
+    expect(marbles.recycledCount).toBe(0);
+
+    // Drops up to the cap never recycle.
+    for (let i = 0; i < PHYSICS.maxMarblesOnTable - 1; i += 1) {
+      marbles.spawnDrop(4, 4);
+    }
+    expect(marbles.count).toBe(PHYSICS.maxMarblesOnTable);
+    expect(marbles.recycledCount).toBe(0);
+
+    // One more drop exceeds the cap: exactly one recycle.
+    marbles.spawnDrop(4, 4);
+    expect(marbles.count).toBe(PHYSICS.maxMarblesOnTable);
+    expect(marbles.recycledCount).toBe(1);
+    marbles.dispose();
+    world.free();
+  });
+
+  it("removes the recycled marble's body from the physics world (no leak)", () => {
+    const world = createPhysicsWorld();
+    const marbles = new MarbleManager(world);
+    const spawned: RAPIER.RigidBody[] = [];
+    for (let i = 0; i < PHYSICS.maxMarblesOnTable + 1; i += 1) {
+      marbles.spawnDrop(4, 4);
+      spawned.push(marbles.all()[marbles.all().length - 1]);
+    }
+
+    expect(world.getRigidBody(spawned[0].handle)).toBeNull();
+    expect(world.getRigidBody(spawned[spawned.length - 1].handle)).not.toBeNull();
+    marbles.dispose();
+    world.free();
+  });
 });
