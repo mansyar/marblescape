@@ -47,6 +47,8 @@ import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
 import { disposeFadeMesh, MarbleFader } from "../render/marble-fade";
+import { MarbleGleam } from "../render/marble-gleam";
+import { MarbleShadows } from "../render/marble-shadow";
 import { PieceJuice } from "../render/piece-juice";
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
@@ -70,6 +72,8 @@ export class Game {
   private pieceBodies = new Map<string, PieceBodyEntry>();
   private marbleMeshes = new Map<object, THREE.Mesh>();
   private readonly marbleFades = new MarbleFader();
+  private shadows: MarbleShadows | null = null;
+  private gleam: MarbleGleam | null = null;
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private sparkles: SparkleSystem | null = null;
@@ -148,6 +152,8 @@ export class Game {
     // reduced motion: it bobs gently, or stands perfectly still.
     this.waiting = createWaitingMarble(handle.scene);
     this.trophies = createTrophyTray(handle.scene);
+    this.shadows = new MarbleShadows(handle.scene);
+    this.gleam = new MarbleGleam(handle.scene);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.sparkles.setReducedMotion(reducedMotion.matches);
     this.waiting.setReducedMotion(reducedMotion.matches);
@@ -239,6 +245,8 @@ export class Game {
       }
       this.marbles?.reap();
       this.syncMarbleMeshes();
+      this.shadows?.update();
+      this.gleam?.update(handle.camera);
       this.stepPopTweens(dt);
       this.marbleFades.update(dt);
       this.juice.update(dt);
@@ -913,12 +921,14 @@ export class Game {
           new THREE.SphereGeometry(PHYSICS.marbleRadius, 24, 16),
           new THREE.MeshStandardMaterial({
             color: colorHex(this.marbles.colorOf(body)),
-            roughness: 0.15,
+            roughness: 0.1,
           }),
         );
         mesh.castShadow = true;
         this.marbleMeshes.set(body, mesh);
         scene.add(mesh);
+        this.shadows?.attach(mesh);
+        this.gleam?.attach(mesh);
       }
       const t = body.translation();
       mesh.position.set(t.x, t.y, t.z);
@@ -929,6 +939,8 @@ export class Game {
     const mesh = this.marbleMeshes.get(body);
     if (mesh) {
       mesh.parent?.remove(mesh);
+      this.shadows?.detach(mesh);
+      this.gleam?.detach(mesh);
       mesh.geometry.dispose();
       this.marbleMeshes.delete(body);
     }
@@ -944,6 +956,8 @@ export class Game {
       return;
     }
     this.marbleMeshes.delete(body);
+    this.shadows?.detach(mesh);
+    this.gleam?.detach(mesh);
     if (this.reducedMotion) {
       disposeFadeMesh(mesh);
       return;
