@@ -51,3 +51,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e) [1dde4a3]
 - [x] Task: Merge to `master`, archive track, update tracks registry [1dde4a3]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 1dde4a3]
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 6bef234
