@@ -26,10 +26,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Height → scale/opacity mapping (clamped, monotonic; no-op above max height)
   - [x] Lifecycle: one shadow per active marble, cleaned on collect/rescue/recycle, pooled with no leak
 - [x] Task: Implement soft contact shadows to green; >80% coverage [124a6d8]
-- [~] Task: Write failing tests for the sheen layer (`src/render/marble-gleam.ts`)
-  - [ ] Shared geometry/material/highlight resources created once and disposed; per-marble attach/detach; no per-frame allocations
-  - [ ] Highlight is additive and never modifies the marble's candy color
-- [ ] Task: Implement marble sheen to green; >80% coverage
+- [x] Task: Write failing tests for the sheen layer (`src/render/marble-gleam.ts`) [dbbaf14]
+  - [x] Shared geometry/material/highlight resources created once and disposed; per-marble attach/detach; no per-frame allocations
+  - [x] Highlight is additive and never modifies the marble's candy color
+- [x] Task: Implement marble sheen to green; >80% coverage [dbbaf14] [4aa377d]
 - [ ] Task: Manual feel pass (portrait + landscape): glossiness, grounding, color clarity, perf spot check with 5 marbles + sparkles
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
