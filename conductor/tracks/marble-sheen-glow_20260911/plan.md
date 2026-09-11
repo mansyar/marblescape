@@ -4,7 +4,7 @@ Branch: `track/marble-sheen-glow` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Table marble limit: recycling policy (TDD)
+## Phase 1 — Table marble limit: recycling policy (TDD) [checkpoint: a23e646]
 
 - [x] Task: Write failing tests for the cap constant & recycling policy (`src/domain/physics-config.ts`, `src/physics/marbles.ts`) [b7f06e9]
   - [x] `PHYSICS.maxMarblesOnTable = 5` beside `maxMarblesPerDrop`; config test
@@ -17,8 +17,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Reduced motion: instant removal
   - [x] Cup lids/floor sync and waiting preview re-evaluated after recycle (existing `refreshCupState`/`syncWaiting`)
 - [x] Task: Implement Game wiring to green; >80% coverage [49589cb]
-- [ ] Task: e2e: rapid Play presses (sandbox + one level) → active count never exceeds 5, `recycledCount` grows, newest marble present; reliability gates unchanged
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: e2e: rapid Play presses (sandbox + one level) → active count never exceeds 5, `recycledCount` grows, newest marble present; reliability gates unchanged [a23e646]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: a23e646]
 
 ## Phase 2 — Marble sheen & soft contact shadow (TDD)
 
