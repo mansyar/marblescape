@@ -6,12 +6,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Table marble limit: recycling policy (TDD)
 
-- [ ] Task: Write failing tests for the cap constant & recycling policy (`src/domain/physics-config.ts`, `src/physics/marbles.ts`)
-  - [ ] `PHYSICS.maxMarblesOnTable = 5` beside `maxMarblesPerDrop`; config test
-  - [ ] Spawning at the cap always adds the new marble and recycles the oldest active one (FIFO); active count never exceeds the cap
-  - [ ] Recycling fires a dedicated event/count distinct from the fresh-run leftover clear (`onLost`): not collected, not rescued; run-settle treats it as done
-  - [ ] Recycled marble fully removed (no body leak, not collectible afterward); cup trophies never recycled
-- [ ] Task: Implement the recycling policy to green; >80% coverage
+- [x] Task: Write failing tests for the cap constant & recycling policy (`src/domain/physics-config.ts`, `src/physics/marbles.ts`) [b7f06e9]
+  - [x] `PHYSICS.maxMarblesOnTable = 5` beside `maxMarblesPerDrop`; config test
+  - [x] Spawning at the cap always adds the new marble and recycles the oldest active one (FIFO); active count never exceeds the cap
+  - [x] Recycling fires a dedicated event/count distinct from the fresh-run leftover clear (`onLost`): not collected, not rescued; run-settle treats it as done
+  - [x] Recycled marble fully removed (no body leak, not collectible afterward); cup trophies never recycled
+- [x] Task: Implement the recycling policy to green; >80% coverage [b7f06e9]
 - [ ] Task: Write failing tests for Game wiring: `recycledCount()` hook + detached fade (`src/game/game.ts`)
   - [ ] State first: body removed immediately; mesh detaches and shrinks/fades ~150–200 ms (reuse `popTweens` pattern extended with opacity), disposed at end
   - [ ] Reduced motion: instant removal
