@@ -46,6 +46,7 @@ import { colorHex, MARBLE_COLORS, nextMarbleColor, type MarbleColor } from "../d
 import { PHYSICS } from "../domain/physics-config";
 import { createFixedStepLoop } from "../physics/fixed-step-loop";
 import { createPhysicsWorld, initPhysics, stepWorld, type World } from "../physics/world";
+import { disposeFadeMesh, MarbleFader } from "../render/marble-fade";
 import { PieceJuice } from "../render/piece-juice";
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { startRenderer } from "../render/scene";
@@ -68,6 +69,7 @@ export class Game {
   private pieceRenderer: PieceRenderer | null = null;
   private pieceBodies = new Map<string, PieceBodyEntry>();
   private marbleMeshes = new Map<object, THREE.Mesh>();
+  private readonly marbleFades = new MarbleFader();
   private popTweens: Array<{ mesh: THREE.Object3D; t: number }> = [];
   private highlight: THREE.Mesh | null = null;
   private sparkles: SparkleSystem | null = null;
@@ -203,6 +205,9 @@ export class Game {
       },
       // A wandered leftover replaced by a fresh run retires its mesh too.
       onLost: (body) => this.removeMarbleMesh(body),
+      // A table-cap recycle eases the oldest mesh out; the freshly dropped
+      // marble stays live (spec FR1).
+      onRecycled: (body) => this.fadeOutMarbleMesh(body),
       // Run over: a soft cue only when the run ended without a goal (the
       // plonk/chime cover success). Play itself never locks on settle.
       onRunSettled: (reason) => playSettleCue(this.audioCtx, reason, this.sound?.isMuted ?? true),
@@ -235,6 +240,7 @@ export class Game {
       this.marbles?.reap();
       this.syncMarbleMeshes();
       this.stepPopTweens(dt);
+      this.marbleFades.update(dt);
       this.juice.update(dt);
       this.sparkles?.update(dt);
       this.waiting?.update(elapsed);
@@ -638,6 +644,16 @@ export class Game {
     return this.marbles?.getRescued().length ?? 0;
   }
 
+  /** Quiet table-cap recycles, distinct from fresh-run leftover clears (FR5). */
+  recycledCount(): number {
+    return this.marbles?.recycledCount ?? 0;
+  }
+
+  /** Active recycle fades; stays 0 under reduced motion (instant removal). */
+  marbleFadeCount(): number {
+    return this.marbleFades.activeCount;
+  }
+
   /** Live marble positions for the Playwright hooks. */
   marblePositions(): Array<{ x: number; y: number; z: number }> {
     return (this.marbles?.all() ?? []).map((body) => {
@@ -916,6 +932,23 @@ export class Game {
       mesh.geometry.dispose();
       this.marbleMeshes.delete(body);
     }
+  }
+
+  /**
+   * Cap-driven recycle (spec FR1): detach the mesh from the live sync so it
+   * eases out on its own — instantly under reduced motion.
+   */
+  private fadeOutMarbleMesh(body: object): void {
+    const mesh = this.marbleMeshes.get(body);
+    if (!mesh) {
+      return;
+    }
+    this.marbleMeshes.delete(body);
+    if (this.reducedMotion) {
+      disposeFadeMesh(mesh);
+      return;
+    }
+    this.marbleFades.start(mesh);
   }
 
   private stepPopTweens(dt: number): void {
