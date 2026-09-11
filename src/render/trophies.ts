@@ -50,7 +50,9 @@ export function createTrophyTray(scene: THREE.Scene): TrophyTray {
       mesh.name = TROPHY_NAME;
       mesh.position.set(
         cup.x + 0.5,
-        CUP_MOUTH_HEIGHT + (level % STACK_WRAP) * STACK_RISE,
+        CUP_MOUTH_HEIGHT +
+          (level % STACK_WRAP) * STACK_RISE +
+          Math.floor(level / STACK_WRAP) * 0.12,
         cup.z + 0.5,
       );
       mesh.castShadow = true;

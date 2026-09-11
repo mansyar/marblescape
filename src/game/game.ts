@@ -732,7 +732,11 @@ export class Game {
   private nextDropColor(): MarbleColor {
     const script = this.puzzle?.level.marbleColors;
     if (script) {
-      return nextScriptedColor(script, this.collectedByColor) ?? MARBLE_COLORS[0];
+      return (
+        nextScriptedColor(script, this.collectedByColor) ??
+        this.marbles?.peekColor() ??
+        MARBLE_COLORS[0]
+      );
     }
     return this.sandboxColor ?? this.marbles?.peekColor() ?? MARBLE_COLORS[0];
   }

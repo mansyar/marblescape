@@ -36,6 +36,18 @@ describe("trophy tray", () => {
     expect((scene.children[1] as THREE.Mesh).position.y).toBeGreaterThan(firstY);
   });
 
+  it("never rests a wrapped trophy on top of an earlier one", () => {
+    const scene = new THREE.Scene();
+    const tray = createTrophyTray(scene);
+    for (let i = 0; i < 4; i += 1) {
+      tray.add({ x: 3, z: 5 }, "mint");
+    }
+
+    const first = (scene.children[0] as THREE.Mesh).position.y;
+    const fourth = (scene.children[3] as THREE.Mesh).position.y;
+    expect(fourth).toBeGreaterThan(first);
+  });
+
   it("keeps different cups at their own resting heights", () => {
     const scene = new THREE.Scene();
     const tray = createTrophyTray(scene);
