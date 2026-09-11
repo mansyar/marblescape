@@ -20,7 +20,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: e2e: rapid Play presses (sandbox + one level) → active count never exceeds 5, `recycledCount` grows, newest marble present; reliability gates unchanged [a23e646]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: a23e646]
 
-## Phase 2 — Marble sheen & soft contact shadow (TDD)
+## Phase 2 — Marble sheen & soft contact shadow (TDD) [checkpoint: cda1e1c]
 
 - [x] Task: Write failing tests for the contact shadow (`src/render/marble-shadow.ts`) [124a6d8]
   - [x] Height → scale/opacity mapping (clamped, monotonic; no-op above max height)
@@ -30,8 +30,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Shared geometry/material/highlight resources created once and disposed; per-marble attach/detach; no per-frame allocations
   - [x] Highlight is additive and never modifies the marble's candy color
 - [x] Task: Implement marble sheen to green; >80% coverage [dbbaf14] [4aa377d]
-- [ ] Task: Manual feel pass (portrait + landscape): glossiness, grounding, color clarity, perf spot check with 5 marbles + sparkles
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Manual feel pass (portrait + landscape): glossiness, grounding, color clarity, perf spot check with 5 marbles + sparkles [cda1e1c]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: cda1e1c]
 
 ## Phase 3 — Cup anticipation glow (TDD)
 
