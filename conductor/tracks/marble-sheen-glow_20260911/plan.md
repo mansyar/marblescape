@@ -35,12 +35,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 3 — Cup anticipation glow (TDD)
 
-- [ ] Task: Write failing tests for the glow intensity mapping (`src/render/cup-glow.ts`)
-  - [ ] Match state: baseline pulse for the compatible cup (steady glow under reduced motion); incompatible cups → 0
-  - [ ] Approach ramp: brightness rises as a matching marble nears (~2 tiles), peaks at collection; classic catch-all cup glows on any approach
-- [ ] Task: Implement cup glow to green; wire the per-frame update (live marble positions + next color); >80% coverage
-  - [ ] ≤3 cups; emissive/tint only on existing cup meshes; no per-frame allocations; lid readability preserved
-- [ ] Task: e2e/regression: sorting levels still solve; lid/color state hooks unchanged by glow; reduced-motion steady glow
+- [x] Task: Write failing tests for the glow intensity mapping (`src/render/cup-glow.ts`) [63aced2]
+  - [x] Match state: baseline pulse for the compatible cup (steady glow under reduced motion); incompatible cups → 0 [63aced2]
+  - [x] Approach ramp: brightness rises as a matching marble nears (~2 tiles), peaks at collection; classic catch-all cup glows on any approach [63aced2]
+- [x] Task: Implement cup glow to green; wire the per-frame update (live marble positions + next color); >80% coverage [63aced2] [cf8497c]
+  - [x] ≤3 cups; emissive/tint only on existing cup meshes; no per-frame allocations; lid readability preserved [63aced2] [cf8497c]
+- [x] Task: e2e/regression: sorting levels still solve; lid/color state hooks unchanged by glow; reduced-motion steady glow [6a9bbc8]
 - [ ] Task: Manual feel pass (both orientations; reduced motion): anticipation reads, no hue confusion
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
