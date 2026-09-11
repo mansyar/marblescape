@@ -22,11 +22,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Marble sheen & soft contact shadow (TDD)
 
-- [ ] Task: Write failing tests for the contact shadow (`src/render/marble-shadow.ts`)
-  - [ ] Height → scale/opacity mapping (clamped, monotonic; no-op above max height)
-  - [ ] Lifecycle: one shadow per active marble, cleaned on collect/rescue/recycle, pooled with no leak
-- [ ] Task: Implement soft contact shadows to green; >80% coverage
-- [ ] Task: Write failing tests for the sheen layer (`src/render/marble-gleam.ts`)
+- [x] Task: Write failing tests for the contact shadow (`src/render/marble-shadow.ts`) [124a6d8]
+  - [x] Height → scale/opacity mapping (clamped, monotonic; no-op above max height)
+  - [x] Lifecycle: one shadow per active marble, cleaned on collect/rescue/recycle, pooled with no leak
+- [x] Task: Implement soft contact shadows to green; >80% coverage [124a6d8]
+- [~] Task: Write failing tests for the sheen layer (`src/render/marble-gleam.ts`)
   - [ ] Shared geometry/material/highlight resources created once and disposed; per-marble attach/detach; no per-frame allocations
   - [ ] Highlight is additive and never modifies the marble's candy color
 - [ ] Task: Implement marble sheen to green; >80% coverage
