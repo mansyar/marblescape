@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [ ] **Track: Marble Sheen, Cup Glow & Table Limit** *Link: [./tracks/marble-sheen-glow_20260911/index.md](./tracks/marble-sheen-glow_20260911/index.md)*
+- [~] **Track: Marble Sheen, Cup Glow & Table Limit** *Link: [./tracks/marble-sheen-glow_20260911/index.md](./tracks/marble-sheen-glow_20260911/index.md)*
 
 ## Archive
 
