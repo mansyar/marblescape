@@ -12,11 +12,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Recycling fires a dedicated event/count distinct from the fresh-run leftover clear (`onLost`): not collected, not rescued; run-settle treats it as done
   - [x] Recycled marble fully removed (no body leak, not collectible afterward); cup trophies never recycled
 - [x] Task: Implement the recycling policy to green; >80% coverage [b7f06e9]
-- [ ] Task: Write failing tests for Game wiring: `recycledCount()` hook + detached fade (`src/game/game.ts`)
-  - [ ] State first: body removed immediately; mesh detaches and shrinks/fades ~150–200 ms (reuse `popTweens` pattern extended with opacity), disposed at end
-  - [ ] Reduced motion: instant removal
-  - [ ] Cup lids/floor sync and waiting preview re-evaluated after recycle (existing `refreshCupState`/`syncWaiting`)
-- [ ] Task: Implement Game wiring to green; >80% coverage
+- [x] Task: Write failing tests for Game wiring: `recycledCount()` hook + detached fade (`src/game/game.ts`) [49589cb]
+  - [x] State first: body removed immediately; mesh detaches and shrinks/fades ~150–200 ms (reuse `popTweens` pattern extended with opacity), disposed at end
+  - [x] Reduced motion: instant removal
+  - [x] Cup lids/floor sync and waiting preview re-evaluated after recycle (existing `refreshCupState`/`syncWaiting`)
+- [x] Task: Implement Game wiring to green; >80% coverage [49589cb]
 - [ ] Task: e2e: rapid Play presses (sandbox + one level) → active count never exceeds 5, `recycledCount` grows, newest marble present; reliability gates unchanged
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
