@@ -29,9 +29,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 3 — Verification, polish & docs
 
-- [ ] Task: Manual feel pass (portrait + landscape, reduced motion): tiles legible, drag feel unchanged
-- [ ] Task: Full 4-viewport production e2e matrix locally (incl. reliability gates)
-- [ ] Task: Docs sync (`product.md`/`product-guidelines.md` record picture tiles; `tech-stack.md` dated no-new-assets note; precache unchanged)
+- [x] Task: Manual feel pass (portrait + landscape, reduced motion): tiles legible, drag feel unchanged
+- [~] Task: Full 4-viewport production e2e matrix locally (incl. reliability gates)
+- [x] Task: Fix landscape-phone HUD/rail overlap found by the matrix (HUD slides clear of the rail; tile hit-test) [927c0b1]
+- [x] Task: Docs sync (`product.md`/`product-guidelines.md` record picture tiles; `tech-stack.md` dated no-new-assets note; precache unchanged) [6b46ae0]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Track completion
