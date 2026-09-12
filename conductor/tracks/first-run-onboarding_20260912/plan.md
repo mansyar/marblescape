@@ -16,7 +16,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement both modules to green; >80% coverage [1b268b7]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1b268b7]
 
-## Phase 2 — Seed, events & cue layer (TDD)
+## Phase 2 — Seed, events & cue layer (TDD) [checkpoint: b91c160]
 
 - [x] Task: Write failing e2e for the first-run flow (`tests/onboarding.spec.ts`) [b91c160]
   - [x] Fresh context: seed pieces present per layout, gap (4,2) open, seed persisted
@@ -35,7 +35,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Hidden in puzzle mode and under overlays; resumes on sandbox return until completed
   - [x] Live reduced-motion branch; loop anchors recomputed per cycle for resize/orientation
 - [x] Task: Unit tests for pure cue config & projection helper; >80% coverage on new/changed modules [ea57da8]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [b91c160]
 
 ## Phase 3 — Verification, polish & docs
 
