@@ -20,11 +20,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Without snapshots: tile falls back to the text label
   - [x] Cup tile: picture + candy dot; tap cycles `data-color` and redraws; drag callbacks unchanged
 - [x] Task: Implement palette rendering changes (`src/ui/palette.ts`) to green [69250bd]
-- [ ] Task: Write failing e2e (`tests/palette.spec.ts`)
-  - [ ] Sandbox: all tiles show images (`naturalWidth > 0`), zero visible text; cup dot cycles on tap
-  - [ ] Drag from a picture tile still places the piece; landscape viewport assertion
-- [ ] Task: Wire boot generation (`src/main.ts` / `Game`) — snapshots generated after `game.start()` resolves and passed into every `buildPalette()` call (including orientation rebuilds)
-- [ ] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive); >80% coverage on changed modules
+- [x] Task: Write failing e2e (`tests/palette.spec.ts`) [434f54b]
+  - [x] Sandbox: all tiles show images (`naturalWidth > 0`), zero visible text; cup dot cycles on tap
+  - [x] Drag from a picture tile still places the piece; landscape viewport assertion
+- [x] Task: Wire boot generation (`src/main.ts` / `Game`) — snapshots generated after `game.start()` resolves and passed into every `buildPalette()` call (including orientation rebuilds) [f1ad687]
+- [x] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive); >80% coverage on changed modules [68c7459]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Verification, polish & docs
