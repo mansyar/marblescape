@@ -6,14 +6,14 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Domain: onboarding state & first-run layout (TDD)
 
-- [ ] Task: Write failing tests for the onboarding state machine & flag IO (`src/domain/onboarding.ts`)
-  - [ ] `nextOnboardingStep`: "place" → "play" on first successful placement; solve on first Play from **any** step (skip-ahead completes); placements after step 1 stay "play"; nothing changes after "done"
-  - [ ] `isOnboarded`/`markOnboarded` under `marblescape.onboarded.v1`: absent/corrupt = not onboarded; set = onboarded; writes idempotent
-- [ ] Task: Write failing tests for the starter layout & fresh detection (`src/domain/first-run.ts`)
-  - [ ] Layout: 8×6; straights rot 0 at (4,0)/(4,1)/(4,3)/(4,4); classic goal at (4,5); gap (4,2); unique, in-bounds cells
-  - [ ] Chain validity: chute → gap → goal connects via `connectsWith` once a Ramp rot 0 fills the gap
-  - [ ] `isFirstRun`: true only when `loadBoard` is null AND flag absent; any save or flag → false; corrupt flag behaves as absent
-- [ ] Task: Implement both modules to green; >80% coverage
+- [x] Task: Write failing tests for the onboarding state machine & flag IO (`src/domain/onboarding.ts`) [1b268b7]
+  - [x] `nextOnboardingStep`: "place" → "play" on first successful placement; solve on first Play from **any** step (skip-ahead completes); placements after step 1 stay "play"; nothing changes after "done"
+  - [x] `isOnboarded`/`markOnboarded` under `marblescape.onboarded.v1`: absent/corrupt = not onboarded; set = onboarded; writes idempotent
+- [x] Task: Write failing tests for the starter layout & fresh detection (`src/domain/first-run.ts`) [1b268b7]
+  - [x] Layout: 8×6; straights rot 0 at (4,0)/(4,1)/(4,3)/(4,4); classic goal at (4,5); gap (4,2); unique, in-bounds cells
+  - [x] Chain validity: chute → gap → goal connects via `connectsWith` once a Ramp rot 0 fills the gap
+  - [x] `isFirstRun`: true only when `loadBoard` is null AND flag absent; any save or flag → false; corrupt flag behaves as absent
+- [x] Task: Implement both modules to green; >80% coverage [1b268b7]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Seed, events & cue layer (TDD)
