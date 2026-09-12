@@ -18,6 +18,7 @@ import {
   type PlacedPiece,
 } from "../domain/board";
 import { openCupKeys } from "../domain/cup-lids";
+import { FIRST_RUN_LAYOUT } from "../domain/first-run";
 import { getLevel, nextScriptedColor } from "../domain/levels";
 import { isLevelComplete, markSolved } from "../domain/solve";
 import type { PieceType, Rotation } from "../domain/pieces";
@@ -52,6 +53,7 @@ import { MarbleGleam } from "../render/marble-gleam";
 import { MarbleShadows } from "../render/marble-shadow";
 import { PieceJuice } from "../render/piece-juice";
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
+import { worldToScreen } from "../render/projection";
 import { startRenderer } from "../render/scene";
 import { SparkleSystem } from "../render/sparkles";
 import { createTrophyTray, type TrophyTray } from "../render/trophies";
@@ -98,6 +100,10 @@ export class Game {
 
   /** Fired each time a marble lands in the goal cup while in level mode. */
   onLevelSolved: ((levelId: number) => void) | null = null;
+  /** Fired after each successful sandbox placement (first-run cues). */
+  onPiecePlaced: (() => void) | null = null;
+  /** Fired on every Play press, in any mode (first-run completion). */
+  onPlayed: (() => void) | null = null;
   private nextId = 1;
   private lastElapsed = -1;
   private sound: SoundManager | null = null;
@@ -346,6 +352,7 @@ export class Game {
     }
     this.syncPieces();
     this.snapBouncePiece(piece.id);
+    this.onPiecePlaced?.();
     return true;
   }
 
@@ -522,6 +529,7 @@ export class Game {
     }
     // A live marble changes which cups are compatible: refresh lids/floors.
     this.refreshCupState();
+    this.onPlayed?.();
   }
 
   /** Reset: clears placed pieces (marbles finish their run naturally). */
@@ -619,6 +627,40 @@ export class Game {
 
   hideHighlight(): void {
     this.showHighlight(null, false);
+  }
+
+  /**
+   * First-run seed: places the starter track's ordinary sandbox pieces with
+   * normal ids and saves immediately, so the welcome run survives a reload
+   * exactly like any child-built board. Called once, only on a fresh start.
+   */
+  seedFirstRun(): void {
+    for (const piece of FIRST_RUN_LAYOUT) {
+      this.board = placeTypedPiece(this.board, {
+        id: `p${this.nextId++}`,
+        type: piece.type,
+        rotation: piece.rotation,
+        x: piece.x,
+        y: piece.y,
+        ...(piece.color !== undefined ? { color: piece.color } : {}),
+      });
+    }
+    this.syncPieces();
+    saveBoard(localStorage, this.board);
+  }
+
+  /** Screen-pixel anchor of a cell's center for DOM overlays (first-run cues). */
+  cellToScreen(cellX: number, cellY: number): { x: number; y: number } | null {
+    const handle = this.rendererHandle;
+    if (!handle) {
+      return null;
+    }
+    return worldToScreen(
+      { x: cellX + 0.5, y: 0.35, z: cellY + 0.5 },
+      handle.camera,
+      this.container.clientWidth || 1,
+      this.container.clientHeight || 1,
+    );
   }
 
   /**

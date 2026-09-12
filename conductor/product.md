@@ -14,6 +14,7 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 - **Sound-first**: every marble event has a satisfying sampled sound, pitch-shifted by marble speed. Prominent, persistent mute toggle.
 - **Marbles**: Up to 5 live marbles — each press drops one; pressing again while the table is full quietly fades the oldest (no waiting, never a fail). Glass-look in six candy colors with a moving catch-light and a soft contact shadow so each marble reads as real and grounded. The next marble waits visibly at the chute — tap it in the sandbox to pick its color; puzzle levels script the order. Calm cause-and-effect: one press, one marble, one story.
 - **Color sorting (v1)**: tinted goal cups — a matching marble drops through the open lid, a mismatch rolls over the closed lid and keeps going (never a fail). The compatible cup softly pulses and brightens as its marble approaches; collected marbles rest visibly in their cups.
+- **First-run onboarding**: brand-new players start with a seeded starter track that has exactly one open gap, plus passive cues — a glowing target ring and a looping ghost hand that walks the Ramp tile to the gap, then a pulsing ▶. Fill the gap, press Play once, and the cues fade out for good. No text, no locks; returning players never see it.
 
 ## v1 Scope
 
@@ -22,6 +23,7 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 - 4-piece palette: straight ramp (sloped), curved ramp, trap (channel with center drop hole), goal hole — plus a color-cup tile that cycles the six candy colors
 - 3 color-sorting levels (7-9): scripted marble colors, matching cups open, mismatches roll on
 - All levels open from the start; subtle ✓ badges on solved levels (nothing locked)
+- First-run onboarding for new players: seeded one-gap starter track + passive drag/Play cues (shown once, then gone forever)
 
 ## Non-Goals (v1)
 

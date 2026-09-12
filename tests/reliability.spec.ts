@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { blockFirstRun } from "./helpers";
 
 declare global {
   interface Window {
     __marblescape?: import("../src/game/game").Game;
   }
 }
+
+// Existing player: drops must not land on a first-run starter track.
+test.beforeEach(async ({ page }) => {
+  await blockFirstRun(page);
+});
 
 const RUNS = 20;
 const MARBLES_PER_RUN = 1; // PHYSICS.maxMarblesPerDrop (user preference)

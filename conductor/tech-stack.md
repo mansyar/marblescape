@@ -20,6 +20,7 @@ Version-checked against npm registry on 2026-09-08.
 > - **Audio & physics feel (2026-09-10, track `physics-feel-polish_20260910`):** per-marble impact throttling replaces the global 60 ms gate; gentle-impact cutoff lowered (force 1 → 0.35); eased pitch/volume curves; looping roll voice per marble (`public/sounds/roll.ogg`, CC0 qubodup — 4th precached OGG); soft run-settle cue when a run ends away from the goal (stall-capped at 15 s, quiet reap). Physics tunables rebalanced (linear/angular damping 0.3/0.45, restitution 0.3/0.2, spawn height 0.9) — gravity direction fixed.
 > - **Celebration & interaction juice (2026-09-11, track `celebration-juice_20260910`):** no new runtime dependencies, assets, or precache entries — sparkles/confetti/juice are code-driven and pooled inside the existing 60 fps budget. See "Celebration & interaction juice" below.
 > - **Glass polish & table calm (2026-09-11, track `marble-sheen-glow_20260911`):** no new runtime dependencies, assets, or precache entries — code-driven gleam sprite, pooled contact shadows, emissive cup glow (steady under reduced motion), and the five-marble table rule with a 180 ms silent fade for recycled marbles. See "Glass polish & table calm" below.
+> - **First-run onboarding (2026-09-12, track `first-run-onboarding_20260912`):** no new runtime dependencies, assets, or precache entries — the starter seed reuses ordinary board pieces; cues are DOM/SVG + CSS keyframes; the target ring is positioned by a pure `worldToScreen` projection helper over the existing fixed camera. See "First-run onboarding" below.
 
 ## Art & Audio
 
@@ -33,7 +34,7 @@ Version-checked against npm registry on 2026-09-08.
 
 | Component | Choice |
 |---|---|
-| Saves / settings | localStorage (sandbox builds, sound preference, level ✓ badges) |
+| Saves / settings | localStorage (sandbox builds, sound preference, level ✓ badges, first-run completion flag) |
 | Backend / Database | None — fully static, fully offline |
 
 ## Quality
@@ -84,3 +85,12 @@ Marble Sheen, Cup Glow & Table Limit (track `marble-sheen-glow_20260911`, 2026-0
 - **Table limit** (`src/domain/physics-config.ts`, `src/physics/marbles.ts`, `src/render/marble-fade.ts`): `PHYSICS.maxMarblesOnTable = 5`; a drop beyond the cap recycles the oldest marble — removed from the sim immediately and never counted as collected or rescued (`recycledCount()` hook), while its mesh eases out with a silent 180 ms shrink/fade (instant under reduced motion).
 - **Sheen & grounding** (`src/render/marble-gleam.ts`, `src/render/marble-shadow.ts`): per-marble additive catch-light sprite (shared material + generated texture, camera-facing, no per-frame allocations) and pooled soft blob contact shadows (generated radial texture; scale/opacity follow height; no shadow maps).
 - **Cup anticipation glow** (`src/render/cup-glow.ts`): compatible cups pulse softly and brighten as a matching marble nears (emissive in the cup's own color so hues stay true; steady under reduced motion; lids stay readable; at most a few cups, no per-frame allocations).
+
+## First-run onboarding
+
+First-Run Onboarding (track `first-run-onboarding_20260912`, 2026-09-12): **no new dependencies, assets, or precache entries** — code-driven, reusing the board, palette, and HUD primitives.
+
+- **Fresh-start detection** (`src/domain/first-run.ts`, `src/domain/onboarding.ts`): `isFirstRun` = no saved board AND no `marblescape.onboarded.v1` flag; the starter layout (8×6: four straights, one classic goal, one gap at (4,2)) is seeded via `Game.seedFirstRun()` with ordinary sandbox piece ids and saved immediately.
+- **Cue layer** (`src/ui/onboarding.ts`, `src/ui/cue-config.ts`, `src/render/projection.ts`): passive `pointer-events:none` DOM overlay — target ring at the gap, looping ghost hand (Ramp tile → gap, then Play), pulsing Ramp tile (`setTilePulse` hook in `src/ui/palette.ts`), pulsing ▶ (`createHud` returns the play ref). Sandbox-only; hidden under level select/solved overlays; loop anchors recomputed per cycle and on resize.
+- **Completion** (`Game.onPiecePlaced` / `onPlayed` callbacks): the first successful placement advances to the Play step; the first Play press (any mode, skip-ahead included) writes the flag and fades the cues out for good. Existing players never see cues; their first Play still records the flag.
+- **Reduced motion:** static hand beside the Ramp tile, opacity-only pulses (live `matchMedia` branch).
