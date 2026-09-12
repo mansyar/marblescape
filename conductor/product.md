@@ -20,7 +20,7 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 
 - 1 sandbox scene (Play → run → settle → collect → Play again), colored cups included
 - 9 tiny "complete the track" puzzle levels (the first six each introduce one piece; levels 7-9 introduce color sorting)
-- 4-piece palette: straight ramp (sloped), curved ramp, trap (channel with center drop hole), goal hole — plus a color-cup tile that cycles the six candy colors
+- 4-piece palette: straight ramp (sloped), curved ramp, trap (channel with center drop hole), goal hole — shown as pictures of the pieces themselves (no labels) — plus a color-cup tile that cycles the six candy colors
 - 3 color-sorting levels (7-9): scripted marble colors, matching cups open, mismatches roll on
 - All levels open from the start; subtle ✓ badges on solved levels (nothing locked)
 - First-run onboarding for new players: seeded one-gap starter track + passive drag/Play cues (shown once, then gone forever)
