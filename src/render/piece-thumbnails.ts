@@ -96,10 +96,12 @@ export function createWebGLCapture(createGL: () => OffscreenGL = defaultOffscree
   return {
     capture(object) {
       scene.add(object);
-      gl.render(scene, camera);
-      const url = gl.domElement.toDataURL("image/png");
-      scene.remove(object);
-      return url;
+      try {
+        gl.render(scene, camera);
+        return gl.domElement.toDataURL("image/png");
+      } finally {
+        scene.remove(object);
+      }
     },
     dispose() {
       gl.dispose();

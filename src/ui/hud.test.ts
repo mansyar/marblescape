@@ -145,4 +145,30 @@ describe("hud placement", () => {
     vi.advanceTimersByTime(100);
     expect(hud.bar.style.right).toBe("max(10px, env(safe-area-inset-right))");
   });
+
+  it("wires play, mute, and reset through the game", () => {
+    const initAudio = vi.fn(() => Promise.resolve());
+    const play = vi.fn();
+    const setSoundOn = vi.fn();
+    const reset = vi.fn();
+    const game = { initAudio, play, setSoundOn, reset } as unknown as Game;
+    (globalThis as { window?: unknown }).window = fakeWindow(390, 844);
+
+    const hud = createHud(game, new FakeElement("div") as unknown as HTMLElement);
+    const bar = hud.bar as unknown as FakeElement;
+    const [home, playButton, mute, resetButton] = bar.children;
+    expect(home.textContent).toBe("🏠");
+
+    playButton.fire("click");
+    expect(initAudio).toHaveBeenCalledTimes(1);
+    expect(play).toHaveBeenCalledTimes(1);
+
+    expect(mute.textContent).toBe("🔊");
+    mute.fire("click");
+    expect(setSoundOn).toHaveBeenLastCalledWith(false);
+    expect(mute.textContent).toBe("🔇");
+
+    resetButton.fire("click");
+    expect(reset).toHaveBeenCalledTimes(1);
+  });
 });
