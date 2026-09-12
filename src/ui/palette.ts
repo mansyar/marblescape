@@ -103,6 +103,46 @@ export function palettePickupTransform(dragging: boolean): string {
   return dragging ? "translateY(-4px)" : "";
 }
 
+/** Class carrying the first-run invitation pulse on a palette tile. */
+export const PALETTE_PULSE_CLASS = "ms-palette-pulse";
+
+/** Keyframes for the first-run tile pulse (soft opacity pulse under reduced motion). */
+export function palettePulseKeyframes(): string {
+  return [
+    "@keyframes ms-palette-pulse{",
+    "0%,100%{transform:scale(1)}",
+    "50%{transform:scale(1.06)}",
+    "}",
+    "@keyframes ms-palette-pulse-soft{",
+    "0%,100%{opacity:1}",
+    "50%{opacity:.55}",
+    "}",
+    `.${PALETTE_PULSE_CLASS}{animation:ms-palette-pulse 1.2s ease-in-out infinite}`,
+    "@media (prefers-reduced-motion:reduce){",
+    `.${PALETTE_PULSE_CLASS}{animation-name:ms-palette-pulse-soft}`,
+    "}",
+  ].join("");
+}
+
+/**
+ * Toggles the first-run pulse on every tile of a type. Palette rebuilds
+ * recreate tiles, so the cue layer re-applies this until completion.
+ */
+export function setTilePulse(type: PieceType, on: boolean): void {
+  for (const tile of document.querySelectorAll<HTMLElement>(`[data-piece-type="${type}"]`)) {
+    if (on) {
+      if (!tile.classList.contains(PALETTE_PULSE_CLASS)) {
+        // A lingering reject shake (inline style) would mask the class
+        // animation; clear it before re-pulsing.
+        tile.style.animation = "";
+        tile.classList.add(PALETTE_PULSE_CLASS);
+      }
+    } else {
+      tile.classList.remove(PALETTE_PULSE_CLASS);
+    }
+  }
+}
+
 /**
  * Bottom palette: one big (64px+) button per entry. Dragging streams NDC
  * coordinates into the given callbacks until release; tapping a color tile
@@ -120,7 +160,7 @@ export function createPalette(
   bar.style.cssText = paletteLayout(mode).containerCss;
 
   const style = document.createElement("style");
-  style.textContent = paletteRejectKeyframes();
+  style.textContent = paletteRejectKeyframes() + palettePulseKeyframes();
   bar.appendChild(style);
 
   for (const entry of normalizePaletteItems(items)) {

@@ -8,11 +8,17 @@ function button(label: string, bg: string): HTMLButtonElement {
   return btn;
 }
 
+export interface HudHandle {
+  bar: HTMLElement;
+  /** The big ▶ button; the cue layer pulses it during first-run step 2. */
+  play: HTMLButtonElement;
+}
+
 /**
  * Top HUD: big Play button (drops marbles), mute toggle and board reset.
  * The mute preference persists and is applied to the game's audio manager.
  */
-export function createHud(game: Game, container: HTMLElement, onHome?: () => void): HTMLElement {
+export function createHud(game: Game, container: HTMLElement, onHome?: () => void): HudHandle {
   const bar = document.createElement("div");
   bar.style.cssText = [
     "position:fixed;top:10px;right:max(10px, env(safe-area-inset-right))",
@@ -42,5 +48,5 @@ export function createHud(game: Game, container: HTMLElement, onHome?: () => voi
 
   bar.append(home, play, mute, reset);
   container.appendChild(bar);
-  return bar;
+  return { bar, play };
 }

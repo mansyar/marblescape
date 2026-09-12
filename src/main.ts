@@ -11,7 +11,10 @@ import { createConfettiLayer } from "./ui/confetti";
 import { createSolvedOverlay } from "./ui/solved-overlay";
 import { registerSW } from "virtual:pwa-register";
 import { LEVELS } from "./domain/levels";
+import { FIRST_RUN_GAP, isFirstRun } from "./domain/first-run";
+import { markOnboarded } from "./domain/onboarding";
 import { createLevelSelect, hideLevelSelect, showLevelSelect } from "./ui/level-select";
+import { createOnboardingCues, type OnboardingCues } from "./ui/onboarding";
 
 declare global {
   interface Window {
@@ -25,6 +28,12 @@ if (app) {
   app.style.inset = "0";
   const game = new Game(app);
   void game.start().then(() => {
+    // First run: seed the one-gap starter track once, and teach drag + Play
+    // with passive cues. Existing players (save or flag) never see either.
+    const firstRun = isFirstRun(localStorage);
+    if (firstRun) {
+      game.seedFirstRun();
+    }
     const aspect = () => window.innerWidth / window.innerHeight;
     const cellFromNdc = (ndcX: number, ndcY: number | null) => {
       if (ndcY === null) {
@@ -40,6 +49,9 @@ if (app) {
       );
       return screenToCell(ndcX, ndcY, framing, aspect());
     };
+
+    // First-run cue layer (created below once the HUD exists).
+    let cues: OnboardingCues | null = null;
 
     // Palette: drag new pieces onto the board. Rebuilt per mode so level
     // palettes stay restricted to the pieces that solve that level.
@@ -83,6 +95,7 @@ if (app) {
     // Level select: sandbox + every shipped level, nothing locked.
     const levelSelect = createLevelSelect(document.body, LEVELS, new Set(), (pick) => {
       hideLevelSelect(levelSelect);
+      cues?.setSuppressed(false);
       if (pick === "sandbox") {
         game.exitLevel();
         buildPalette();
@@ -93,7 +106,10 @@ if (app) {
       }
       // Picking the level already open keeps its placements (board replayable).
     });
-    createHud(game, document.body, () => showLevelSelect(levelSelect));
+    const hud = createHud(game, document.body, () => {
+      cues?.setSuppressed(true);
+      showLevelSelect(levelSelect);
+    });
 
     // Update banner: prompts when a new version finished installing.
     // Tap Update to apply (page reloads); ✕ dismisses until the next update.
@@ -120,6 +136,7 @@ if (app) {
       },
       onHome: () => {
         solvedOverlay.hide();
+        cues?.setSuppressed(true);
         showLevelSelect(levelSelect);
       },
     });
@@ -127,6 +144,45 @@ if (app) {
       confetti.burst();
       solvedOverlay.show();
     };
+
+    // First-run cues: passive DOM overlay (hand + ring + pulses) created only
+    // on a fresh start; hidden in puzzle mode and under overlays until the
+    // child's first Play completes the sequence for good.
+    if (firstRun) {
+      cues = createOnboardingCues(
+        document.body,
+        {
+          gap: () => game.cellToScreen(FIRST_RUN_GAP.x, FIRST_RUN_GAP.y),
+          tile: () => {
+            const tile = document.querySelector<HTMLElement>('[data-piece-type="straight"]');
+            if (!tile) {
+              return null;
+            }
+            const rect = tile.getBoundingClientRect();
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+          },
+          play: () => {
+            const rect = hud.play.getBoundingClientRect();
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+          },
+        },
+        {
+          playButton: hud.play,
+          reducedMotion: reducedMotion.matches,
+          isSandbox: () => game.currentLevelId() === null,
+        },
+      );
+    }
+    // A placement advances the cues; the first Play (any mode) writes the
+    // completion flag and fades the cues out for good.
+    game.onPiecePlaced = () => {
+      cues?.advance("piece-placed");
+    };
+    game.onPlayed = () => {
+      markOnboarded(localStorage);
+      cues?.complete();
+    };
+
     const style = document.createElement("style");
     style.textContent =
       "@keyframes ms-pop{0%{transform:scale(0.4)}60%{transform:scale(1.15)}100%{transform:scale(1)}}";
