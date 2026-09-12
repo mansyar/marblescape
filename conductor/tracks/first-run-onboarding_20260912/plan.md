@@ -14,27 +14,27 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Chain validity: chute → gap → goal connects via `connectsWith` once a Ramp rot 0 fills the gap
   - [x] `isFirstRun`: true only when `loadBoard` is null AND flag absent; any save or flag → false; corrupt flag behaves as absent
 - [x] Task: Implement both modules to green; >80% coverage [1b268b7]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [1b268b7]
 
 ## Phase 2 — Seed, events & cue layer (TDD)
 
-- [ ] Task: Write failing e2e for the first-run flow (`tests/onboarding.spec.ts`)
-  - [ ] Fresh context: seed pieces present per layout, gap (4,2) open, seed persisted
-  - [ ] Cues at step "place": hand + target ring + pulsing Ramp tile; `pointer-events:none` layer
-  - [ ] `place("straight", 4, 2)` → step "play" (ring/tile pulse stop; Play pulses; hand gestures to Play)
-  - [ ] `play()` → flag set, cue layer done/gone; reload → no cues, child's board persists, no reseed
-  - [ ] Pre-existing save → no seed, no cues (existing player untouched)
-  - [ ] Reduced-motion emulation → no traveling hand (static cue), flow still completable
-  - [ ] One landscape viewport boot assertion
-- [ ] Task: Implement seed & detection to green (`Game.seedFirstRun()`, `isFirstRun` boot order in `main.ts`)
-  - [ ] Seed uses the layout constant, assigns normal sandbox ids, syncs visuals, saves immediately
-- [ ] Task: Implement Game callbacks + main wiring to green
-  - [ ] `onPiecePlaced` (successful sandbox placement), `onPlayed` (every Play; house pattern like `onLevelSolved`)
-  - [ ] First Play writes the flag; cue step advances on real actions
-- [ ] Task: Implement the cue layer (`src/ui/onboarding.ts`; DOM target ring positioned via a new `worldToScreen` projection helper; Ramp-tile pulse hook in `palette.ts`; Play ref returned by `createHud`)
-  - [ ] Hidden in puzzle mode and under overlays; resumes on sandbox return until completed
-  - [ ] Live reduced-motion branch; loop anchors recomputed per cycle for resize/orientation
-- [ ] Task: Unit tests for pure cue config & projection helper; >80% coverage on new/changed modules
+- [x] Task: Write failing e2e for the first-run flow (`tests/onboarding.spec.ts`) [b91c160]
+  - [x] Fresh context: seed pieces present per layout, gap (4,2) open, seed persisted
+  - [x] Cues at step "place": hand + target ring + pulsing Ramp tile; `pointer-events:none` layer
+  - [x] `place("straight", 4, 2)` → step "play" (ring/tile pulse stop; Play pulses; hand gestures to Play)
+  - [x] `play()` → flag set, cue layer done/gone; reload → no cues, child's board persists, no reseed
+  - [x] Pre-existing save → no seed, no cues (existing player untouched)
+  - [x] Reduced-motion emulation → no traveling hand (static cue), flow still completable
+  - [x] One landscape viewport boot assertion
+- [x] Task: Implement seed & detection to green (`Game.seedFirstRun()`, `isFirstRun` boot order in `main.ts`) [ea57da8]
+  - [x] Seed uses the layout constant, assigns normal sandbox ids, syncs visuals, saves immediately
+- [x] Task: Implement Game callbacks + main wiring to green [ea57da8]
+  - [x] `onPiecePlaced` (successful sandbox placement), `onPlayed` (every Play; house pattern like `onLevelSolved`)
+  - [x] First Play writes the flag; cue step advances on real actions
+- [x] Task: Implement the cue layer (`src/ui/onboarding.ts`; DOM target ring positioned via a new `worldToScreen` projection helper; Ramp-tile pulse hook in `palette.ts`; Play ref returned by `createHud`) [ea57da8]
+  - [x] Hidden in puzzle mode and under overlays; resumes on sandbox return until completed
+  - [x] Live reduced-motion branch; loop anchors recomputed per cycle for resize/orientation
+- [x] Task: Unit tests for pure cue config & projection helper; >80% coverage on new/changed modules [ea57da8]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Verification, polish & docs
