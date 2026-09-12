@@ -45,8 +45,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Run the full 4-viewport production e2e matrix locally (incl. reliability gates) [c01dae5]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [c01dae5]
 
-## Phase 4 — Track completion
+## Phase 4 — Track completion [checkpoint: 144b97b]
 
-- [ ] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e)
-- [ ] Task: Merge to `master`, archive track, update tracks registry
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e) [d2b85b3]
+- [x] Task: Merge to `master`, archive track, update tracks registry [144b97b]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [144b97b]
