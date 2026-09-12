@@ -1,9 +1,10 @@
 import { colorHex, type MarbleColor } from "../domain/colors";
 import type { PieceType } from "../domain/pieces";
 import { DRAG_THRESHOLD_PX } from "../game/gestures";
+import type { PieceThumbnails } from "../render/piece-thumbnails";
 import type { LayoutMode } from "./layout";
 
-/** Kid-facing button labels, in canonical palette order (Ramp → Hole). */
+/** Kid-facing tile names: aria-labels and fallback text (Ramp → Hole). */
 export const LABELS: Record<PieceType, string> = {
   straight: "Ramp",
   curved: "Curve",
@@ -59,6 +60,9 @@ const BUTTON_LANDSCAPE = [
   "border-radius:14px;border:3px solid #2c3e50;background:#fff",
   "touch-action:none",
 ].join(";");
+
+/** Picture-tile image sizing: fits inside the ≥72px tile (dot below). */
+const THUMB_IMAGE_CSS = "width:44px;height:44px;display:block;pointer-events:none";
 
 export interface PaletteLayout {
   containerCss: string;
@@ -153,9 +157,9 @@ export function setTilePulse(type: PieceType, on: boolean): void {
 }
 
 /**
- * Bottom palette: one big (64px+) button per entry. Dragging streams NDC
- * coordinates into the given callbacks until release; tapping a color tile
- * cycles its candy color instead (onCycle).
+ * Bottom palette: one big (64+px) button per entry, picture-first (word
+ * label fallback). Dragging streams NDC coordinates into the given callbacks
+ * until release; tapping a color tile cycles its candy color (onCycle).
  */
 export function createPalette(
   root: HTMLElement,
@@ -164,6 +168,7 @@ export function createPalette(
   onDrop: (item: PaletteItem, ndcX: number, ndcY: number | null, button: HTMLButtonElement) => void,
   mode: LayoutMode,
   onCycle?: (item: PaletteItem) => MarbleColor | null,
+  thumbnails: PieceThumbnails = {},
 ): HTMLElement {
   const bar = document.createElement("div");
   bar.style.cssText = paletteLayout(mode).containerCss;
@@ -175,9 +180,25 @@ export function createPalette(
   for (const entry of normalizePaletteItems(items)) {
     let item = entry;
     const btn = document.createElement("button");
-    btn.textContent = LABELS[item.type];
     btn.dataset.pieceType = item.type;
+    // The name stays for screen readers and as the fallback when a picture
+    // snapshot is missing (e.g. offscreen WebGL unavailable).
+    btn.setAttribute("aria-label", LABELS[item.type]);
     btn.style.cssText = paletteLayout(mode).buttonCss;
+    const picture = thumbnails[item.type];
+    if (picture) {
+      btn.style.display = "flex";
+      btn.style.justifyContent = "center";
+      btn.style.alignItems = "center";
+      const img = document.createElement("img");
+      img.src = picture;
+      img.alt = "";
+      img.draggable = false;
+      img.style.cssText = THUMB_IMAGE_CSS;
+      btn.appendChild(img);
+    } else {
+      btn.textContent = LABELS[item.type];
+    }
     // Color cup tile: a candy dot under the label, redrawn on every cycle.
     let swatch: HTMLSpanElement | null = null;
     if (item.color !== undefined) {

@@ -1,5 +1,7 @@
 import type { Game } from "../game/game";
 import { isSoundOn } from "../audio/prefs";
+import { registerViewportResize } from "../render/resize";
+import { layoutMode, type LayoutMode } from "./layout";
 
 function button(label: string, bg: string): HTMLButtonElement {
   const btn = document.createElement("button");
@@ -15,6 +17,19 @@ export interface HudHandle {
 }
 
 /**
+ * Horizontal space the landscape palette rail occupies (a 72px tile column
+ * plus the rail's padding) with a small breathing gap; the HUD slides left
+ * by this much so its buttons never sit on top of a tile.
+ */
+export const LANDSCAPE_HUD_CLEARANCE_PX = 84;
+
+/** Right-edge inset for the HUD bar; in landscape it clears the palette rail. */
+export function hudRightInset(mode: LayoutMode): string {
+  const safeArea = "max(10px, env(safe-area-inset-right))";
+  return mode === "landscape" ? `calc(${safeArea} + ${LANDSCAPE_HUD_CLEARANCE_PX}px)` : safeArea;
+}
+
+/**
  * Top HUD: big Play button (drops marbles), mute toggle and board reset.
  * The mute preference persists and is applied to the game's audio manager.
  */
@@ -24,6 +39,14 @@ export function createHud(game: Game, container: HTMLElement, onHome?: () => voi
     "position:fixed;top:10px;right:max(10px, env(safe-area-inset-right))",
     "display:flex;gap:10px;z-index:10",
   ].join(";");
+
+  // Keep the bar clear of the right-side palette rail in landscape (the rail's
+  // top tile would otherwise sit underneath the ♻ button on short viewports).
+  const applyBarPlacement = () => {
+    bar.style.right = hudRightInset(layoutMode(window.innerWidth, window.innerHeight).mode);
+  };
+  applyBarPlacement();
+  registerViewportResize(window, applyBarPlacement);
 
   const home = button("🏠", "#073b4c");
   home.dataset.testid = "hud-home";

@@ -23,6 +23,7 @@ Warm, playful, encouraging. Any visible text is minimal, lowercase-friendly, and
 ## UX Rules
 
 - The interaction vocabulary is exactly: **drag, tap, Play button**. No pinch, no orbit, no multi-touch requirements.
+- The palette is picture-first: each tile shows the piece itself, not its name. Word labels are the fallback only; aria-labels serve screen readers.
 - Pieces snap to grid slots; ambiguous overlaps are impossible by construction.
 - Marbles can never escape the board (raised edges, guard rails).
 - Settings are limited to sound on/off. No menus deeper than one level.

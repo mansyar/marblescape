@@ -1,8 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { colorHex, type MarbleColor } from "../domain/colors";
 import type { PieceType } from "../domain/pieces";
+import type { PieceThumbnails } from "../render/piece-thumbnails";
 import {
   colorSwatchCss,
+  createPalette,
   LABELS,
   normalizePaletteItems,
   PALETTE_REJECT_ANIMATION,
@@ -153,5 +155,266 @@ describe("color swatch", () => {
       seen.add(colorSwatchCss(color));
     }
     expect(seen.size).toBe(6);
+  });
+});
+
+// Minimal element stub: just the DOM surface createPalette uses, so picture
+// tiles are testable in the node suite (no jsdom).
+class FakeStyle {
+  cssText = "";
+  [key: string]: unknown;
+  setProperty(name: string, value: string): void {
+    this[name] = value;
+  }
+}
+
+interface FakePointerEvent {
+  pointerId: number;
+  clientX: number;
+  clientY: number;
+}
+
+class FakeElement {
+  tagName: string;
+  style = new FakeStyle();
+  dataset: Record<string, string> = {};
+  attrs = new Map<string, string>();
+  textContent = "";
+  src = "";
+  alt = "";
+  draggable = false;
+  children: FakeElement[] = [];
+  parent: FakeElement | null = null;
+  listeners: Record<string, Array<(event: FakePointerEvent) => void>> = {};
+  capturedPointer: number | null = null;
+  bounds: { left: number; top: number; width: number; height: number } | null = null;
+
+  constructor(tagName: string) {
+    this.tagName = tagName;
+  }
+
+  appendChild(child: FakeElement): FakeElement {
+    child.parent = this;
+    this.children.push(child);
+    return child;
+  }
+
+  setAttribute(name: string, value: string): void {
+    this.attrs.set(name, value);
+  }
+
+  addEventListener(type: string, handler: (event: FakePointerEvent) => void): void {
+    const handlers = this.listeners[type] ?? [];
+    handlers.push(handler);
+    this.listeners[type] = handlers;
+  }
+
+  setPointerCapture(pointerId: number): void {
+    this.capturedPointer = pointerId;
+  }
+
+  hasPointerCapture(pointerId: number): boolean {
+    return this.capturedPointer === pointerId;
+  }
+
+  getBoundingClientRect(): {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+  } {
+    const b = this.bounds ?? { left: 0, top: 0, width: 0, height: 0 };
+    return {
+      left: b.left,
+      top: b.top,
+      right: b.left + b.width,
+      bottom: b.top + b.height,
+      width: b.width,
+      height: b.height,
+    };
+  }
+
+  querySelector(): FakeElement | null {
+    return null;
+  }
+
+  fire(type: string, event: Partial<FakePointerEvent> = {}): void {
+    const full: FakePointerEvent = { pointerId: 1, clientX: 0, clientY: 0, ...event };
+    for (const handler of this.listeners[type] ?? []) {
+      handler(full);
+    }
+  }
+
+  find(predicate: (el: FakeElement) => boolean): FakeElement | null {
+    for (const child of this.children) {
+      if (predicate(child)) {
+        return child;
+      }
+      const nested = child.find(predicate);
+      if (nested) {
+        return nested;
+      }
+    }
+    return null;
+  }
+}
+
+describe("createPalette picture tiles", () => {
+  let originalDocument: unknown;
+
+  beforeEach(() => {
+    originalDocument = (globalThis as { document?: unknown }).document;
+    (globalThis as { document?: unknown }).document = {
+      createElement: (tagName: string) => new FakeElement(tagName),
+    };
+  });
+
+  afterEach(() => {
+    (globalThis as { document?: unknown }).document = originalDocument;
+  });
+
+  function mount(options: {
+    items?: Array<PieceType | PaletteItem>;
+    thumbnails?: PieceThumbnails;
+    onCycle?: (item: PaletteItem) => MarbleColor | null;
+    canvas?: { left: number; top: number; width: number; height: number };
+  }) {
+    const drags: PaletteItem[] = [];
+    const drops: PaletteItem[] = [];
+    const dragPoints: Array<{ ndcX: number; ndcY: number | null }> = [];
+    const root = new FakeElement("div");
+    if (options.canvas) {
+      const canvas = new FakeElement("canvas");
+      canvas.bounds = options.canvas;
+      root.querySelector = () => canvas;
+    }
+    const bar = createPalette(
+      root as unknown as HTMLElement,
+      options.items ?? ["straight", { type: "goal", color: "mint" }],
+      (item, ndcX, ndcY) => {
+        drags.push(item);
+        dragPoints.push({ ndcX, ndcY });
+      },
+      (item) => {
+        drops.push(item);
+      },
+      "portrait",
+      options.onCycle,
+      options.thumbnails,
+    );
+    const barEl = bar as unknown as FakeElement;
+    const tile = (type: PieceType) =>
+      barEl.children.find((el) => el.dataset.pieceType === type) ?? null;
+    const findIn = (el: FakeElement | null, tagName: string) =>
+      el?.find((child) => child.tagName === tagName) ?? null;
+    return { barEl, tile, findIn, drags, dragPoints, drops };
+  }
+
+  it("renders a picture tile: img data URL, no visible text, aria-label, hooks intact", () => {
+    const { tile, findIn } = mount({
+      thumbnails: {
+        straight: "data:image/png;base64,AAA",
+        goal: "data:image/png;base64,BBB",
+      },
+    });
+
+    const ramp = tile("straight");
+    expect(ramp?.textContent).toBe("");
+    expect(ramp?.dataset.pieceType).toBe("straight");
+    expect(ramp?.attrs.get("aria-label")).toBe("Ramp");
+    expect(findIn(ramp, "img")?.src).toBe("data:image/png;base64,AAA");
+
+    const cup = tile("goal");
+    expect(cup?.textContent).toBe("");
+    expect(cup?.dataset.color).toBe("mint");
+    expect(findIn(cup, "img")?.src).toBe("data:image/png;base64,BBB");
+    expect(findIn(cup, "span")?.style.cssText).toContain(colorHex("mint"));
+  });
+
+  it("falls back to the word label when a snapshot is missing", () => {
+    const { tile, findIn } = mount({
+      items: ["straight", "curved"],
+      thumbnails: { straight: "data:image/png;base64,AAA" },
+    });
+
+    expect(findIn(tile("straight"), "img")).not.toBeNull();
+    expect(tile("straight")?.textContent).toBe("");
+
+    expect(findIn(tile("curved"), "img")).toBeNull();
+    expect(tile("curved")?.textContent).toBe("Curve");
+    expect(tile("curved")?.attrs.get("aria-label")).toBe("Curve");
+  });
+
+  it("keeps the candy dot on the picture cup tile: tap cycles, drag drops", () => {
+    const cycles: PaletteItem[] = [];
+    const { tile, findIn, drags, drops } = mount({
+      items: [{ type: "goal", color: "mint" }],
+      thumbnails: { goal: "data:image/png;base64,BBB" },
+      onCycle: (item) => {
+        cycles.push(item);
+        return "lemon";
+      },
+    });
+    const cup = tile("goal");
+    if (!cup) {
+      throw new Error("cup tile missing");
+    }
+    const dot = findIn(cup, "span");
+
+    // Tap (no movement): cycles the candy color and redraws the dot.
+    cup.fire("pointerdown", { clientX: 5, clientY: 5 });
+    cup.fire("pointerup", { clientX: 5, clientY: 5 });
+    expect(cycles).toHaveLength(1);
+    expect(cycles[0].color).toBe("mint");
+    expect(cup.dataset.color).toBe("lemon");
+    expect(dot?.style.cssText).toContain(colorHex("lemon"));
+    expect(drops).toHaveLength(0);
+
+    // Drag (moved past the threshold): normal palette drag → drop callbacks.
+    cup.fire("pointerdown", { clientX: 5, clientY: 5 });
+    cup.fire("pointermove", { clientX: 45, clientY: 5 });
+    expect(drags).toHaveLength(1);
+    expect(drags[0].color).toBe("lemon");
+    cup.fire("pointerup", { clientX: 45, clientY: 5 });
+    expect(drops).toHaveLength(1);
+    expect(drops[0].type).toBe("goal");
+  });
+
+  it("streams board NDC while dragging over the canvas, null off-board", () => {
+    const { tile, drags, dragPoints } = mount({
+      items: ["straight"],
+      canvas: { left: 0, top: 0, width: 200, height: 100 },
+    });
+    const ramp = tile("straight");
+    if (!ramp) {
+      throw new Error("ramp tile missing");
+    }
+
+    ramp.fire("pointerdown", { clientX: 10, clientY: 10 });
+    // Inside the canvas: NDC is computed from the canvas rect.
+    ramp.fire("pointermove", { clientX: 150, clientY: 25 });
+    // Outside the canvas: no board point (null axis).
+    ramp.fire("pointermove", { clientX: 250, clientY: 25 });
+
+    expect(drags).toHaveLength(2);
+    expect(dragPoints[0]).toEqual({ ndcX: 0.5, ndcY: 0.5 });
+    expect(dragPoints[1]).toEqual({ ndcX: 0, ndcY: null });
+  });
+
+  it("ignores pointer moves and releases without an active capture", () => {
+    const { tile, drags, dragPoints, drops } = mount({ items: ["straight"] });
+    const ramp = tile("straight");
+    if (!ramp) {
+      throw new Error("ramp tile missing");
+    }
+
+    ramp.fire("pointermove", { clientX: 40, clientY: 40 });
+    ramp.fire("pointerup", { clientX: 40, clientY: 40 });
+
+    expect(drags).toHaveLength(0);
+    expect(dragPoints).toHaveLength(0);
+    expect(drops).toHaveLength(0);
   });
 });

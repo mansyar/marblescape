@@ -54,7 +54,9 @@ if (app) {
     let cues: OnboardingCues | null = null;
 
     // Palette: drag new pieces onto the board. Rebuilt per mode so level
-    // palettes stay restricted to the pieces that solve that level.
+    // palettes stay restricted to the pieces that solve that level. Picture
+    // tiles snapshot each piece once (offscreen) and reuse it on every rebuild.
+    const thumbnails = game.createPaletteThumbnails();
     let paletteBar: HTMLElement | null = null;
     let paletteMode: LayoutMode = "portrait";
     const buildPalette = () => {
@@ -79,6 +81,7 @@ if (app) {
         },
         layoutMode(window.innerWidth, window.innerHeight).mode,
         (item) => (item.color === undefined ? null : game.cyclePaletteColor()),
+        thumbnails,
       );
       document.body.appendChild(paletteBar);
     };

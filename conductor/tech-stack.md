@@ -21,6 +21,7 @@ Version-checked against npm registry on 2026-09-08.
 > - **Celebration & interaction juice (2026-09-11, track `celebration-juice_20260910`):** no new runtime dependencies, assets, or precache entries — sparkles/confetti/juice are code-driven and pooled inside the existing 60 fps budget. See "Celebration & interaction juice" below.
 > - **Glass polish & table calm (2026-09-11, track `marble-sheen-glow_20260911`):** no new runtime dependencies, assets, or precache entries — code-driven gleam sprite, pooled contact shadows, emissive cup glow (steady under reduced motion), and the five-marble table rule with a 180 ms silent fade for recycled marbles. See "Glass polish & table calm" below.
 > - **First-run onboarding (2026-09-12, track `first-run-onboarding_20260912`):** no new runtime dependencies, assets, or precache entries — the starter seed reuses ordinary board pieces; cues are DOM/SVG + CSS keyframes; the target ring is positioned by a pure `worldToScreen` projection helper over the existing fixed camera. See "First-run onboarding" below.
+> - **Picture-based palette (2026-09-13, track `palette-pictures_20260912`):** no new runtime dependencies, assets, or precache entries — palette tiles are snapshotted at boot from the existing piece GLB templates (one offscreen WebGL pass, transparent 160 px data URLs); word labels remain only as the fallback text and as screen-reader aria-labels. See "Picture-based palette" below.
 
 ## Art & Audio
 
@@ -94,3 +95,10 @@ First-Run Onboarding (track `first-run-onboarding_20260912`, 2026-09-12): **no n
 - **Cue layer** (`src/ui/onboarding.ts`, `src/ui/cue-config.ts`, `src/render/projection.ts`): passive `pointer-events:none` DOM overlay — target ring at the gap, looping ghost hand (Ramp tile → gap, then Play), pulsing Ramp tile (`setTilePulse` hook in `src/ui/palette.ts`), pulsing ▶ (`createHud` returns the play ref). Sandbox-only; hidden under level select/solved overlays; loop anchors recomputed per cycle and on resize.
 - **Completion** (`Game.onPiecePlaced` / `onPlayed` callbacks): the first successful placement advances to the Play step; the first Play press (any mode, skip-ahead included) writes the flag and fades the cues out for good. Existing players never see cues; their first Play still records the flag.
 - **Reduced motion:** static hand beside the Ramp tile, opacity-only pulses (live `matchMedia` branch).
+
+## Picture-based palette
+
+Picture-Based Piece Palette (track `palette-pictures_20260912`, 2026-09-13): **no new dependencies, assets, or precache entries** — tiles are rendered from the existing piece GLBs at boot; the precache list is unchanged.
+
+- **Snapshots** (`src/render/piece-thumbnails.ts`, `PieceRenderer.templateFor`): one offscreen `WebGLRenderer` pass after templates load renders each piece type (yaw offset and ramp pitch applied, three-quarter camera) to a 160×160 transparent PNG data URL; a failed type is omitted without throwing (word-label fallback) and the offscreen renderer is disposed after the pass.
+- **Integration** (`src/game/game.ts`, `src/main.ts`, `src/ui/palette.ts`): `Game.createPaletteThumbnails()` is generated once after `game.start()` and passed into every `createPalette()` call (boot + orientation rebuilds); tiles render an `<img>` with an `aria-label` and no visible text, while the cup tile keeps its candy dot and tap-to-cycle/drag behavior. Covered by `tests/palette.spec.ts` across the 4-viewport matrix plus the palette unit suite.

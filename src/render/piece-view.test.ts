@@ -81,6 +81,13 @@ describe("PieceRenderer", () => {
     expect(root.children).toHaveLength(0);
   });
 
+  it("exposes loaded model templates for offscreen snapshots", async () => {
+    const { renderer } = makeRenderer();
+    expect(renderer.templateFor("straight")).toBeNull();
+    await renderer.loadTemplates();
+    expect(renderer.templateFor("straight")).toBeInstanceOf(THREE.Object3D);
+  });
+
   it("falls back to a placeholder when a model fails to load", async () => {
     const root = new THREE.Group();
     const renderer = new PieceRenderer(root, {
