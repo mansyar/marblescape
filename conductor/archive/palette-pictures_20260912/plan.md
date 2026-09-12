@@ -35,8 +35,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Docs sync (`product.md`/`product-guidelines.md` record picture tiles; `tech-stack.md` dated no-new-assets note; precache unchanged) [6b46ae0]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [927c0b1]
 
-## Phase 4 — Track completion
+## Phase 4 — Track completion [checkpoint: e77e03c]
 
-- [ ] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e)
-- [ ] Task: Merge to `master`, archive track, update tracks registry
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Push branch, open PR, verify CI green (unit + 4-viewport e2e) [f5a4f0f]
+- [x] Task: Merge to `master`, archive track, update tracks registry [e77e03c]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [e77e03c]

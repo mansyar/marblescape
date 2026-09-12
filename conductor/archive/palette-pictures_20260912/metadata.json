@@ -1,7 +1,8 @@
 {
   "id": "palette-pictures_20260912",
   "type": "feature",
-  "status": "new",
-  "description": "Picture-based piece palette: replaces the word labels on palette tiles (Ramp, Curve, Funnel, Hole) with runtime snapshots of the actual piece models, so pre-readers can choose pieces visually (product principle: No reading required). Snapshots are rendered once at startup from the already-loaded Kenney GLB templates into small in-memory images — no new assets, dependencies, or precache entries; text remains only as aria-label and as a fallback if a snapshot fails. The color-cup tile keeps its candy dot and tap-to-cycle behavior; drag, rejection shake, onboarding pulses, layouts, physics, audio, levels, and saves are unchanged.",
-  "created": "2026-09-12T00:00:00Z"
+  "status": "completed",
+  "description": "Picture-based piece palette: replaces the word labels on palette tiles (Ramp, Curve, Funnel, Hole) with runtime snapshots of the actual piece models, so pre-readers can choose pieces visually (product principle: No reading required). Snapshots are rendered once at startup from the already-loaded Kenney GLB templates into small in-memory images — no new assets, dependencies, or precache entries; text remains only as aria-label and as a fallback if a snapshot fails. The color-cup tile keeps its candy dot and tap-to-cycle behavior; drag, rejection shake, onboarding pulses, layouts, physics, audio, levels, and saves are unchanged. Verified by unit tests, the palette e2e suite, regression runs, and the 4-viewport production matrix (includes a landscape-phone HUD/rail overlap fix found by the matrix).",
+  "created": "2026-09-12T00:00:00Z",
+  "completed": "2026-09-13T00:00:00Z"
 }
