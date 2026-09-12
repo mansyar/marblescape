@@ -6,11 +6,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Snapshot module (TDD)
 
-- [ ] Task: Write failing unit tests for piece snapshots (`src/render/piece-thumbnails.ts`)
-  - [ ] Renders one image per piece type (straight, curved, funnel, goal) via an injectable render seam (headless — no WebGL in jsdom)
-  - [ ] One pass, results cached; a failing type is omitted without throwing (fallback path)
-- [ ] Task: Implement the snapshot module to green (offscreen renderer + scene, transparent clear, three-quarter camera, `toDataURL` per template clone; expose a read-only template accessor from `PieceRenderer`)
-- [ ] Task: >80% coverage on the new module; `pnpm check` clean
+- [x] Task: Write failing unit tests for piece snapshots (`src/render/piece-thumbnails.ts`) [eff97ac]
+  - [x] Renders one image per piece type (straight, curved, funnel, goal) via an injectable render seam (headless — no WebGL in jsdom)
+  - [x] One pass, results cached; a failing type is omitted without throwing (fallback path)
+- [x] Task: Implement the snapshot module to green (offscreen renderer + scene, transparent clear, three-quarter camera, `toDataURL` per template clone; expose a read-only template accessor from `PieceRenderer`) [eff97ac]
+- [x] Task: >80% coverage on the new module; `pnpm check` clean [eff97ac]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Picture tiles & boot wiring (TDD)
