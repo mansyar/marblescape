@@ -37,13 +37,13 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Unit tests for pure cue config & projection helper; >80% coverage on new/changed modules [ea57da8]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [b91c160]
 
-## Phase 3 — Verification, polish & docs
+## Phase 3 — Verification, polish & docs [checkpoint: c01dae5]
 
-- [ ] Task: Manual feel pass (portrait + landscape; reduced motion): cues read as invitation, hand path lands correctly on gap and Play, no drag obstruction, pulses subtle
-- [ ] Task: e2e regression: smoke, levels, color-sorting, responsive, reliability suites green; no cue leakage into puzzle/overlays
-- [ ] Task: Docs sync (`product.md` records first-run onboarding + starter seed; `tech-stack.md` dated no-new-deps note; precache list unchanged)
-- [ ] Task: Run the full 4-viewport production e2e matrix locally (incl. reliability gates)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Manual feel pass (portrait + landscape; reduced motion): cues read as invitation, hand path lands correctly on gap and Play, no drag obstruction, pulses subtle
+- [x] Task: e2e regression: smoke, levels, color-sorting, responsive, reliability suites green; no cue leakage into puzzle/overlays [c01dae5]
+- [x] Task: Docs sync (`product.md` records first-run onboarding + starter seed; `tech-stack.md` dated no-new-deps note; precache list unchanged) [6da4d31]
+- [x] Task: Run the full 4-viewport production e2e matrix locally (incl. reliability gates) [c01dae5]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [c01dae5]
 
 ## Phase 4 — Track completion
 
