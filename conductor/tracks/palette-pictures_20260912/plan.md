@@ -4,14 +4,14 @@ Branch: `track/palette-pictures` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Snapshot module (TDD)
+## Phase 1 — Snapshot module (TDD) [checkpoint: eff97ac]
 
 - [x] Task: Write failing unit tests for piece snapshots (`src/render/piece-thumbnails.ts`) [eff97ac]
   - [x] Renders one image per piece type (straight, curved, funnel, goal) via an injectable render seam (headless — no WebGL in jsdom)
   - [x] One pass, results cached; a failing type is omitted without throwing (fallback path)
 - [x] Task: Implement the snapshot module to green (offscreen renderer + scene, transparent clear, three-quarter camera, `toDataURL` per template clone; expose a read-only template accessor from `PieceRenderer`) [eff97ac]
 - [x] Task: >80% coverage on the new module; `pnpm check` clean [eff97ac]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [eff97ac]
 
 ## Phase 2 — Picture tiles & boot wiring (TDD)
 
