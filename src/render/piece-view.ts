@@ -28,6 +28,11 @@ export class PieceRenderer {
     return this.meshes.get(id) ?? null;
   }
 
+  /** Read-only template access for offscreen snapshots (null before load). */
+  templateFor(type: PieceType): THREE.Object3D | null {
+    return this.templates.get(type) ?? null;
+  }
+
   constructor(root: THREE.Group, loader: { loadAsync: (url: string) => Promise<unknown> }) {
     this.root = root;
     this.loader = loader;
