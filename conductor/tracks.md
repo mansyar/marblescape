@@ -2,7 +2,7 @@
 
 ## Tracks
 
-_No active tracks._
+- [ ] **Track: Picture-Based Piece Palette** *Link: [./tracks/palette-pictures_20260912/index.md](./tracks/palette-pictures_20260912/index.md)*
 
 ## Archive
 
