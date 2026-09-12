@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { PieceType } from "../src/domain/pieces";
+import { blockFirstRun } from "./helpers";
 
 declare global {
   interface Window {
@@ -221,6 +222,7 @@ test("levels 8-9 ship playable: scripted previews, cups, and a live drop", async
 test("a mismatched marble rolls away quietly; the next Play clears it and collects", async ({
   page,
 }) => {
+  await blockFirstRun(page);
   await page.goto("/");
   await page.waitForFunction(() => Boolean(window.__marblescape), null, { timeout: 30_000 });
 
