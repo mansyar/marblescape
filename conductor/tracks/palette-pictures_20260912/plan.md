@@ -15,11 +15,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Picture tiles & boot wiring (TDD)
 
-- [ ] Task: Update failing palette tests (`src/ui/palette.test.ts`)
-  - [ ] With snapshots: tile renders an `<img>` with the data URL, no visible text, `aria-label` present; existing hooks (`data-piece-type`, `data-color`) intact
-  - [ ] Without snapshots: tile falls back to the text label
-  - [ ] Cup tile: picture + candy dot; tap cycles `data-color` and redraws; drag callbacks unchanged
-- [ ] Task: Implement palette rendering changes (`src/ui/palette.ts`) to green
+- [x] Task: Update failing palette tests (`src/ui/palette.test.ts`) [69250bd]
+  - [x] With snapshots: tile renders an `<img>` with the data URL, no visible text, `aria-label` present; existing hooks (`data-piece-type`, `data-color`) intact
+  - [x] Without snapshots: tile falls back to the text label
+  - [x] Cup tile: picture + candy dot; tap cycles `data-color` and redraws; drag callbacks unchanged
+- [x] Task: Implement palette rendering changes (`src/ui/palette.ts`) to green [69250bd]
 - [ ] Task: Write failing e2e (`tests/palette.spec.ts`)
   - [ ] Sandbox: all tiles show images (`naturalWidth > 0`), zero visible text; cup dot cycles on tap
   - [ ] Drag from a picture tile still places the piece; landscape viewport assertion
