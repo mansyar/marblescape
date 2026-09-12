@@ -111,3 +111,23 @@ test("landscape: picture tiles fill the right rail", async ({ page }) => {
   }
   expect(box.x).toBeGreaterThan(844 * 0.8);
 });
+
+test("landscape: every rail tile is hit-testable at its center", async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await boot(page);
+  await waitForPictures(page);
+
+  const tiles = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>("[data-piece-type]")].map((tile) => {
+      const box = tile.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+      return {
+        type: tile.dataset.pieceType,
+        reachable: hit !== null && (hit === tile || tile.contains(hit)),
+      };
+    }),
+  );
+  for (const tile of tiles) {
+    expect(tile.reachable, `${tile.type} tile must be reachable at its center`).toBe(true);
+  }
+});
