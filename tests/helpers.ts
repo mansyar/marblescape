@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { ONBOARDED_KEY, ONBOARDED_VALUE } from "../src/domain/onboarding";
 
 /**
  * Boots the page as an existing player: sets the first-run completion flag
@@ -6,7 +7,10 @@ import type { Page } from "@playwright/test";
  * the starter seed or the onboarding cues (spec FR4).
  */
 export async function blockFirstRun(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    localStorage.setItem("marblescape.onboarded.v1", "done");
-  });
+  await page.addInitScript(
+    ({ key, value }) => {
+      localStorage.setItem(key, value);
+    },
+    { key: ONBOARDED_KEY, value: ONBOARDED_VALUE },
+  );
 }

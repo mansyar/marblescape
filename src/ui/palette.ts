@@ -93,6 +93,15 @@ export function pulseReject(tile: HTMLElement): void {
   tile.style.animation = "none";
   void tile.offsetWidth; // reflow so the same animation can restart
   tile.style.animation = PALETTE_REJECT_ANIMATION;
+  // Clear the inline animation once the shake ends so a class-based pulse
+  // (first-run invitation) can play again.
+  tile.addEventListener(
+    "animationend",
+    () => {
+      tile.style.animation = "";
+    },
+    { once: true },
+  );
 }
 
 /** Tile transition for the pickup lift and its release. */

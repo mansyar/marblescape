@@ -213,3 +213,28 @@ test("cues hide in puzzle mode and under the level select, resuming in the sandb
   await page.locator('[data-level-select="sandbox"]').click();
   await expect(cues).toBeVisible();
 });
+
+test("a rejected drop does not silence the Ramp tile pulse", async ({ page }) => {
+  await boot(page);
+  const tile = page.locator('[data-piece-type="straight"]');
+
+  // Drag the Ramp onto the occupied chute cell: the board rejects the drop.
+  const tileBox = await tile.boundingBox();
+  if (!tileBox) {
+    throw new Error("ramp tile not visible");
+  }
+  const target = await page.evaluate(() => window.__marblescape?.cellToScreen(4, 0) ?? null);
+  if (!target) {
+    throw new Error("chute anchor unavailable");
+  }
+  await page.mouse.move(tileBox.x + tileBox.width / 2, tileBox.y + tileBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target.x, target.y, { steps: 8 });
+  await page.mouse.up();
+
+  // After the reject shake finishes, the invitation pulse must still play.
+  await page.waitForTimeout(450);
+  expect(await tile.evaluate((el) => getComputedStyle(el).animationName)).toContain(
+    "ms-palette-pulse",
+  );
+});

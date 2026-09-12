@@ -61,9 +61,20 @@ describe("palette reject feedback", () => {
   });
 
   it("restarts the shake from rest on every reject", () => {
-    const tile = { style: { animation: "" }, offsetWidth: 0 } as unknown as HTMLElement;
+    const listeners: Record<string, () => void> = {};
+    const tile = {
+      style: { animation: "" },
+      offsetWidth: 0,
+      addEventListener: (type: string, listener: () => void) => {
+        listeners[type] = listener;
+      },
+    } as unknown as HTMLElement;
     pulseReject(tile);
     expect(tile.style.animation).toBe(PALETTE_REJECT_ANIMATION);
+    // Once the shake ends, the inline animation clears so a class-based
+    // pulse (first-run invitation) can play again.
+    listeners.animationend();
+    expect(tile.style.animation).toBe("");
   });
 });
 
