@@ -52,6 +52,7 @@ import { disposeFadeMesh, MarbleFader } from "../render/marble-fade";
 import { MarbleGleam } from "../render/marble-gleam";
 import { MarbleShadows } from "../render/marble-shadow";
 import { PieceJuice } from "../render/piece-juice";
+import { generatePieceThumbnails, type PieceThumbnails } from "../render/piece-thumbnails";
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { worldToScreen } from "../render/projection";
 import { startRenderer } from "../render/scene";
@@ -313,6 +314,15 @@ export class Game {
       return this.puzzle.level.palette.map((type) => ({ type }));
     }
     return [...PIECE_TYPES.map((type) => ({ type })), { type: "goal", color: this.cupColor }];
+  }
+
+  /**
+   * Boot-time offscreen snapshots of every piece template, keyed by type,
+   * for the picture palette tiles. Empty when offscreen WebGL is unavailable
+   * (each tile then keeps its word label).
+   */
+  createPaletteThumbnails(): PieceThumbnails {
+    return generatePieceThumbnails((type) => this.pieceRenderer?.templateFor(type) ?? null);
   }
 
   /**
