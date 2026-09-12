@@ -4,7 +4,7 @@ Branch: `track/first-run-onboarding` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Domain: onboarding state & first-run layout (TDD)
+## Phase 1 — Domain: onboarding state & first-run layout (TDD) [checkpoint: 1b268b7]
 
 - [x] Task: Write failing tests for the onboarding state machine & flag IO (`src/domain/onboarding.ts`) [1b268b7]
   - [x] `nextOnboardingStep`: "place" → "play" on first successful placement; solve on first Play from **any** step (skip-ahead completes); placements after step 1 stay "play"; nothing changes after "done"
