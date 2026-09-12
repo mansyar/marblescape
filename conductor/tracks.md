@@ -2,10 +2,11 @@
 
 ## Tracks
 
-- [~] **Track: First-Run Onboarding** *Link: [./tracks/first-run-onboarding_20260912/index.md](./tracks/first-run-onboarding_20260912/index.md)*
+_No active tracks._
 
 ## Archive
 
+- [x] **Track: First-Run Onboarding** *Link: [./archive/first-run-onboarding_20260912/index.md](./archive/first-run-onboarding_20260912/index.md)* *(completed - merged to `master` @ `d2b85b3`)*
 - [x] **Track: Marble Sheen, Cup Glow & Table Limit** *Link: [./archive/marble-sheen-glow_20260911/index.md](./archive/marble-sheen-glow_20260911/index.md)* *(completed - merged to `master` @ `1dde4a3`)*
 - [x] **Track: Color Sorting** *Link: [./archive/color-sorting_20260911/index.md](./archive/color-sorting_20260911/index.md)* *(completed - merged to `master` @ `4cf11ea`)*
 - [x] **Track: Celebration & Interaction Juice** *Link: [./archive/celebration-juice_20260910/index.md](./archive/celebration-juice_20260910/index.md)* *(completed - merged to `master` @ `d5a668f`)*

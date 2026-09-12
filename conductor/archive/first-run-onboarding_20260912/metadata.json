@@ -1,0 +1,8 @@
+{
+  "id": "first-run-onboarding_20260912",
+  "type": "feature",
+  "status": "completed",
+  "description": "First-run onboarding: closes success criterion #1 (a child can pick it up with no instruction). A fresh sandbox is seeded once with a one-gap starter track; passive, no-text cues (pulsing Ramp tile, projected target ring, ghost hand) demonstrate drag → snap, then pulse Play. Cues advance only on the child's real actions, complete on the first Play press, and never return; existing players (saved board or flag) are never interrupted. Entirely code-driven (inline SVG/CSS): no new dependencies, assets, or precache entries; reduced-motion aware; drag/tap/Play vocabulary, levels, saves, physics, and sorting unchanged. Verified by unit tests, the onboarding e2e suite, regression runs, and the 4-viewport production matrix + reliability gates.",
+  "created": "2026-09-12T00:00:00Z",
+  "completed": "2026-09-12T00:00:00Z"
+}
