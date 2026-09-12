@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { blockFirstRun } from "./helpers";
 
 declare global {
   interface Window {
     __marblescape?: import("../src/game/game").Game;
   }
 }
+
+// Existing player: no first-run seed, so the chute stays empty.
+test.beforeEach(async ({ page }) => {
+  await blockFirstRun(page);
+});
 
 test("sandbox: chute tap cycles the waiting marble; Play drops exactly that color", async ({
   page,

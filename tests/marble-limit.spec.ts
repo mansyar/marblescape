@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { blockFirstRun } from "./helpers";
 
 declare global {
   interface Window {
     __marblescape?: import("../src/game/game").Game;
   }
 }
+
+// Existing player: no first-run seed so the chute cell stays empty.
+test.beforeEach(async ({ page }) => {
+  await blockFirstRun(page);
+});
 
 const PRESSES = 8;
 const TABLE_LIMIT = 5; // PHYSICS.maxMarblesOnTable (spec FR1)

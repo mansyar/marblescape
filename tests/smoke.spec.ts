@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { blockFirstRun } from "./helpers";
 
 declare global {
   interface Window {
@@ -21,6 +22,8 @@ test("app boots on a touch phone without console errors", async ({ page }) => {
 });
 
 test("a scripted marble rolls, falls through the hole and is collected", async ({ page }) => {
+  // Existing player: the sandbox starts empty (no first-run seed).
+  await blockFirstRun(page);
   await page.goto("/");
   // Wait for the game (renderer + physics + models) to be fully started.
   await page.waitForFunction(() => Boolean(window.__marblescape), null, { timeout: 30_000 });

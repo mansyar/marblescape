@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { blockFirstRun } from "./helpers";
 
 declare global {
   interface Window {
     __marblescape?: import("../src/game/game").Game;
   }
 }
+
+// Existing player: the sandbox cup test drops at (4,3), free of the seed.
+test.beforeEach(async ({ page }) => {
+  await blockFirstRun(page);
+});
 
 test("cup glow: level 7 lights only the compatible cup", async ({ page }) => {
   await page.goto("/");
