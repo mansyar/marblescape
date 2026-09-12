@@ -27,13 +27,13 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive); >80% coverage on changed modules [68c7459]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [68c7459]
 
-## Phase 3 — Verification, polish & docs
+## Phase 3 — Verification, polish & docs [checkpoint: 927c0b1]
 
 - [x] Task: Manual feel pass (portrait + landscape, reduced motion): tiles legible, drag feel unchanged
-- [~] Task: Full 4-viewport production e2e matrix locally (incl. reliability gates)
+- [x] Task: Full 4-viewport production e2e matrix locally (incl. reliability gates) [927c0b1]
 - [x] Task: Fix landscape-phone HUD/rail overlap found by the matrix (HUD slides clear of the rail; tile hit-test) [927c0b1]
 - [x] Task: Docs sync (`product.md`/`product-guidelines.md` record picture tiles; `tech-stack.md` dated no-new-assets note; precache unchanged) [6b46ae0]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [927c0b1]
 
 ## Phase 4 — Track completion
 
