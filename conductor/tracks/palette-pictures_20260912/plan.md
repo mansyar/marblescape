@@ -13,7 +13,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: >80% coverage on the new module; `pnpm check` clean [eff97ac]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [eff97ac]
 
-## Phase 2 — Picture tiles & boot wiring (TDD)
+## Phase 2 — Picture tiles & boot wiring (TDD) [checkpoint: 68c7459]
 
 - [x] Task: Update failing palette tests (`src/ui/palette.test.ts`) [69250bd]
   - [x] With snapshots: tile renders an `<img>` with the data URL, no visible text, `aria-label` present; existing hooks (`data-piece-type`, `data-color`) intact
@@ -25,7 +25,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] Drag from a picture tile still places the piece; landscape viewport assertion
 - [x] Task: Wire boot generation (`src/main.ts` / `Game`) — snapshots generated after `game.start()` resolves and passed into every `buildPalette()` call (including orientation rebuilds) [f1ad687]
 - [x] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive); >80% coverage on changed modules [68c7459]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [68c7459]
 
 ## Phase 3 — Verification, polish & docs
 
