@@ -187,6 +187,7 @@ class FakeElement {
   parent: FakeElement | null = null;
   listeners: Record<string, Array<(event: FakePointerEvent) => void>> = {};
   capturedPointer: number | null = null;
+  bounds: { left: number; top: number; width: number; height: number } | null = null;
 
   constructor(tagName: string) {
     this.tagName = tagName;
@@ -214,6 +215,25 @@ class FakeElement {
 
   hasPointerCapture(pointerId: number): boolean {
     return this.capturedPointer === pointerId;
+  }
+
+  getBoundingClientRect(): {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+  } {
+    const b = this.bounds ?? { left: 0, top: 0, width: 0, height: 0 };
+    return {
+      left: b.left,
+      top: b.top,
+      right: b.left + b.width,
+      bottom: b.top + b.height,
+      width: b.width,
+      height: b.height,
+    };
   }
 
   querySelector(): FakeElement | null {
@@ -259,15 +279,23 @@ describe("createPalette picture tiles", () => {
     items?: Array<PieceType | PaletteItem>;
     thumbnails?: PieceThumbnails;
     onCycle?: (item: PaletteItem) => MarbleColor | null;
+    canvas?: { left: number; top: number; width: number; height: number };
   }) {
     const drags: PaletteItem[] = [];
     const drops: PaletteItem[] = [];
+    const dragPoints: Array<{ ndcX: number; ndcY: number | null }> = [];
     const root = new FakeElement("div");
+    if (options.canvas) {
+      const canvas = new FakeElement("canvas");
+      canvas.bounds = options.canvas;
+      root.querySelector = () => canvas;
+    }
     const bar = createPalette(
       root as unknown as HTMLElement,
       options.items ?? ["straight", { type: "goal", color: "mint" }],
-      (item) => {
+      (item, ndcX, ndcY) => {
         drags.push(item);
+        dragPoints.push({ ndcX, ndcY });
       },
       (item) => {
         drops.push(item);
@@ -281,7 +309,7 @@ describe("createPalette picture tiles", () => {
       barEl.children.find((el) => el.dataset.pieceType === type) ?? null;
     const findIn = (el: FakeElement | null, tagName: string) =>
       el?.find((child) => child.tagName === tagName) ?? null;
-    return { barEl, tile, findIn, drags, drops };
+    return { barEl, tile, findIn, drags, dragPoints, drops };
   }
 
   it("renders a picture tile: img data URL, no visible text, aria-label, hooks intact", () => {
@@ -352,5 +380,41 @@ describe("createPalette picture tiles", () => {
     cup.fire("pointerup", { clientX: 45, clientY: 5 });
     expect(drops).toHaveLength(1);
     expect(drops[0].type).toBe("goal");
+  });
+
+  it("streams board NDC while dragging over the canvas, null off-board", () => {
+    const { tile, drags, dragPoints } = mount({
+      items: ["straight"],
+      canvas: { left: 0, top: 0, width: 200, height: 100 },
+    });
+    const ramp = tile("straight");
+    if (!ramp) {
+      throw new Error("ramp tile missing");
+    }
+
+    ramp.fire("pointerdown", { clientX: 10, clientY: 10 });
+    // Inside the canvas: NDC is computed from the canvas rect.
+    ramp.fire("pointermove", { clientX: 150, clientY: 25 });
+    // Outside the canvas: no board point (null axis).
+    ramp.fire("pointermove", { clientX: 250, clientY: 25 });
+
+    expect(drags).toHaveLength(2);
+    expect(dragPoints[0]).toEqual({ ndcX: 0.5, ndcY: 0.5 });
+    expect(dragPoints[1]).toEqual({ ndcX: 0, ndcY: null });
+  });
+
+  it("ignores pointer moves and releases without an active capture", () => {
+    const { tile, drags, dragPoints, drops } = mount({ items: ["straight"] });
+    const ramp = tile("straight");
+    if (!ramp) {
+      throw new Error("ramp tile missing");
+    }
+
+    ramp.fire("pointermove", { clientX: 40, clientY: 40 });
+    ramp.fire("pointerup", { clientX: 40, clientY: 40 });
+
+    expect(drags).toHaveLength(0);
+    expect(dragPoints).toHaveLength(0);
+    expect(drops).toHaveLength(0);
   });
 });
