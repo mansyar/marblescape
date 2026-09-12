@@ -2,10 +2,11 @@
 
 ## Tracks
 
-- [~] **Track: Picture-Based Piece Palette** *Link: [./tracks/palette-pictures_20260912/index.md](./tracks/palette-pictures_20260912/index.md)*
+_No active tracks._
 
 ## Archive
 
+- [x] **Track: Picture-Based Piece Palette** *Link: [./archive/palette-pictures_20260912/index.md](./archive/palette-pictures_20260912/index.md)* *(completed - merged to `master` @ `f5a4f0f`)*
 - [x] **Track: First-Run Onboarding** *Link: [./archive/first-run-onboarding_20260912/index.md](./archive/first-run-onboarding_20260912/index.md)* *(completed - merged to `master` @ `d2b85b3`)*
 - [x] **Track: Marble Sheen, Cup Glow & Table Limit** *Link: [./archive/marble-sheen-glow_20260911/index.md](./archive/marble-sheen-glow_20260911/index.md)* *(completed - merged to `master` @ `1dde4a3`)*
 - [x] **Track: Color Sorting** *Link: [./archive/color-sorting_20260911/index.md](./archive/color-sorting_20260911/index.md)* *(completed - merged to `master` @ `4cf11ea`)*
