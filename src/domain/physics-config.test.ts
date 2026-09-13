@@ -48,9 +48,13 @@ describe("PHYSICS tuning config", () => {
     }).toThrow();
   });
 
-  it("keeps gravity tilted due south (direction fixed, spec FR1)", () => {
-    expect(PHYSICS.gravity[0]).toBe(0); // no east-west drift
-    expect(PHYSICS.gravity[2]).toBeGreaterThan(1.5); // south pull preserved
+  it("leans the table ~6° south (gentle-lean spec FR1)", () => {
+    const [gx, gy, gz] = PHYSICS.gravity;
+    expect(gx).toBe(0); // no east-west drift
+    expect(gy).toBeLessThan(0); // still downward
+    const leanDeg = (Math.atan2(gz, -gy) * 180) / Math.PI;
+    expect(leanDeg).toBeGreaterThan(5.5);
+    expect(leanDeg).toBeLessThan(6.5);
   });
 
   it("keeps momentum between the v1 mud-band and the too-fast extreme", () => {
