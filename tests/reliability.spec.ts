@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import type { PieceType } from "../src/domain/pieces";
 import { blockFirstRun } from "./helpers";
 
 declare global {
@@ -111,4 +112,56 @@ test("mismatch roll-over: a mismatched marble skips the closed cup, never escape
   expect(after.rescued).toBe(0); // and nothing escaped
   expect(after.marbles).toBe(1); // exactly one live marble: no body leak
   expect(after.y).toBeGreaterThan(0.2); // rolling on the floor, not sunk below it
+});
+
+const FLOW_CHAIN: Array<[number, number, PieceType]> = [
+  [4, 0, "straight"],
+  [4, 1, "straight"],
+  [4, 2, "straight"],
+  [4, 3, "goal"],
+];
+
+test("lean flow: a dropped marble rolls a flat straight chain into a downstream cup", async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await page.goto("/");
+  await page.waitForFunction(() => Boolean(window.__marblescape), null, { timeout: 30_000 });
+
+  // Flat straights chain south from the chute; the board's ~6° lean is the
+  // only drive — no manufactured ramp may assist the roll.
+  for (const [x, y, type] of FLOW_CHAIN) {
+    const placed = await page.evaluate(
+      ([px, py, ptype]) => window.__marblescape?.place(ptype, px, py) ?? false,
+      [x, y, type],
+    );
+    expect(placed, `could not place ${type} at (${x}, ${y})`).toBe(true);
+  }
+
+  await page.evaluate(() => window.__marblescape?.play());
+
+  // Leaves the chute cell: it cannot rest on a flat floor while the table leans.
+  await page.waitForFunction(
+    () => (window.__marblescape?.marblePositions()[0]?.z ?? 0) > 1.5,
+    null,
+    { timeout: 30_000 },
+  );
+  // Traverses the whole chain, joints included.
+  await page.waitForFunction(
+    () => (window.__marblescape?.marblePositions()[0]?.z ?? 0) > 2.5,
+    null,
+    { timeout: 30_000 },
+  );
+  // The downstream cup collects it; nothing escapes and nothing leaks.
+  await page.waitForFunction(
+    () => (window.__marblescape?.collectedCount() ?? 0) >= 1,
+    null,
+    { timeout: 45_000 },
+  );
+  const after = await page.evaluate(() => ({
+    rescued: window.__marblescape?.rescuedCount() ?? -1,
+    live: window.__marblescape?.marbleCount() ?? -1,
+  }));
+  expect(after.rescued).toBe(0);
+  expect(after.live).toBe(0);
 });
