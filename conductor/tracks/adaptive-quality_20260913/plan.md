@@ -25,7 +25,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 4 — Docs, manual pass & completion
 
-- [ ] Task: Docs sync — `product.md` (criterion #3 is now machine-checked), `tech-stack.md` (final system + thresholds), inline comments
+- [x] Task: Docs sync — `product.md` (criterion #3 is now machine-checked), `tech-stack.md` (final system + thresholds), inline comments [2db73e6]
 - [ ] Task: Owner manual pass on phone, portrait + landscape: steady pacing on busy runs, no visible resolution pops, `?debug` sane; record result
 - [ ] Task: Final gates (`pnpm check`, unit coverage, full e2e) + conductor review; apply review fixes if any
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
