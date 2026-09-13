@@ -4,21 +4,20 @@ Branch: `track/gentle-lean` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Domain: gentler lean & slope retirement (TDD)
+## Phase 1 — Gentler lean (TDD)
 
-- [ ] Task: Write failing unit tests
-  - [ ] `physics-config.test.ts`: lean angle derived from `gravity` ≈ 6° (within 0.5°), direction due south (`x = 0`), still downward (`y < 0`); existing bounds re-expressed against the new intent
-  - [ ] `pieces.test.ts`: no piece declares a slope (straights flat); `slope` is gone from `PieceDef`
-- [ ] Task: Implement to green — `gravity` z 2.5 → ≈1.88 (+ comment), remove `slope` from `PieceDef`/straight, update comments; >80% coverage
+- [x] Task: Write failing lean tests (`src/domain/physics-config.test.ts`): angle derived from `gravity` ≈ 6° (within 0.5°), direction due south (`x = 0`), still downward (`y < 0`); old magnitude bound re-expressed as the angle [0f9df66]
+- [x] Task: Implement to green — `gravity` z 2.5 → ≈1.88 (+ comments); >80% coverage [0f9df66]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 2 — Render: flush posing everywhere (TDD)
+## Phase 2 — Flat straights: metadata + posing (TDD)
 
 - [ ] Task: Write failing tests
+  - [ ] `pieces.test.ts`: no piece declares a slope (straights flat); `slope` is gone from `PieceDef`
   - [ ] `piece-view.test.ts`: `posePiece` applies yaw alignment only — no pitch, no lift, for every piece type/rotation
   - [ ] `piece-thumbnails.test.ts`: thumbnail clones stay flat (rotation.x = 0, no y offset)
   - [ ] `board-thumbnails.test.ts`: level mini-board clones stay flat (shared poser)
-- [ ] Task: Implement `posePiece` + `createThumbnailClone` to green; palette tiles and level previews inherit automatically; >80% coverage
+- [ ] Task: Implement to green — remove `slope` from `PieceDef`/straight, simplify `posePiece` + `createThumbnailClone`; palette tiles and level previews inherit automatically; >80% coverage
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Flow verification & tuning (gates + e2e)
