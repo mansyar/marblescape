@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { QUALITY_TIERS } from "../src/render/quality-config";
+import { QUALITY_DOWNGRADE_P95_MS, QUALITY_TIERS } from "../src/render/quality-config";
 import { blockFirstRun } from "./helpers";
 
 declare global {
@@ -11,7 +11,9 @@ declare global {
 /**
  * CI perf gate (spec FR5): the adaptive quality system must keep frame pacing
  * inside the 30 fps floor on a deterministic busy scene even when the CPU is
- * starved, and adaptation must actually engage under that starvation.
+ * starved. Starvation is ramped until the governor engages (or a cap); a
+ * runner too fast to starve must instead show pacing that never breached the
+ * healthy band, and an engaged governor must show real downgrades + budgets.
  *
  * The scene covers the stress sources the tiers govern: five live marbles
  * rolling a straight chain (physics + shadows + gleam), collect sparkle
@@ -25,10 +27,15 @@ declare global {
 
 const PERF_PROJECT = "portrait-phone";
 
-// CDP CPU slowdown so the busy scene reliably trips adaptation even on fast
-// CI runners. Baseline evidence lives in the dated perf-gate note in
+// CDP CPU slowdown so the busy scene trips adaptation. Machines differ wildly
+// (the GitHub runner stayed fully healthy where the dev machine starved), so
+// the gate ramps this rate until the governor engages instead of betting on
+// one fixed value. Baseline evidence lives in the dated perf-gate note in
 // tech-stack.md — re-tune only with fresh evidence.
 const CPU_THROTTLE_RATE = 6;
+const THROTTLE_RAMP_STEP = 3;
+const THROTTLE_RAMP_MAX_RATE = 18;
+const THROTTLE_RAMP_STEP_MS = 3_000;
 
 // Busy-tail ceiling (read right after the 5-marble stress + roll-over).
 // Crash-guard only: adapted runs measured 18-36 ms across the 2026-09-14
@@ -100,6 +107,21 @@ test("perf gate: 5-marble stress scene stays on the 30 fps floor under CPU starv
     { timeout: 120_000 },
   );
 
+  // Starvation ramp: step the throttle up until the governor engages (or the
+  // cap is reached). The dev machine starves at 6x; the GitHub runner stayed
+  // fully healthy at 6x, so a fixed rate silently stopped testing adaptation
+  // there. Fast local runs exit the ramp immediately (tier already dropped).
+  let throttleRate = CPU_THROTTLE_RATE;
+  for (;;) {
+    const tier = await page.evaluate(() => window.__marblescape?.qualityStats().tier ?? 0);
+    if (tier >= 1 || throttleRate >= THROTTLE_RAMP_MAX_RATE) break;
+    throttleRate += THROTTLE_RAMP_STEP;
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: throttleRate });
+    console.log(`perf gate: throttle ramp stepped to ${throttleRate}x`);
+    await page.waitForTimeout(THROTTLE_RAMP_STEP_MS);
+  }
+  console.log(`perf gate: throttle ramp settled at ${throttleRate}x`);
+
   // Sorting path: a mismatched marble rolls over the closed mint lid.
   await page.evaluate(() => window.__marblescape?.play("grape"));
   await page.waitForFunction(
@@ -116,6 +138,17 @@ test("perf gate: 5-marble stress scene stays on the 30 fps floor under CPU starv
     `perf gate (stress): tier=${stressStats.tier} p95=${stressStats.p95FrameMs.toFixed(1)}ms ema=${stressStats.emaFrameMs.toFixed(1)}ms frames=${stressStats.frameCount} down=${stressStats.downgrades}`,
   );
   expect(stressStats.p95FrameMs).toBeLessThanOrEqual(STRESS_P95_BUDGET_MS);
+
+  // Adaptation contract: when starvation actually bit (tier dropped), a
+  // downgrade must be on record. A runner too fast to starve even at the ramp
+  // cap must instead show pacing that never breached the healthy band — a
+  // connected-but-inert meter/governor would breach it at the cap and fail.
+  const adapted = stressStats.tier >= 1;
+  if (adapted) {
+    expect(stressStats.downgrades).toBeGreaterThanOrEqual(1);
+  } else {
+    expect(stressStats.p95FrameMs).toBeLessThanOrEqual(QUALITY_DOWNGRADE_P95_MS);
+  }
 
   // Celebration path: solve level 1 (classic) — confetti burst + overlay.
   const entered = await page.evaluate(() => window.__marblescape?.enterLevel(1) ?? false);
@@ -156,9 +189,11 @@ test("perf gate: 5-marble stress scene stays on the 30 fps floor under CPU starv
 
   // Celebration tail: catastrophic-collapse guard only.
   expect(stats.p95FrameMs).toBeLessThanOrEqual(FINAL_P95_BUDGET_MS);
-  // Adaptation engaged under starvation: tier below full quality.
-  expect(stats.tier).toBeGreaterThanOrEqual(1);
-  expect(stats.downgrades).toBeGreaterThanOrEqual(1);
+  // Once engaged under starvation, the drop is sticky for the rest of the run.
+  if (adapted) {
+    expect(stats.tier).toBeGreaterThanOrEqual(1);
+    expect(stats.downgrades).toBeGreaterThanOrEqual(1);
+  }
   // The window actually contains telemetry from a long busy scene.
   expect(stats.frameCount).toBeGreaterThanOrEqual(MIN_FRAME_COUNT);
   // Nothing was lost on the way: the scene ran clean under starvation.
