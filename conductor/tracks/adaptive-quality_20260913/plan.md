@@ -23,9 +23,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Full-suite check — 4-viewport matrix green, suite duration impact acceptable, both reliability gates unaffected [f0feee5]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [f0feee5]
 
-## Phase 4 — Docs, manual pass & completion
+## Phase 4 — Docs, manual pass & completion [checkpoint: 3a5436c]
 
 - [x] Task: Docs sync — `product.md` (criterion #3 is now machine-checked), `tech-stack.md` (final system + thresholds), inline comments [2db73e6]
-- [ ] Task: Owner manual pass on phone, portrait + landscape: steady pacing on busy runs, no visible resolution pops, `?debug` sane; record result
-- [ ] Task: Final gates (`pnpm check`, unit coverage, full e2e) + conductor review; apply review fixes if any
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Owner manual pass on phone, portrait + landscape: steady pacing on busy runs, no visible resolution pops, `?debug` sane; record result
+- [x] Task: Final gates (`pnpm check`, unit coverage, full e2e) + conductor review; apply review fixes if any [3a5436c]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [3a5436c]
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 3a5436c
