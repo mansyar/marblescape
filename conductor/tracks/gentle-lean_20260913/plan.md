@@ -30,6 +30,10 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 ## Phase 4 — Docs, manual pass & completion
 
 - [x] Task: Docs sync — `product.md` (~6° lean; "straight channel" not "straight ramp"), `tech-stack.md` (dated tuning note), inline comments [3add2b0]
-- [ ] Task: Owner manual pass on phone, portrait + landscape: straights flush, runs calmer but clearly flowing; record result
-- [ ] Task: Final gates (`pnpm check`, unit coverage, e2e) + conductor review; apply review fixes if any
+- [x] Task: Owner manual pass on phone, portrait + landscape: straights flush, runs calmer but clearly flowing; record result — owner approved on phone (2026-09-13)
+- [x] Task: Final gates (`pnpm check`, unit coverage, e2e) + conductor review; apply review fixes if any [d54ecab]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [d54ecab]
