@@ -6,15 +6,15 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Board snapshot engine (TDD)
 
-- [ ] Task: Write failing unit tests for board snapshots (`src/render/board-thumbnails.test.ts`) via the injectable capture seam (headless — no WebGL in jsdom)
-  - [ ] Composes a level board: floor/walls sized to the level, posed piece clones at cell centers (authored yaw + rotation + ramp lift), colored cups tinted, gap cells softly highlighted, other empty cells untouched
-  - [ ] `levelSnapshotInput(level)` maps fixed furniture (incl. spawn chute + cup colors) and gap cells
-  - [ ] Renders all levels in one pass → `Partial<Record<levelId, dataUrl>>`; missing templates skipped; a failing level omitted without throwing; capture disposed once
-  - [ ] Sandbox composition from `BoardState` (empty board → plain tabletop); preview cache reuses a URL while the serialized board token is unchanged and regenerates when it changes
-  - [ ] Camera framed like gameplay: `computeCameraFraming(1, cols, rows)` position/look-at at gameplay FOV/elevation
-- [ ] Task: Extract shared pose/tint helpers (`piece-view.ts`: pose a placed piece; tint a colored cup) used by both the piece renderer and snapshots — keep `piece-view` tests green
-- [ ] Task: Implement `src/render/board-thumbnails.ts` to green (offscreen capture reusing the `OffscreenGL`/`PieceCapture` seam; transparent clear; resources disposed)
-- [ ] Task: >80% coverage on new/changed modules; `pnpm check` clean
+- [x] Task: Write failing unit tests for board snapshots (`src/render/board-thumbnails.test.ts`) via the injectable capture seam (headless — no WebGL in jsdom) [3f19815]
+  - [x] Composes a level board: floor/walls sized to the level, posed piece clones at cell centers (authored yaw + rotation + ramp lift), colored cups tinted, gap cells softly highlighted, other empty cells untouched
+  - [x] `levelSnapshotInput(level)` maps fixed furniture (incl. spawn chute + cup colors) and gap cells
+  - [x] Renders all levels in one pass → `Partial<Record<levelId, dataUrl>>`; missing templates skipped; a failing level omitted without throwing; capture disposed once
+  - [x] Sandbox composition from `BoardState` (empty board → plain tabletop); preview cache reuses a URL while the serialized board token is unchanged and regenerates when it changes
+  - [x] Camera framed like gameplay: `computeCameraFraming(1, cols, rows)` position/look-at at gameplay FOV/elevation
+- [x] Task: Extract shared pose/tint helpers (`piece-view.ts`: pose a placed piece; tint a colored cup) used by both the piece renderer and snapshots — keep `piece-view` tests green [359d0e0]
+- [x] Task: Implement `src/render/board-thumbnails.ts` to green (offscreen capture reusing the `OffscreenGL`/`PieceCapture` seam; transparent clear; resources disposed) [3f19815]
+- [x] Task: >80% coverage on new/changed modules; `pnpm check` clean [3f19815]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Preview wiring & picture tiles (TDD)
