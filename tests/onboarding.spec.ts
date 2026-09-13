@@ -150,13 +150,20 @@ test("an existing player with only the completion flag gets no seed and no cues"
 
   await expect(page.locator("[data-onboarding-cues]")).toHaveCount(0);
   const state = await page.evaluate(
-    (key) => ({
-      chute: window.__marblescape?.pieceAt(4, 0) ?? null,
-      saved: localStorage.getItem(key),
-    }),
+    (key) => {
+      const raw = localStorage.getItem(key);
+      const saved = raw ? (JSON.parse(raw) as { pieces?: unknown[] }) : null;
+      return {
+        chute: window.__marblescape?.pieceAt(4, 0) ?? null,
+        savedPieceCount: saved?.pieces?.length ?? 0,
+      };
+    },
     BOARD_KEY,
   );
-  expect(state).toEqual({ chute: null, saved: null });
+  expect(state.chute).toBeNull();
+  // The debounced auto-save may already have flushed the untouched board;
+  // what matters is that no starter track was seeded into it.
+  expect(state.savedPieceCount).toBe(0);
 });
 
 test("reduced motion: static hand beside the Ramp tile, still completable", async ({ page }) => {
