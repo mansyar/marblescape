@@ -4,11 +4,11 @@ Branch: `track/gentle-lean` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Gentler lean (TDD)
+## Phase 1 — Gentler lean (TDD) [checkpoint: 0f9df66]
 
 - [x] Task: Write failing lean tests (`src/domain/physics-config.test.ts`): angle derived from `gravity` ≈ 6° (within 0.5°), direction due south (`x = 0`), still downward (`y < 0`); old magnitude bound re-expressed as the angle [0f9df66]
 - [x] Task: Implement to green — `gravity` z 2.5 → ≈1.88 (+ comments); >80% coverage [0f9df66]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [0f9df66]
 
 ## Phase 2 — Flat straights: metadata + posing (TDD)
 
