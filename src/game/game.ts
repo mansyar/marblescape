@@ -15,11 +15,12 @@ import {
   placeTypedPiece,
   removeTypedPiece,
   saveBoard,
+  toJSON,
   type PlacedPiece,
 } from "../domain/board";
 import { openCupKeys } from "../domain/cup-lids";
 import { FIRST_RUN_LAYOUT } from "../domain/first-run";
-import { getLevel, nextScriptedColor } from "../domain/levels";
+import { getLevel, LEVELS, nextScriptedColor } from "../domain/levels";
 import { isLevelComplete, markSolved } from "../domain/solve";
 import type { PieceType, Rotation } from "../domain/pieces";
 import { CONNECTIONS, rotate } from "../domain/pieces";
@@ -52,6 +53,13 @@ import { disposeFadeMesh, MarbleFader } from "../render/marble-fade";
 import { MarbleGleam } from "../render/marble-gleam";
 import { MarbleShadows } from "../render/marble-shadow";
 import { PieceJuice } from "../render/piece-juice";
+import {
+  type BoardPreviews,
+  boardSnapshotInput,
+  createBoardPreview,
+  createBoardPreviewCache,
+  generateLevelPreviews,
+} from "../render/board-thumbnails";
 import { generatePieceThumbnails, type PieceThumbnails } from "../render/piece-thumbnails";
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { worldToScreen } from "../render/projection";
@@ -116,6 +124,8 @@ export class Game {
   private floorHolesKey: string | null = "init";
   private readonly collectedByColor = new Map<MarbleColor, number>();
   private saveTimer: number | null = null;
+  /** Lazily created token-keyed cache for the sandbox tile preview. */
+  private sandboxPreviewCache: (() => string | null) | null = null;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -323,6 +333,39 @@ export class Game {
    */
   createPaletteThumbnails(): PieceThumbnails {
     return generatePieceThumbnails((type) => this.pieceRenderer?.templateFor(type) ?? null);
+  }
+
+  /**
+   * Boot-time offscreen snapshots of every level's starting board, keyed by
+   * level id, for the picture level tiles. Empty when offscreen WebGL is
+   * unavailable (each tile then keeps its digit).
+   */
+  createLevelPreviews(): BoardPreviews {
+    return generateLevelPreviews(LEVELS, (type) => this.pieceRenderer?.templateFor(type) ?? null);
+  }
+
+  /**
+   * Offscreen snapshot of the sandbox board (the parked build while a level
+   * is loaded), regenerated only when the board changed; null keeps the emoji.
+   */
+  sandboxPreview(): string | null {
+    this.sandboxPreviewCache ??= createBoardPreviewCache(
+      () => {
+        const board = this.puzzle ? this.sandboxBoard : this.board;
+        return board ? JSON.stringify(toJSON(board)) : null;
+      },
+      () => {
+        const board = this.puzzle ? this.sandboxBoard : this.board;
+        if (!board) {
+          return null;
+        }
+        return createBoardPreview(
+          boardSnapshotInput(board),
+          (type) => this.pieceRenderer?.templateFor(type) ?? null,
+        );
+      },
+    );
+    return this.sandboxPreviewCache();
   }
 
   /**

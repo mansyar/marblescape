@@ -85,13 +85,25 @@ export function generatePieceThumbnails(
 
 /** Builds the offscreen capture; `createGL` is injectable for tests. */
 export function createWebGLCapture(createGL: () => OffscreenGL = defaultOffscreenGL): PieceCapture {
+  return createOffscreenCapture(createGL, createThumbnailCamera());
+}
+
+/**
+ * Builds an offscreen square capture that renders one object at a time through
+ * a fixed camera; shared by piece thumbnails and board previews. `createGL` is
+ * injectable for tests.
+ */
+export function createOffscreenCapture(
+  createGL: () => OffscreenGL,
+  camera: THREE.PerspectiveCamera,
+  size: number = THUMBNAIL_SIZE,
+): PieceCapture {
   const gl = createGL();
-  gl.setSize(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+  gl.setSize(size, size);
   gl.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
   addLighting(scene);
-  const camera = createThumbnailCamera();
 
   return {
     capture(object) {
@@ -132,6 +144,6 @@ function createThumbnailCamera(): THREE.PerspectiveCamera {
   return camera;
 }
 
-function defaultOffscreenGL(): OffscreenGL {
+export function defaultOffscreenGL(): OffscreenGL {
   return new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
 }

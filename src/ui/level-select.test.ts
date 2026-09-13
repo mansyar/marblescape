@@ -15,6 +15,11 @@ class FakeElement {
   style = new FakeStyle();
   dataset: Record<string, string> = {};
   attrs = new Map<string, string>();
+
+  setAttribute(name: string, value: string): void {
+    this.attrs.set(name, value);
+  }
+
   textContent = "";
   children: FakeElement[] = [];
   parent: FakeElement | null = null;
@@ -93,11 +98,18 @@ describe("createLevelSelect", () => {
     (globalThis as { localStorage?: unknown }).localStorage = originalStorage;
   });
 
-  function mount(badges = new Set<number>()) {
+  function mount(
+    badges = new Set<number>(),
+    preview?: (pick: number | "sandbox") => string | null,
+  ) {
     const picks: Array<number | "sandbox"> = [];
     const host = new FakeElement();
-    const handle = createLevelSelect(host as unknown as HTMLElement, LEVELS, badges, (pick) =>
-      picks.push(pick),
+    const handle = createLevelSelect(
+      host as unknown as HTMLElement,
+      LEVELS,
+      badges,
+      (pick) => picks.push(pick),
+      preview ? { preview } : undefined,
     );
     const root = handle.el as unknown as FakeElement;
     const grid = root.children[0];
@@ -140,6 +152,40 @@ describe("createLevelSelect", () => {
     grid.children[0].click();
     grid.children[8].click();
     expect(picks).toEqual(["sandbox", 8]);
+  });
+
+  it("renders picture tiles with aria-labels when previews are available", () => {
+    const { grid, chip } = mount(new Set([3]), (pick) => `data:image/png;base64,${pick}`);
+    const sandbox = grid.children[0];
+    const firstLevel = grid.children[1];
+    expect(sandbox.textContent).toBe("");
+    expect(firstLevel.textContent).toBe("");
+    expect((sandbox.children[0] as unknown as { src: string }).src).toBe(
+      "data:image/png;base64,sandbox",
+    );
+    expect((firstLevel.children[0] as unknown as { src: string }).src).toBe(
+      "data:image/png;base64,1",
+    );
+    expect(sandbox.attrs.get("aria-label")).toBe("Sandbox");
+    expect(firstLevel.attrs.get("aria-label")).toBe("Level 1");
+    expect(chip(grid.children[3])).not.toBeNull();
+  });
+
+  it("falls back to glyph tiles when previews are unavailable", () => {
+    const { grid } = mount(new Set(), () => null);
+    expect(grid.children[0].textContent).toBe("🏖️");
+    expect(grid.children[1].textContent).toBe("1");
+    expect(grid.children[1].attrs.get("aria-label")).toBe("Level 1");
+  });
+
+  it("queries the provider again on refresh so the sandbox tile updates", () => {
+    let url = "data:image/png;base64,old";
+    const { handle, grid } = mount(new Set(), (pick) => (pick === "sandbox" ? url : null));
+    url = "data:image/png;base64,new";
+    handle.refreshBadges();
+    expect((grid.children[0].children[0] as unknown as { src: string }).src).toBe(
+      "data:image/png;base64,new",
+    );
   });
 
   it("shows and hides via the handle", () => {

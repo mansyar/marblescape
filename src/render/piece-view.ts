@@ -16,6 +16,24 @@ export function rotationYaw(rotation: Rotation): number {
   return (-rotation * Math.PI) / 2;
 }
 
+/**
+ * Poses a piece mesh on the board at a cell: center position, authored yaw
+ * alignment with the piece's rotation, and the ramp pitch + lift so the low
+ * end stays flush with neighboring piece floors. Shared by the live renderer
+ * and offscreen board previews.
+ */
+export function posePiece(
+  mesh: THREE.Object3D,
+  piece: { type: PieceType; rotation: Rotation; x: number; y: number },
+): void {
+  mesh.position.set(...cellToWorld(piece.x, piece.y));
+  mesh.rotation.order = "YXZ";
+  mesh.rotation.y = rotationYaw(piece.rotation) + CONNECTIONS[piece.type].modelYawOffset;
+  const slope = CONNECTIONS[piece.type].slope ?? 0;
+  mesh.rotation.x = slope;
+  mesh.position.y += slope > 0 ? 0.48 * Math.sin(slope) : 0;
+}
+
 /** Preloads each piece type's Kenney model and syncs meshes to a board state. */
 export class PieceRenderer {
   private readonly templates = new Map<PieceType, THREE.Object3D>();
@@ -87,37 +105,12 @@ export class PieceRenderer {
         this.root.add(mesh);
         this.meshes.set(piece.id, mesh);
       }
-      mesh.position.set(...cellToWorld(piece.x, piece.y));
-      mesh.rotation.order = "YXZ";
-      mesh.rotation.y = rotationYaw(piece.rotation) + CONNECTIONS[piece.type].modelYawOffset;
-      // Ramp tilt: pitch about the piece-local X axis (YXZ order applies yaw
-      // first), matching the pitched physics body — plus the same lift so
-      // the low end stays flush with neighboring piece floors.
-      const slope = CONNECTIONS[piece.type].slope ?? 0;
-      mesh.rotation.x = slope;
-      mesh.position.y += slope > 0 ? 0.48 * Math.sin(slope) : 0;
+      posePiece(mesh, piece);
       // Colored sorting cups wear their candy tint; classics stay as modeled.
       if (piece.type === "goal" && piece.color !== undefined) {
-        PieceRenderer.tintCup(mesh, piece.color);
+        tintCup(mesh, piece.color);
       }
     }
-  }
-
-  /** Tints a colored cup's materials, cloning them so the template is safe. */
-  private static tintCup(mesh: THREE.Object3D, color: MarbleColor): void {
-    mesh.traverse((node) => {
-      const part = node as THREE.Mesh;
-      if (!part.isMesh) {
-        return;
-      }
-      let material = part.material as THREE.MeshStandardMaterial;
-      if (material.userData.msCupTint !== true) {
-        material = material.clone();
-        material.userData.msCupTint = true;
-        part.material = material;
-      }
-      material.color.set(colorHex(color));
-    });
   }
 
   private static placeholder(type: PieceType): THREE.Object3D {
@@ -129,6 +122,23 @@ export class PieceRenderer {
     mesh.position.y = 0.125;
     return mesh;
   }
+}
+
+/** Tints a colored cup's materials, cloning them so the template is safe. */
+export function tintCup(mesh: THREE.Object3D, color: MarbleColor): void {
+  mesh.traverse((node) => {
+    const part = node as THREE.Mesh;
+    if (!part.isMesh) {
+      return;
+    }
+    let material = part.material as THREE.MeshStandardMaterial;
+    if (material.userData.msCupTint !== true) {
+      material = material.clone();
+      material.userData.msCupTint = true;
+      part.material = material;
+    }
+    material.color.set(colorHex(color));
+  });
 }
 
 /**

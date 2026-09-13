@@ -6,6 +6,7 @@ _No active tracks._
 
 ## Archive
 
+- [x] **Track: Picture-Based Level Select** *Link: [./archive/level-pictures_20260913/index.md](./archive/level-pictures_20260913/index.md)* *(completed - branch `track/level-pictures` @ `fa37b66`)*
 - [x] **Track: Picture-Based Piece Palette** *Link: [./archive/palette-pictures_20260912/index.md](./archive/palette-pictures_20260912/index.md)* *(completed - merged to `master` @ `f5a4f0f`)*
 - [x] **Track: First-Run Onboarding** *Link: [./archive/first-run-onboarding_20260912/index.md](./archive/first-run-onboarding_20260912/index.md)* *(completed - merged to `master` @ `d2b85b3`)*
 - [x] **Track: Marble Sheen, Cup Glow & Table Limit** *Link: [./archive/marble-sheen-glow_20260911/index.md](./archive/marble-sheen-glow_20260911/index.md)* *(completed - merged to `master` @ `1dde4a3`)*

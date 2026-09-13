@@ -95,20 +95,32 @@ if (app) {
       }
     });
 
-    // Level select: sandbox + every shipped level, nothing locked.
-    const levelSelect = createLevelSelect(document.body, LEVELS, new Set(), (pick) => {
-      hideLevelSelect(levelSelect);
-      cues?.setSuppressed(false);
-      if (pick === "sandbox") {
-        game.exitLevel();
-        buildPalette();
-      } else if (game.currentLevelId() !== pick) {
-        game.exitLevel();
-        game.enterLevel(pick);
-        buildPalette();
-      }
-      // Picking the level already open keeps its placements (board replayable).
-    });
+    // Level select: sandbox + every shipped level, nothing locked. Picture
+    // tiles use boot-time level mini-boards; the sandbox tile re-snapshots
+    // lazily whenever the child's build changed.
+    const levelPreviews = game.createLevelPreviews();
+    const levelSelect = createLevelSelect(
+      document.body,
+      LEVELS,
+      new Set(),
+      (pick) => {
+        hideLevelSelect(levelSelect);
+        cues?.setSuppressed(false);
+        if (pick === "sandbox") {
+          game.exitLevel();
+          buildPalette();
+        } else if (game.currentLevelId() !== pick) {
+          game.exitLevel();
+          game.enterLevel(pick);
+          buildPalette();
+        }
+        // Picking the level already open keeps its placements (board replayable).
+      },
+      {
+        preview: (pick) =>
+          pick === "sandbox" ? game.sandboxPreview() : (levelPreviews[pick] ?? null),
+      },
+    );
     const hud = createHud(game, document.body, () => {
       cues?.setSuppressed(true);
       showLevelSelect(levelSelect);
