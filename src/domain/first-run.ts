@@ -22,7 +22,7 @@ export interface FirstRunPiece {
 
 /**
  * One-gap starter run placed once on a brand-new sandbox:
- * chute (4,0) → ramps → [gap (4,2)] → ramps → classic goal cup (4,5).
+ * chute (4,0) → straights → [gap (4,2)] → straights → classic goal cup (4,5).
  * Filling the gap with a Ramp completes a working run; every seeded piece
  * stays editable and removable like any child-placed piece.
  */

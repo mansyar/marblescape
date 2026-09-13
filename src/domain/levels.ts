@@ -319,7 +319,7 @@ export function validateLevel(level: LevelDef): void {
 /**
  * Static connectivity check: does a route exist from the spawn chute to the
  * goal cup, given the fixed pieces and the pieces the restricted palette can
- * bridge? Physics fidelity (tilt, ramps, bounces) is not simulated — this is
+ * bridge? Physics fidelity (lean, bounces) is not simulated — this is
  * the mouth-graph guarantee required by the spec.
  */
 export function isLevelSolvable(level: LevelDef): boolean {
