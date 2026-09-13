@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [~] **Track: Adaptive Performance & Quality** *Link: [./tracks/adaptive-quality_20260913/index.md](./tracks/adaptive-quality_20260913/index.md)*
+- [x] **Track: Adaptive Performance & Quality** *Link: [./tracks/adaptive-quality_20260913/index.md](./tracks/adaptive-quality_20260913/index.md)*
 
 ## Archive
 
