@@ -15,7 +15,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Extract shared pose/tint helpers (`piece-view.ts`: pose a placed piece; tint a colored cup) used by both the piece renderer and snapshots — keep `piece-view` tests green [359d0e0]
 - [x] Task: Implement `src/render/board-thumbnails.ts` to green (offscreen capture reusing the `OffscreenGL`/`PieceCapture` seam; transparent clear; resources disposed) [3f19815]
 - [x] Task: >80% coverage on new/changed modules; `pnpm check` clean [3f19815]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [3f19815]
 
 ## Phase 2 — Preview wiring & picture tiles (TDD) [checkpoint: 799ec67]
 
@@ -26,15 +26,15 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement tile rendering + provider option in `src/ui/level-select.ts` to green [1c05628]
 - [x] Task: Wire `Game` (`createLevelPreviews()`, cached `sandboxPreview()`) and `src/main.ts` boot (generate after `game.start()` resolves; pass provider) — glue is exercised by e2e per project precedent [659a8c3]
 - [x] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive, palette); >80% coverage on changed modules [799ec67]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [799ec67]
 
-## Phase 3 — e2e, verification, polish & docs
+## Phase 3 — e2e, verification, polish & docs [checkpoint: d52cde8]
 
-- [ ] Task: Write e2e (`tests/level-pictures.spec.ts`)
-  - [ ] Level select: 10 tiles show `<img>` with `naturalWidth > 0`; no visible digits/emoji; ✓ chips still render
-  - [ ] Sandbox tile updates after an edit; entering a level and tapping 🏠 still shows the parked sandbox build (not the level board)
-  - [ ] Portrait + landscape assertions
-- [ ] Task: Regression check existing suites; full 4-viewport production e2e matrix locally (incl. reliability gates)
-- [ ] Task: Manual feel pass (portrait + landscape, reduced motion): tile legibility at 84–96px, no blank tiles
-- [ ] Task: Docs sync (`product.md` records picture level select + live sandbox preview; `tech-stack.md` dated note; precache unchanged)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Write e2e (`tests/level-pictures.spec.ts`) [e7839ab]
+  - [x] Level select: 10 tiles show `<img>` with `naturalWidth > 0`; no visible digits/emoji; ✓ chips still render
+  - [x] Sandbox tile updates after an edit; entering a level and tapping 🏠 still shows the parked sandbox build (not the level board)
+  - [x] Portrait + landscape assertions
+- [x] Task: Regression check existing suites; full 4-viewport production e2e matrix locally (incl. reliability gates) [d52cde8]
+- [x] Task: Manual feel pass (portrait + landscape, reduced motion): tile legibility at 84–96px, no blank tiles [d52cde8]
+- [x] Task: Docs sync (`product.md` records picture level select + live sandbox preview; `tech-stack.md` dated note; precache unchanged) [d52cde8]
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [d52cde8]
