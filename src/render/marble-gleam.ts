@@ -61,6 +61,8 @@ export class MarbleGleam {
   });
   private readonly sprites = new Map<THREE.Object3D, THREE.Sprite>();
   private readonly pool: THREE.Sprite[] = [];
+  /** Tier gate: off hides every highlight and skips the per-frame path. */
+  private enabled = true;
   /** Scratch vector, reused every frame (no per-frame allocations). */
   private readonly towardCamera = new THREE.Vector3();
 
@@ -82,6 +84,7 @@ export class MarbleGleam {
     this.sprites.set(marble, sprite);
     this.scene.add(sprite);
     sprite.position.copy(marble.position);
+    sprite.visible = this.enabled;
   }
 
   /** Collect / rescue / recycle: returns the sprite to the pool immediately. */
@@ -97,10 +100,25 @@ export class MarbleGleam {
 
   /** Floats every highlight just in front of its marble; call once per frame. */
   update(camera: THREE.Camera): void {
+    if (!this.enabled) {
+      return;
+    }
     const offset = PHYSICS.marbleRadius * GLEAM_OFFSET_FACTOR;
     for (const [marble, sprite] of this.sprites) {
       this.towardCamera.subVectors(camera.position, marble.position).normalize();
       sprite.position.copy(marble.position).addScaledVector(this.towardCamera, offset);
+      sprite.visible = true;
+    }
+  }
+
+  /** Adaptive quality tier gate (spec FR2): off = no gleam draws at all. */
+  setEnabled(on: boolean): void {
+    this.enabled = on;
+    if (on) {
+      return; // sprites reappear on the next per-frame update
+    }
+    for (const sprite of this.sprites.values()) {
+      sprite.visible = false;
     }
   }
 

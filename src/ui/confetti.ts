@@ -58,6 +58,8 @@ export interface ConfettiLayerHandle {
   el: HTMLElement;
   /** Fires one shower; a second call replaces the previous one. */
   burst(): void;
+  /** Caps the pieces per shower at the current quality tier's budget. */
+  setPieceBudget(requested: number): void;
   setReducedMotion(on: boolean): void;
   dispose(): void;
 }
@@ -73,6 +75,7 @@ export function createConfettiLayer(
 ): ConfettiLayerHandle {
   let reducedMotion = options.reducedMotion ?? false;
   const requestedCount = options.pieceCount ?? DEFAULT_PIECE_COUNT;
+  let pieceBudget = CONFETTI_MAX_PIECES;
   let cleanupTimer: number | null = null;
   let effects: HTMLElement[] = [];
   let bursts = 0;
@@ -125,7 +128,7 @@ export function createConfettiLayer(
       el.appendChild(glow);
       effects.push(glow);
     } else {
-      for (const piece of confettiPieces(requestedCount)) {
+      for (const piece of confettiPieces(Math.min(requestedCount, pieceBudget))) {
         const node = document.createElement("div");
         node.dataset.confetti = "piece";
         node.style.cssText = [
@@ -157,6 +160,11 @@ export function createConfettiLayer(
   return {
     el,
     burst,
+    setPieceBudget(requested: number) {
+      pieceBudget = Number.isFinite(requested)
+        ? Math.max(0, Math.min(CONFETTI_MAX_PIECES, Math.floor(requested)))
+        : CONFETTI_MAX_PIECES;
+    },
     setReducedMotion(on: boolean) {
       reducedMotion = on;
     },

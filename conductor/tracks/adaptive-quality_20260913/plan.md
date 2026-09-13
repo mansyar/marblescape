@@ -12,7 +12,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Renderer & effects integration + hidden dev readout (TDD)
 
-- [ ] Task: Write failing tests: quality → renderer pixel-ratio path flows through the shared framing function (`applyFraming`) incl. orientation/resize; sparkle/confetti/gleam/shadow budgets consult tier at emission time (pool capacities unchanged); downgrades immediate, upgrades gated to rest; reduced-motion × tier composition (smaller budget wins); `?debug` overlay only exists with the flag, zero cost without
+- [~] Task: Write failing tests: quality → renderer pixel-ratio path flows through the shared framing function (`applyFraming`) incl. orientation/resize; sparkle/confetti/gleam/shadow budgets consult tier at emission time (pool capacities unchanged); downgrades immediate, upgrades gated to rest; reduced-motion × tier composition (smaller budget wins); `?debug` overlay only exists with the flag, zero cost without
 - [ ] Task: Implement to green — meter wired into the game/render loop; governor applies dpr; effects read budgets; dev overlay lives in the UI layer; >80% coverage
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 

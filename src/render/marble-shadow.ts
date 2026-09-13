@@ -69,6 +69,8 @@ export class MarbleShadows {
   private readonly texture = createBlobTexture();
   private readonly shadows = new Map<THREE.Object3D, THREE.Mesh>();
   private readonly pool: THREE.Mesh[] = [];
+  /** Tier gate: off hides every quad and skips the per-frame update path. */
+  private enabled = true;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
@@ -104,8 +106,23 @@ export class MarbleShadows {
 
   /** Grounds every attached quad to its marble; call once per frame. */
   update(): void {
+    if (!this.enabled) {
+      return;
+    }
     for (const [marble, quad] of this.shadows) {
       this.place(quad, marble);
+    }
+  }
+
+  /** Adaptive quality tier gate (spec FR2): off = no shadow draws at all. */
+  setEnabled(on: boolean): void {
+    this.enabled = on;
+    if (on) {
+      this.update();
+      return;
+    }
+    for (const quad of this.shadows.values()) {
+      quad.visible = false;
     }
   }
 
@@ -149,6 +166,6 @@ export class MarbleShadows {
     quad.position.set(marble.position.x, SHADOW_SURFACE_Y, marble.position.z);
     quad.scale.set(scale, scale, 1);
     (quad.material as THREE.MeshBasicMaterial).opacity = opacity;
-    quad.visible = opacity > MIN_VISIBLE_OPACITY;
+    quad.visible = this.enabled && opacity > MIN_VISIBLE_OPACITY;
   }
 }

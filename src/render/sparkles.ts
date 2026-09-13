@@ -34,6 +34,8 @@ interface FlyingSlot {
   positions: THREE.BufferAttribute;
   colors: THREE.BufferAttribute;
   velocities: Float32Array;
+  /** Particles emitted by the current burst (≤ pool capacity). */
+  emitCount: number;
   active: boolean;
   age: number;
 }
@@ -81,6 +83,8 @@ export class SparkleSystem {
   private readonly pulse: PulseSlot[] = [];
   private readonly owned: THREE.Object3D[] = [];
   private reducedMotion: boolean;
+  /** Cap on particles emitted by later bursts (tier budget); pools stay full. */
+  private particleBudget: number;
   private lastFlying: FlyingSlot | undefined;
   private lastPulse: PulseSlot | undefined;
 
@@ -90,6 +94,7 @@ export class SparkleSystem {
     this.burstDuration = options.burstDuration ?? SPARKLE_BURST_DURATION;
     this.coalesceWindow = options.coalesceWindow ?? SPARKLE_COALESCE_WINDOW;
     this.reducedMotion = options.reducedMotion ?? false;
+    this.particleBudget = this.particleCount;
     const poolSize = clampSlotCount(options.poolSize);
 
     for (let i = 0; i < poolSize; i += 1) {
@@ -135,6 +140,18 @@ export class SparkleSystem {
   /** Switch between flying particles and the gentle pulse fallback. */
   setReducedMotion(reduced: boolean): void {
     this.reducedMotion = reduced;
+  }
+
+  /**
+   * Caps how many particles future bursts emit (adaptive quality). Emitting
+   * more than the budget is impossible; pools and buffers keep their full
+   * capacity, so switching tiers never reallocates.
+   */
+  setParticleBudget(requested: number): void {
+    this.particleBudget =
+      requested === undefined || !Number.isFinite(requested)
+        ? this.particleCount
+        : Math.max(0, Math.min(this.particleCount, Math.floor(requested)));
   }
 
   /** Advance all active bursts by `dt` seconds. */
@@ -195,6 +212,7 @@ export class SparkleSystem {
       positions,
       colors,
       velocities: new Float32Array(this.particleCount * 3),
+      emitCount: 0,
       active: false,
       age: 0,
     };
@@ -228,7 +246,10 @@ export class SparkleSystem {
     const positions = slot.positions.array as Float32Array;
     const colors = slot.colors.array as Float32Array;
     const velocities = slot.velocities;
-    for (let i = 0; i < this.particleCount; i += 1) {
+    const emitCount = this.particleBudget;
+    slot.emitCount = emitCount;
+    slot.points.geometry.setDrawRange(0, emitCount);
+    for (let i = 0; i < emitCount; i += 1) {
       const offset = i * 3;
       positions[offset] = 0;
       positions[offset + 1] = 0;
@@ -314,7 +335,7 @@ export class SparkleSystem {
       // Same Float32Array attributes as the emit path.
       const positions = slot.positions.array as Float32Array;
       const velocities = slot.velocities;
-      for (let i = 0; i < this.particleCount; i += 1) {
+      for (let i = 0; i < slot.emitCount; i += 1) {
         const offset = i * 3;
         velocities[offset + 1] -= GRAVITY * dt;
         positions[offset] += velocities[offset] * dt;
