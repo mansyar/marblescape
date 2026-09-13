@@ -10,11 +10,11 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement to green — meter, governor state machine, centralized config constants (spec defaults, evidence-tunable); >80% coverage [8dbdf08]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [8dbdf08]
 
-## Phase 2 — Renderer & effects integration + hidden dev readout (TDD)
+## Phase 2 — Renderer & effects integration + hidden dev readout (TDD) [checkpoint: 61f4ce7]
 
 - [x] Task: Write failing tests: quality → renderer pixel-ratio path flows through the shared framing function (`applyFraming`) incl. orientation/resize; sparkle/confetti/gleam/shadow budgets consult tier at emission time (pool capacities unchanged); downgrades immediate, upgrades gated to rest; reduced-motion × tier composition (smaller budget wins); `?debug` overlay only exists with the flag, zero cost without [61f4ce7]
 - [x] Task: Implement to green — meter wired into the game/render loop; governor applies dpr; effects read budgets; dev overlay lives in the UI layer; >80% coverage [61f4ce7]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [61f4ce7]
 
 ## Phase 3 — CI perf gate (CPU-throttled e2e) + evidence tuning
 
