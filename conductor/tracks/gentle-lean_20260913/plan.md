@@ -10,7 +10,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement to green — `gravity` z 2.5 → ≈1.88 (+ comments); >80% coverage [0f9df66]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [0f9df66]
 
-## Phase 2 — Flat straights: metadata + posing (TDD)
+## Phase 2 — Flat straights: metadata + posing (TDD) [checkpoint: b706a5a]
 
 - [x] Task: Write failing tests [b706a5a]
   - [x] `pieces.test.ts`: no piece declares a slope (straights flat); `slope` is gone from `PieceDef` [b706a5a]
@@ -18,7 +18,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
   - [x] `piece-thumbnails.test.ts`: thumbnail clones stay flat (rotation.x = 0, no y offset) [b706a5a]
   - [x] `board-thumbnails.test.ts`: level mini-board clones stay flat (shared poser) [b706a5a]
 - [x] Task: Implement to green — remove `slope` from `PieceDef`/straight, simplify `posePiece` + `createThumbnailClone`; palette tiles and level previews inherit automatically; >80% coverage [b706a5a]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [b706a5a]
 
 ## Phase 3 — Flow verification & tuning (gates + e2e)
 
