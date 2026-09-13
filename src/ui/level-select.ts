@@ -3,21 +3,48 @@ import { loadBadges } from "../domain/badges";
 
 export type LevelSelectPick = number | "sandbox";
 
+/** Data-URL preview for a pick; null keeps the glyph fallback tile. */
+export type LevelPreviewProvider = (pick: LevelSelectPick) => string | null;
+
+export interface LevelSelectOptions {
+  preview?: LevelPreviewProvider;
+}
+
 export interface LevelSelectHandle {
   el: HTMLElement;
   /** Re-reads badges from storage and refreshes the ✓ chips (e.g. after a solve). */
   refreshBadges(): void;
 }
 
-function tile(glyph: string, label: string, solved: boolean): HTMLButtonElement {
+/** Picture-tile image sizing: fits inside the ≥84px tile. */
+const TILE_IMAGE_CSS =
+  "width:72px;height:72px;object-fit:contain;display:block;pointer-events:none";
+
+function tile(
+  label: string,
+  accessibleName: string,
+  glyph: string,
+  solved: boolean,
+  preview: string | null,
+): HTMLButtonElement {
   const btn = document.createElement("button");
   btn.dataset.levelSelect = label;
+  btn.setAttribute("aria-label", accessibleName);
   btn.style.cssText = [
     "min-width:84px;min-height:84px;font-size:34px;font-weight:700",
     "border-radius:18px;border:3px solid #2c3e50;background:#ffd166;color:#2c3e50",
     "touch-action:manipulation;position:relative",
   ].join(";");
-  btn.textContent = glyph;
+  if (preview) {
+    // Camera-matched mini-board; no visible text on picture tiles.
+    const img = document.createElement("img");
+    img.src = preview;
+    img.alt = "";
+    img.style.cssText = TILE_IMAGE_CSS;
+    btn.appendChild(img);
+  } else {
+    btn.textContent = glyph;
+  }
   if (solved) {
     const chip = document.createElement("span");
     chip.textContent = "✓";
@@ -31,15 +58,17 @@ function tile(glyph: string, label: string, solved: boolean): HTMLButtonElement 
 }
 
 /**
- * Full-screen level select: one tile per level (sandbox + all shipped
- * levels) with nothing locked and a ✓ chip on solved levels. Icon-only
- * tiles, big enough for small fingers, portrait and landscape friendly.
+ * Full-screen level select: one tile per level (sandbox + all shipped levels)
+ * with nothing locked and a ✓ chip on solved levels. Picture tiles show
+ * camera-matched mini-boards and fall back to glyphs when a preview is
+ * unavailable; big enough for small fingers, portrait and landscape friendly.
  */
 export function createLevelSelect(
   container: HTMLElement,
   levels: readonly LevelDef[],
   badges: Set<number>,
   onPick: (pick: LevelSelectPick) => void,
+  options?: LevelSelectOptions,
 ): LevelSelectHandle {
   const overlay = document.createElement("div");
   overlay.dataset.levelSelect = "overlay";
@@ -56,11 +85,19 @@ export function createLevelSelect(
 
   const buildGrid = (badgeSet: Set<number>) => {
     grid.replaceChildren();
-    const sandboxTile = tile("🏖️", "sandbox", false);
+    const sandboxPreview = options?.preview?.("sandbox") ?? null;
+    const sandboxTile = tile("sandbox", "Sandbox", "🏖️", false, sandboxPreview);
     sandboxTile.addEventListener("click", () => onPick("sandbox"));
     grid.appendChild(sandboxTile);
     for (const level of levels) {
-      const t = tile(String(level.id), `level-${level.id}`, badgeSet.has(level.id));
+      const preview = options?.preview?.(level.id) ?? null;
+      const t = tile(
+        `level-${level.id}`,
+        `Level ${level.id}`,
+        String(level.id),
+        badgeSet.has(level.id),
+        preview,
+      );
       t.addEventListener("click", () => onPick(level.id));
       grid.appendChild(t);
     }
