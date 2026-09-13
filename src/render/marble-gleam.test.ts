@@ -97,4 +97,36 @@ describe("MarbleGleam lifecycle", () => {
     expect(mapSpy).toHaveBeenCalledTimes(1);
     expect(() => gleam.update(camera)).not.toThrow();
   });
+
+  it("setEnabled(false) hides highlights and pauses the per-frame path; re-enable resumes", () => {
+    const scene = new THREE.Scene();
+    const gleam = new MarbleGleam(scene);
+    const camera = new THREE.PerspectiveCamera();
+    camera.position.set(0, 5, 10);
+    const marble = makeMarble();
+    gleam.attach(marble);
+    const sprite = scene.children[0] as THREE.Sprite;
+    expect(sprite.visible).toBe(true);
+
+    gleam.setEnabled(false);
+    expect(sprite.visible).toBe(false);
+
+    const before = sprite.position.clone();
+    marble.position.set(2, 0.3, 0);
+    gleam.update(camera);
+    expect(sprite.position.equals(before)).toBe(true); // paused while disabled
+
+    gleam.setEnabled(true);
+    gleam.update(camera);
+    expect(sprite.visible).toBe(true);
+    expect(sprite.position.equals(before)).toBe(false); // follows again
+  });
+
+  it("attach while disabled stays hidden", () => {
+    const scene = new THREE.Scene();
+    const gleam = new MarbleGleam(scene);
+    gleam.setEnabled(false);
+    gleam.attach(makeMarble());
+    expect((scene.children[0] as THREE.Sprite).visible).toBe(false);
+  });
 });

@@ -64,6 +64,8 @@ import { generatePieceThumbnails, type PieceThumbnails } from "../render/piece-t
 import { cupTintTarget, PieceRenderer, rotationYaw } from "../render/piece-view";
 import { worldToScreen } from "../render/projection";
 import { startRenderer } from "../render/scene";
+import { QualityGovernor, type QualityStats } from "../render/quality";
+import type { QualityTierSpec } from "../render/quality-config";
 import { SparkleSystem } from "../render/sparkles";
 import { createTrophyTray, type TrophyTray } from "../render/trophies";
 import { createWaitingMarble, type WaitingMarble } from "../render/waiting-marble";
@@ -106,6 +108,12 @@ export class Game {
   /** Color used by the sandbox color-cup palette tile. */
   private cupColor: MarbleColor = MARBLE_COLORS[0];
   private reducedMotion = false;
+  /** Adaptive quality: frame-pacing meter + tier governor (spec FR1/FR2). */
+  private readonly governor = new QualityGovernor();
+  /** Last tier pushed to the renderer/effects; -1 until the first apply. */
+  private appliedTier = -1;
+  /** True while a solve celebration (confetti + overlay) is animating. */
+  private celebrationActive = false;
 
   /** Fired each time a marble lands in the goal cup while in level mode. */
   onLevelSolved: ((levelId: number) => void) | null = null;
@@ -113,6 +121,8 @@ export class Game {
   onPiecePlaced: (() => void) | null = null;
   /** Fired on every Play press, in any mode (first-run completion). */
   onPlayed: (() => void) | null = null;
+  /** Fired whenever the adaptive-quality tier changes (main syncs confetti). */
+  onQualityTier: ((spec: QualityTierSpec) => void) | null = null;
   private nextId = 1;
   private lastElapsed = -1;
   private sound: SoundManager | null = null;
@@ -188,6 +198,10 @@ export class Game {
       this.reducedMotion = event.matches;
     });
 
+    // Baseline adaptive-quality apply: tier 0 budgets (today's look) plus the
+    // initial onQualityTier notification for late subscribers (confetti).
+    this.applyQualityTier();
+
     await initPhysics();
     const world = createPhysicsWorld();
     this.world = world;
@@ -262,8 +276,15 @@ export class Game {
     handle.scene.add(this.highlight);
 
     handle.onFrame((elapsed) => {
+      const frameMs = this.lastElapsed >= 0 ? (elapsed - this.lastElapsed) * 1000 : 0;
       const dt = this.lastElapsed >= 0 ? Math.min(elapsed - this.lastElapsed, 0.1) : 0;
       this.lastElapsed = elapsed;
+      // Adaptive quality (spec FR1): sample real frame pacing every frame,
+      // then re-apply instantly when the governor moves the tier.
+      this.governor.sample({ deltaMs: frameMs, atRest: this.marblesAtRest() });
+      if (this.governor.currentTier !== this.appliedTier) {
+        this.applyQualityTier();
+      }
       if (this.ticker) {
         this.ticker.update(elapsed);
       }
@@ -729,12 +750,43 @@ export class Game {
     this.sound?.play("tick", { rate: 0.7, volume: 0.5 });
   }
 
+  /** No marble in flight and no celebration animating → safe to upgrade. */
+  private marblesAtRest(): boolean {
+    return (this.marbles?.count ?? 0) === 0 && !this.celebrationActive;
+  }
+
+  /** Pushes the current tier's budgets into renderer + effects (spec FR2). */
+  private applyQualityTier(): void {
+    const spec = this.governor.spec;
+    this.appliedTier = this.governor.currentTier;
+    this.rendererHandle?.setDprCap(spec.dprCap);
+    this.sparkles?.setParticleBudget(spec.sparkleParticleCount);
+    this.shadows?.setEnabled(spec.shadows);
+    this.gleam?.setEnabled(spec.gleam);
+    this.onQualityTier?.(spec);
+  }
+
   /** Valid-drop pop for a piece that just landed (palette or re-place). */
   private snapBouncePiece(id: string): void {
     const mesh = this.pieceRenderer?.meshFor(id);
     if (mesh) {
       this.juice.snapBounce(mesh);
     }
+  }
+
+  /** Live adaptive-quality snapshot (hidden ?debug readout + e2e gate). */
+  qualityStats(): QualityStats {
+    return this.governor.stats();
+  }
+
+  /** Current tier's budget spec; main.ts seeds the confetti layer with it. */
+  qualitySpec(): QualityTierSpec {
+    return this.governor.spec;
+  }
+
+  /** Solve-celebration lifecycle: upgrades wait while it animates (FR2). */
+  setCelebrationActive(on: boolean): void {
+    this.celebrationActive = on;
   }
 
   /** Collect-celebration counter for the Playwright hooks. */

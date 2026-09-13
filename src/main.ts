@@ -8,6 +8,7 @@ import { createHud } from "./ui/hud";
 import { createPalette, pulseReject } from "./ui/palette";
 import { createUpdateBanner } from "./ui/update-banner";
 import { createConfettiLayer } from "./ui/confetti";
+import { createDebugOverlay, debugOverlayEnabled } from "./ui/debug-overlay";
 import { createSolvedOverlay } from "./ui/solved-overlay";
 import { registerSW } from "virtual:pwa-register";
 import { LEVELS } from "./domain/levels";
@@ -144,18 +145,34 @@ if (app) {
     reducedMotion.addEventListener("change", (event) => {
       confetti.setReducedMotion(event.matches);
     });
+
+    // Adaptive quality: the celebration honors the current tier's piece
+    // budget, and the hidden ?debug readout exists only when asked for.
+    confetti.setPieceBudget(game.qualitySpec().confettiPieces);
+    game.onQualityTier = (spec) => {
+      confetti.setPieceBudget(spec.confettiPieces);
+    };
+    const debugOverlay = debugOverlayEnabled(window.location.search)
+      ? createDebugOverlay(document.body)
+      : null;
+    if (debugOverlay) {
+      window.setInterval(() => debugOverlay.update(game.qualityStats()), 250);
+    }
     const solvedOverlay = createSolvedOverlay(document.body, {
       onReplay: () => {
         solvedOverlay.hide();
+        game.setCelebrationActive(false);
         game.play();
       },
       onHome: () => {
         solvedOverlay.hide();
+        game.setCelebrationActive(false);
         cues?.setSuppressed(true);
         showLevelSelect(levelSelect);
       },
     });
     game.onLevelSolved = () => {
+      game.setCelebrationActive(true);
       confetti.burst();
       solvedOverlay.show();
     };

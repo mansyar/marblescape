@@ -37,7 +37,7 @@ Children ages 5-10 on phones and iPads. No reading assumed; big touch targets; z
 
 1. A child can pick it up with no instruction and stay engaged.
 2. Fully playable offline after first load; installable to home screen (PWA).
-3. Smooth on mid-range phones and iPads, in both portrait (phone) and landscape (tablet).
+3. Smooth on mid-range phones and iPads, in both portrait (phone) and landscape (tablet) — machine-checked: when a device gets busy an adaptive quality system quietly steps rendering quality down to keep frame pacing smooth, restores it when calm, and a CPU-throttled perf gate guards it (track `adaptive-quality_20260913`).
 4. Sandbox builds and settings persist between sessions (localStorage).
 
 ## Known Risks

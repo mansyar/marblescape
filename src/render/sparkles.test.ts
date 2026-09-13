@@ -131,3 +131,57 @@ describe("SparkleSystem", () => {
     expect(sparkles.activeBurstCount).toBe(0);
   });
 });
+
+describe("sparkle particle budget", () => {
+  it("caps emitted particles without shrinking pool capacities", () => {
+    const { parent, sparkles } = makeSystem();
+    const childrenBefore = parent.children.length;
+    sparkles.setParticleBudget(10);
+    sparkles.burstAt({ x: 0, y: 0, z: 0 });
+
+    const active = visibleByMode(parent, "flying") as THREE.Points[];
+    expect(active).toHaveLength(1);
+    expect(active[0].geometry.drawRange.count).toBe(10);
+    // The preallocated attribute keeps the full capacity (no reallocation).
+    expect(active[0].geometry.getAttribute("position").count).toBe(SPARKLE_MAX_PARTICLES_PER_BURST);
+    expect(parent.children.length).toBe(childrenBefore);
+  });
+
+  it("updates and expires a reduced-size burst exactly like a full one", () => {
+    const { sparkles } = makeSystem();
+    sparkles.setParticleBudget(8);
+    sparkles.burstAt({ x: 0, y: 0, z: 0 });
+    sparkles.update(SPARKLE_BURST_DURATION * 0.5);
+    expect(sparkles.activeBurstCount).toBe(1);
+    sparkles.update(SPARKLE_BURST_DURATION * 0.5 + 0.001);
+    expect(sparkles.activeBurstCount).toBe(0);
+  });
+
+  it("falls back to the system's own count for junk and clamps extremes", () => {
+    const { parent, sparkles } = makeSystem({ particleCount: 20 });
+    const flyingCount = () =>
+      (visibleByMode(parent, "flying")[0] as THREE.Points).geometry.drawRange.count;
+
+    sparkles.setParticleBudget(Number.NaN);
+    sparkles.burstAt({ x: 0, y: 0, z: 0 });
+    expect(flyingCount()).toBe(20);
+
+    sparkles.setParticleBudget(10_000);
+    sparkles.update(SPARKLE_BURST_DURATION + 0.001);
+    sparkles.burstAt({ x: 0, y: 0, z: 0 });
+    expect(flyingCount()).toBe(20);
+
+    sparkles.setParticleBudget(-3);
+    sparkles.update(SPARKLE_BURST_DURATION + 0.001);
+    sparkles.burstAt({ x: 0, y: 0, z: 0 });
+    expect(flyingCount()).toBe(0);
+  });
+
+  it("leaves the reduced-motion pulse untouched by the budget (smaller visual wins)", () => {
+    const { parent, sparkles } = makeSystem({ reducedMotion: true });
+    sparkles.setParticleBudget(1);
+    sparkles.burstAt({ x: 0, y: 0, z: 0 });
+    expect(visibleByMode(parent, "pulse")).toHaveLength(1);
+    expect(visibleByMode(parent, "flying")).toHaveLength(0);
+  });
+});

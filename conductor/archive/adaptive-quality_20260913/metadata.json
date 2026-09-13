@@ -1,0 +1,8 @@
+{
+  "id": "adaptive-quality_20260913",
+  "type": "feature",
+  "status": "completed",
+  "description": "Adaptive performance & quality: in-app frame-pacing meter with a hysteresis-driven, visual-only degradation ladder (pixel ratio, sparkle/confetti budgets, contact shadows + gleam), upgrades at rest, hidden ?debug readout, and a hard CI perf gate on CPU-throttled Chromium (p95 budget after adaptation, adaptation engaged). 60 fps target / 30 fps floor; no physics, audio, UI-setting, save, or asset changes; no new dependencies.",
+  "created": "2026-09-13T00:00:00Z",
+  "completed": "2026-09-14T00:00:00Z"
+}

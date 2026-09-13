@@ -181,4 +181,45 @@ describe("createConfettiLayer", () => {
     vi.advanceTimersByTime(CONFETTI_DURATION_MS * 2);
     expect(host.children).toHaveLength(0);
   });
+
+  it("caps a shower at the current tier budget", () => {
+    const { layer, root } = mount();
+    layer.setPieceBudget(60);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(60);
+
+    layer.setPieceBudget(30);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(30);
+  });
+
+  it("never exceeds the layer's requested piece count", () => {
+    const { layer, root } = mount({ pieceCount: 40 });
+    layer.setPieceBudget(CONFETTI_MAX_PIECES);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(40);
+  });
+
+  it("falls back to the hard cap for junk budgets and clamps extremes", () => {
+    const { layer, root } = mount({ pieceCount: CONFETTI_MAX_PIECES });
+    layer.setPieceBudget(Number.NaN);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(CONFETTI_MAX_PIECES);
+
+    layer.setPieceBudget(10_000);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(CONFETTI_MAX_PIECES);
+
+    layer.setPieceBudget(-5);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(0);
+  });
+
+  it("leaves the reduced-motion glow untouched by the budget", () => {
+    const { layer, root } = mount({ reducedMotion: true });
+    layer.setPieceBudget(1);
+    layer.burst();
+    expect(root.pieceNodes()).toHaveLength(0);
+    expect(root.glowNodes()).toHaveLength(1);
+  });
 });

@@ -142,4 +142,34 @@ describe("MarbleShadows lifecycle", () => {
     expect(scene.children).toHaveLength(0);
     expect(() => shadows.update()).not.toThrow();
   });
+
+  it("setEnabled(false) hides attached quads and suspends the update path", () => {
+    const scene = new THREE.Scene();
+    const shadows = new MarbleShadows(scene);
+    const marble = makeMarble();
+    shadows.attach(marble);
+    const quad = scene.children[0] as THREE.Mesh;
+    expect(quad.visible).toBe(true);
+
+    shadows.setEnabled(false);
+    expect(quad.visible).toBe(false);
+
+    marble.position.set(0, 0.3, 0);
+    shadows.update();
+    expect(quad.visible).toBe(false);
+    expect(quad.position.x).toBeCloseTo(2.5); // not repositioned while disabled
+
+    shadows.setEnabled(true);
+    expect(quad.visible).toBe(true);
+    expect(quad.position.x).toBeCloseTo(0); // grounded again on re-enable
+  });
+
+  it("attach while disabled stays hidden until re-enabled", () => {
+    const scene = new THREE.Scene();
+    const shadows = new MarbleShadows(scene);
+    shadows.setEnabled(false);
+    shadows.attach(makeMarble());
+    const quad = scene.children[0] as THREE.Mesh;
+    expect(quad.visible).toBe(false);
+  });
 });
