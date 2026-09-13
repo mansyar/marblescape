@@ -17,9 +17,9 @@ export function rotationYaw(rotation: Rotation): number {
 }
 
 /**
- * Poses a piece mesh on the board at a cell: center position, authored yaw
- * alignment with the piece's rotation, and the ramp pitch + lift so the low
- * end stays flush with neighboring piece floors. Shared by the live renderer
+ * Poses a piece mesh on the board at a cell: center position and authored
+ * yaw alignment with the piece's rotation. Every piece sits flush on the
+ * table — the board's lean alone drives marbles. Shared by the live renderer
  * and offscreen board previews.
  */
 export function posePiece(
@@ -29,9 +29,6 @@ export function posePiece(
   mesh.position.set(...cellToWorld(piece.x, piece.y));
   mesh.rotation.order = "YXZ";
   mesh.rotation.y = rotationYaw(piece.rotation) + CONNECTIONS[piece.type].modelYawOffset;
-  const slope = CONNECTIONS[piece.type].slope ?? 0;
-  mesh.rotation.x = slope;
-  mesh.position.y += slope > 0 ? 0.48 * Math.sin(slope) : 0;
 }
 
 /** Preloads each piece type's Kenney model and syncs meshes to a board state. */

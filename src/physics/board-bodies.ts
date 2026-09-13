@@ -114,7 +114,8 @@ export function syncPieceBodies(
     const bodies = colliderDescriptors(piece.type, piece.rotation, piece.lid ?? "open").map((d) => {
       // Offsets arrive fully rotated from colliderDescriptors. Body
       // orientation = yaw (about Y, from piece rotation + deflector) then
-      // pitch (about the piece-local X axis, for ramps): q = qYaw ⊗ qPitch.
+      // optional pitch (about the piece-local X axis; unused today — pieces
+      // sit flush): q = qYaw ⊗ qPitch.
       const yaw = d.yaw ?? 0;
       const pitch = d.pitch ?? 0;
       const hw = Math.cos(yaw / 2);

@@ -6,6 +6,7 @@ _No active tracks._
 
 ## Archive
 
+- [x] **Track: Gentle Lean & Flat Straights** *Link: [./archive/gentle-lean_20260913/index.md](./archive/gentle-lean_20260913/index.md)* *(completed - pending merge to `master`)*
 - [x] **Track: Picture-Based Level Select** *Link: [./archive/level-pictures_20260913/index.md](./archive/level-pictures_20260913/index.md)* *(completed - merged to `master` @ `4145535`)*
 - [x] **Track: Picture-Based Piece Palette** *Link: [./archive/palette-pictures_20260912/index.md](./archive/palette-pictures_20260912/index.md)* *(completed - merged to `master` @ `f5a4f0f`)*
 - [x] **Track: First-Run Onboarding** *Link: [./archive/first-run-onboarding_20260912/index.md](./archive/first-run-onboarding_20260912/index.md)* *(completed - merged to `master` @ `d2b85b3`)*

@@ -8,7 +8,7 @@ import type { Storage } from "./storage";
 export const FIRST_RUN_WIDTH = 8;
 export const FIRST_RUN_HEIGHT = 6;
 
-/** The starter run's single empty cell — where the demo hand invites a Ramp. */
+/** The starter run's single empty cell — where the demo hand invites the straight tile. */
 export const FIRST_RUN_GAP = { x: 4, y: 2 } as const;
 
 /** A piece of the starter seed; the game assigns normal ids when seeding. */
@@ -22,8 +22,8 @@ export interface FirstRunPiece {
 
 /**
  * One-gap starter run placed once on a brand-new sandbox:
- * chute (4,0) → ramps → [gap (4,2)] → ramps → classic goal cup (4,5).
- * Filling the gap with a Ramp completes a working run; every seeded piece
+ * chute (4,0) → straights → [gap (4,2)] → straights → classic goal cup (4,5).
+ * Filling the gap with a straight completes a working run; every seeded piece
  * stays editable and removable like any child-placed piece.
  */
 export const FIRST_RUN_LAYOUT: readonly FirstRunPiece[] = [

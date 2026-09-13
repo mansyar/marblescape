@@ -72,12 +72,12 @@ describe("FIRST_RUN_LAYOUT", () => {
     expect(getPieceAt(board, FIRST_RUN_GAP.x, FIRST_RUN_GAP.y + 1)).not.toBeNull();
   });
 
-  it("starts the run with the chute ramp at the spawn cell", () => {
+  it("starts the run with the chute straight at the spawn cell", () => {
     const board = starterBoard(false);
     expect(mustPiece(board, 4, 0)).toMatchObject({ type: "straight", rotation: 0 });
   });
 
-  it("connects chute → gap → goal once a Ramp fills the gap", () => {
+  it("connects chute → gap → goal once a straight fills the gap", () => {
     const board = starterBoard(true);
     const above = mustPiece(board, FIRST_RUN_GAP.x, FIRST_RUN_GAP.y - 1);
     const ramp = mustPiece(board, FIRST_RUN_GAP.x, FIRST_RUN_GAP.y);

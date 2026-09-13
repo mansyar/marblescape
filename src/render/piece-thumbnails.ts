@@ -33,17 +33,14 @@ export interface PieceCapture {
 }
 
 /**
- * Clones a template already posed as on the board at rotation 0: authored
- * yaw alignment, ramp pitch, and the same lift so the picture matches the
- * piece the player sees placed.
+ * Clones a template posed as on the board at rotation 0: authored yaw
+ * alignment only, so the picture matches the flush piece the player sees
+ * placed.
  */
 export function createThumbnailClone(type: PieceType, template: THREE.Object3D): THREE.Object3D {
   const clone = template.clone(true);
   clone.rotation.order = "YXZ";
   clone.rotation.y = CONNECTIONS[type].modelYawOffset;
-  const slope = CONNECTIONS[type].slope ?? 0;
-  clone.rotation.x = slope;
-  clone.position.y += slope > 0 ? 0.48 * Math.sin(slope) : 0;
   return clone;
 }
 

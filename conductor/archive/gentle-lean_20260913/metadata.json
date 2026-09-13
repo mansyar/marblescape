@@ -1,0 +1,8 @@
+{
+  "id": "gentle-lean_20260913",
+  "type": "feature",
+  "status": "completed",
+  "description": "Gentler table lean (gravity south pull ~8° → ~6°, z 2.5 → 1.88) and visually flat straight pieces: remove the mesh-only 0.09 rad ramp pitch + lift so live rendering, palette tiles, and level previews read flush and match the already-flat colliders. Light re-tune of centralized physics constants allowed to keep both 20-drop reliability gates and the 9-level e2e green. No new dependencies/assets; levels, saves, audio, UI unchanged.",
+  "created": "2026-09-13T00:00:00Z",
+  "completed": "2026-09-13T00:00:00Z"
+}

@@ -9,7 +9,7 @@ export interface ColliderDesc {
   offset: [number, number, number];
   /** Optional yaw (radians about Y) for diagonal deflectors. */
   yaw?: number;
-  /** Optional pitch (radians about the piece-local X axis) for ramps. */
+  /** Optional pitch (radians about the piece-local X axis); unused today — every piece sits flush. */
   pitch?: number;
 }
 

@@ -10,11 +10,11 @@ export const PHYSICS = Object.freeze({
   maxSubSteps: 3,
 
   /**
-   * World gravity, tilted ~8° toward the player (south, +z) — the board
-   * reads as a table leaning toward you: marbles always drift south on any
-   * surface, while ramps (extra pitch) accelerate them further.
+   * World gravity, tilted ~6° toward the player (south, +z) — the board
+   * reads as a gently leaning table: marbles always drift south on any
+   * surface. Every piece sits flush, so this lean is the only drive.
    */
-  gravity: [0, -17.8, 2.5] as const,
+  gravity: [0, -17.8, 1.88] as const,
 
   /** Marbles roll with intent but can still slow on flats (feel iteration 2). */
   linearDamping: 0.3,
