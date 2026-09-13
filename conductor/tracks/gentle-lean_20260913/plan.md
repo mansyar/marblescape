@@ -12,12 +12,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Flat straights: metadata + posing (TDD)
 
-- [ ] Task: Write failing tests
-  - [ ] `pieces.test.ts`: no piece declares a slope (straights flat); `slope` is gone from `PieceDef`
-  - [ ] `piece-view.test.ts`: `posePiece` applies yaw alignment only — no pitch, no lift, for every piece type/rotation
-  - [ ] `piece-thumbnails.test.ts`: thumbnail clones stay flat (rotation.x = 0, no y offset)
-  - [ ] `board-thumbnails.test.ts`: level mini-board clones stay flat (shared poser)
-- [ ] Task: Implement to green — remove `slope` from `PieceDef`/straight, simplify `posePiece` + `createThumbnailClone`; palette tiles and level previews inherit automatically; >80% coverage
+- [x] Task: Write failing tests [b706a5a]
+  - [x] `pieces.test.ts`: no piece declares a slope (straights flat); `slope` is gone from `PieceDef` [b706a5a]
+  - [x] `piece-view.test.ts`: `posePiece` applies yaw alignment only — no pitch, no lift, for every piece type/rotation [b706a5a]
+  - [x] `piece-thumbnails.test.ts`: thumbnail clones stay flat (rotation.x = 0, no y offset) [b706a5a]
+  - [x] `board-thumbnails.test.ts`: level mini-board clones stay flat (shared poser) [b706a5a]
+- [x] Task: Implement to green — remove `slope` from `PieceDef`/straight, simplify `posePiece` + `createThumbnailClone`; palette tiles and level previews inherit automatically; >80% coverage [b706a5a]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Flow verification & tuning (gates + e2e)

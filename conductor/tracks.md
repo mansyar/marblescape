@@ -2,7 +2,7 @@
 
 ## Tracks
 
-- [ ] **Track: Gentle Lean & Flat Straights** *Link: [./tracks/gentle-lean_20260913/index.md](./tracks/gentle-lean_20260913/index.md)*
+- [~] **Track: Gentle Lean & Flat Straights** *Link: [./tracks/gentle-lean_20260913/index.md](./tracks/gentle-lean_20260913/index.md)*
 
 ## Archive
 
