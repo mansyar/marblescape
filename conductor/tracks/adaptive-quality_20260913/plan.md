@@ -18,8 +18,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 3 — CI perf gate (CPU-throttled e2e) + evidence tuning
 
-- [ ] Task: Add `tests/perf.spec.ts`: deterministic 5-marble stress scene (run → sparkles → collect/confetti → sorting) under CDP CPU throttling; Chromium single-project, skipped elsewhere; reads meter stats via `window.__marblescape`; asserts p95 ≤ budget after adaptation, adaptation engaged (tier < full), no catastrophic long frames; no new dependencies
-- [ ] Task: Baseline & tune — ≥3 local baseline runs, set generous documented thresholds, confirm repeat stability and that full-quality regressions would be caught; record numbers; add dated perf-gate note to `tech-stack.md`
+- [x] Task: Add `tests/perf.spec.ts`: deterministic 5-marble stress scene (run → sparkles → collect/confetti → sorting) under CDP CPU throttling; Chromium single-project, skipped elsewhere; reads meter stats via `window.__marblescape`; asserts p95 ≤ budget after adaptation, adaptation engaged (tier < full), no catastrophic long frames; no new dependencies [6ae8be3]
+- [x] Task: Baseline & tune — ≥3 local baseline runs, set generous documented thresholds, confirm repeat stability and that full-quality regressions would be caught; record numbers; add dated perf-gate note to `tech-stack.md` [f0feee5]
 - [ ] Task: Full-suite check — 4-viewport matrix green, suite duration impact acceptable, both reliability gates unaffected
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
