@@ -41,15 +41,33 @@ export interface QualityTierSpec {
   gleam: boolean;
 }
 
-/** Full → reduced → lean floor. */
-export const QUALITY_TIERS: readonly QualityTierSpec[] = [
+/** Full → reduced → lean floor (frozen at runtime, like physics-config.ts). */
+export const QUALITY_TIERS: readonly QualityTierSpec[] = Object.freeze([
   // Tier 0 reproduces today's full-quality budgets exactly (drift guard).
-  { dprCap: 2, sparkleParticleCount: 64, confettiPieces: 120, shadows: true, gleam: true },
+  Object.freeze({
+    dprCap: 2,
+    sparkleParticleCount: 64,
+    confettiPieces: 120,
+    shadows: true,
+    gleam: true,
+  }),
   // Tier 1: cheaper pixels and particles; grounding cues stay.
-  { dprCap: 1.5, sparkleParticleCount: 32, confettiPieces: 60, shadows: true, gleam: true },
+  Object.freeze({
+    dprCap: 1.5,
+    sparkleParticleCount: 32,
+    confettiPieces: 60,
+    shadows: true,
+    gleam: true,
+  }),
   // Tier 2 (floor): leanest pixels; minimal particles; shadow + gleam sprites off.
-  { dprCap: 1, sparkleParticleCount: 16, confettiPieces: 30, shadows: false, gleam: false },
-];
+  Object.freeze({
+    dprCap: 1,
+    sparkleParticleCount: 16,
+    confettiPieces: 30,
+    shadows: false,
+    gleam: false,
+  }),
+]);
 
 /** Highest tier index (the lean floor). */
 export const QUALITY_MAX_TIER = QUALITY_TIERS.length - 1;
