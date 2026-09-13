@@ -17,15 +17,15 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: >80% coverage on new/changed modules; `pnpm check` clean [3f19815]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
-## Phase 2 — Preview wiring & picture tiles (TDD)
+## Phase 2 — Preview wiring & picture tiles (TDD) [checkpoint: 799ec67]
 
-- [~] Task: Update failing level-select tests (`src/ui/level-select.test.ts`)
-  - [ ] With previews: tiles render `<img>` (no visible text), `aria-label` present, `data-level-select` hooks and ✓ chips intact
-  - [ ] Without previews: digit/emoji fallback tiles, never blank
-  - [ ] Preview provider queried on every grid rebuild, incl. `showLevelSelect` (sandbox refresh path)
-- [ ] Task: Implement tile rendering + provider option in `src/ui/level-select.ts` to green
-- [ ] Task: Wire `Game` (`createLevelPreviews()`, cached `sandboxPreview()`) and `src/main.ts` boot (generate after `game.start()` resolves; pass provider) — glue is exercised by e2e per project precedent
-- [ ] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive, palette); >80% coverage on changed modules
+- [x] Task: Update failing level-select tests (`src/ui/level-select.test.ts`) [1c05628]
+  - [x] With previews: tiles render `<img>` (no visible text), `aria-label` present, `data-level-select` hooks and ✓ chips intact
+  - [x] Without previews: digit/emoji fallback tiles, never blank
+  - [x] Preview provider queried on every grid rebuild, incl. `showLevelSelect` (sandbox refresh path)
+- [x] Task: Implement tile rendering + provider option in `src/ui/level-select.ts` to green [1c05628]
+- [x] Task: Wire `Game` (`createLevelPreviews()`, cached `sandboxPreview()`) and `src/main.ts` boot (generate after `game.start()` resolves; pass provider) — glue is exercised by e2e per project precedent [659a8c3]
+- [x] Task: Regression check existing suites (smoke, levels, onboarding, color-sorting, responsive, palette); >80% coverage on changed modules [799ec67]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — e2e, verification, polish & docs
