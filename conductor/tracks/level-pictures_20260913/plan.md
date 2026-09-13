@@ -4,7 +4,7 @@ Branch: `track/level-pictures` · Spec: [spec.md](./spec.md)
 
 Workflow discipline: strict TDD (failing tests → green → refactor → coverage → commit + git note → plan update). Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete (append commit SHA).
 
-## Phase 1 — Board snapshot engine (TDD)
+## Phase 1 — Board snapshot engine (TDD) [checkpoint: 3f19815]
 
 - [x] Task: Write failing unit tests for board snapshots (`src/render/board-thumbnails.test.ts`) via the injectable capture seam (headless — no WebGL in jsdom) [3f19815]
   - [x] Composes a level board: floor/walls sized to the level, posed piece clones at cell centers (authored yaw + rotation + ramp lift), colored cups tinted, gap cells softly highlighted, other empty cells untouched
@@ -19,7 +19,7 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 2 — Preview wiring & picture tiles (TDD)
 
-- [ ] Task: Update failing level-select tests (`src/ui/level-select.test.ts`)
+- [~] Task: Update failing level-select tests (`src/ui/level-select.test.ts`)
   - [ ] With previews: tiles render `<img>` (no visible text), `aria-label` present, `data-level-select` hooks and ✓ chips intact
   - [ ] Without previews: digit/emoji fallback tiles, never blank
   - [ ] Preview provider queried on every grid rebuild, incl. `showLevelSelect` (sandbox refresh path)
