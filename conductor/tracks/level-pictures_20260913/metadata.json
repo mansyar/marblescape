@@ -1,0 +1,7 @@
+{
+  "id": "level-pictures_20260913",
+  "type": "feature",
+  "status": "new",
+  "description": "Picture-based level select: replaces the digit tiles (1-9) and the sandbox emoji with runtime-rendered mini-boards. Level tiles become camera-matched snapshots of each level's starting board (floor, walls, furniture, colored cups) with empty gaps softly highlighted; the sandbox tile shows a live snapshot of the child's current build, refreshed when it changes. Snapshots reuse the offscreen capture pipeline built for the picture palette - no new assets, dependencies, or precache entries; digit/emoji remains as a fallback when rendering is unavailable. Level picking, badges, layouts, physics, audio, and saves are unchanged.",
+  "created": "2026-09-13T00:00:00Z"
+}

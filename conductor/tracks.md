@@ -2,7 +2,7 @@
 
 ## Tracks
 
-_No active tracks._
+- [ ] **Track: Picture-Based Level Select** *Link: [./tracks/level-pictures_20260913/index.md](./tracks/level-pictures_20260913/index.md)*
 
 ## Archive
 
