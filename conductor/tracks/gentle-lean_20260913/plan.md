@@ -27,12 +27,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Regression check settle/rescue behavior at slower speeds (no false settles, no new stuck marbles) [2546b87]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [2546b87]
 
-## Phase 4 — Docs, manual pass & completion
+## Phase 4 — Docs, manual pass & completion [checkpoint: d54ecab]
 
 - [x] Task: Docs sync — `product.md` (~6° lean; "straight channel" not "straight ramp"), `tech-stack.md` (dated tuning note), inline comments [3add2b0]
 - [x] Task: Owner manual pass on phone, portrait + landscape: straights flush, runs calmer but clearly flowing; record result — owner approved on phone (2026-09-13)
 - [x] Task: Final gates (`pnpm check`, unit coverage, e2e) + conductor review; apply review fixes if any [d54ecab]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [d54ecab]
 
 ## Phase: Review Fixes
 
