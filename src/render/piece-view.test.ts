@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { colorHex } from "../domain/colors";
-import { cellToWorld, cupTintTarget, PieceRenderer, rotationYaw } from "./piece-view";
+import { CONNECTIONS, PIECE_TYPES } from "../domain/pieces";
+import { cellToWorld, cupTintTarget, PieceRenderer, posePiece, rotationYaw } from "./piece-view";
 
 describe("cellToWorld", () => {
   it("maps cell (0,0) to the center of its cell", () => {
@@ -35,6 +36,26 @@ describe("rotationYaw", () => {
     // turn viewed from +Y is a negative rotation around Y.
     expect(rotationYaw(1)).toBeLessThan(0);
     expect(rotationYaw(3)).toBeLessThan(0);
+  });
+});
+
+describe("posePiece", () => {
+  it("sits flush on the board: yaw alignment only, no pitch or lift", () => {
+    for (const type of PIECE_TYPES) {
+      for (const rotation of [0, 1, 2, 3] as const) {
+        const mesh = new THREE.Object3D();
+        posePiece(mesh, { type, rotation, x: 2, y: 3 });
+        expect(mesh.rotation.order).toBe("YXZ");
+        expect(mesh.rotation.x).toBe(0);
+        expect(mesh.rotation.z).toBe(0);
+        expect(mesh.position.y).toBe(0);
+        expect(mesh.rotation.y).toBeCloseTo(
+          rotationYaw(rotation) + CONNECTIONS[type].modelYawOffset,
+        );
+        expect(mesh.position.x).toBeCloseTo(2.5);
+        expect(mesh.position.z).toBeCloseTo(3.5);
+      }
+    }
   });
 });
 

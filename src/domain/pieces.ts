@@ -19,11 +19,6 @@ export interface PieceDef {
   modelYawOffset: number;
   /** Whether tap-to-rotate cycles this piece through 4 orientations. */
   rotatable: boolean;
-  /**
-   * Downhill tilt in radians (high end north, low end south at rotation 0).
-   * Absent/0 = flat. Drives both the pitched physics body and mesh.
-   */
-  slope?: number;
   /** Open connection sides for a given rotation. */
   sides: (rotation: Rotation) => Side[];
 }
@@ -36,11 +31,6 @@ export const CONNECTIONS: Record<PieceType, PieceDef> = {
   straight: {
     model: `${BASE}/straight.glb`,
     modelYawOffset: 0,
-    // Gentle ~5° ramp (combined with the tilted gravity this gives a lively
-    // downhill); the lift keeps the low end flush with neighboring floors.
-    // Shallow on purpose: chained ramps form small seam steps a rolling
-    // marble can hop.
-    slope: 0.09,
     rotatable: true,
     // A straight channel: enters one side, exits the opposite.
     sides: (r) => shiftSides(["north", "south"], r),

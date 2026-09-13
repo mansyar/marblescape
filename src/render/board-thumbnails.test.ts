@@ -103,6 +103,7 @@ const SPEC: BoardSnapshotSpec = {
   cols: 8,
   rows: 6,
   pieces: [
+    { type: "straight", rotation: 0, x: 1, y: 1 },
     { type: "curved", rotation: 1, x: 2, y: 3 },
     { type: "goal", rotation: 0, x: 4, y: 5, color: "mint" },
   ],
@@ -174,7 +175,11 @@ describe("buildBoardSnapshot", () => {
     expect(curved?.position.z).toBeCloseTo(cellToWorld(2, 3)[2]);
     expect(curved?.rotation.order).toBe("YXZ");
     expect(curved?.rotation.y).toBeCloseTo(rotationYaw(1) + CONNECTIONS.curved.modelYawOffset);
-    expect(curved?.rotation.x).toBeCloseTo(CONNECTIONS.curved.slope ?? 0);
+    expect(Math.abs(curved?.rotation.x ?? 1)).toBe(0); // clone() may yield -0; both are flat
+
+    const straight = root.getObjectByName("piece-straight");
+    expect(Math.abs(straight?.rotation.x ?? 1)).toBe(0); // clone() may yield -0; both are flat
+    expect(straight?.position.y).toBe(0);
 
     const gap = root.getObjectByName("gap-highlight") as THREE.Mesh;
     expect(gap.position.toArray()).toEqual([cellToWorld(6, 1)[0], 0.02, cellToWorld(6, 1)[2]]);

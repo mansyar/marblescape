@@ -92,7 +92,7 @@ describe("generatePieceThumbnails", () => {
     const first = stub.state.objects[0];
     expect(first).not.toBe(templates.get("straight"));
     expect(first.rotation.y).toBeCloseTo(CONNECTIONS.straight.modelYawOffset);
-    expect(first.rotation.x).toBeCloseTo(CONNECTIONS.straight.slope ?? 0);
+    expect(Math.abs(first.rotation.x)).toBe(0); // clone() may yield -0; both are flat
   });
 
   it("omits failed types and keeps the rest", () => {
@@ -131,12 +131,12 @@ describe("createThumbnailClone", () => {
     expect(clone.children[0]).not.toBe(template.children[0]);
   });
 
-  it("applies the rotation-0 board pose, ramp lift included", () => {
+  it("applies the flush rotation-0 board pose (no pitch or lift)", () => {
     const clone = createThumbnailClone("straight", new THREE.Object3D());
     expect(clone.rotation.order).toBe("YXZ");
     expect(clone.rotation.y).toBeCloseTo(CONNECTIONS.straight.modelYawOffset);
-    expect(clone.rotation.x).toBeCloseTo(CONNECTIONS.straight.slope ?? 0);
-    expect(clone.position.y).toBeCloseTo(0.48 * Math.sin(CONNECTIONS.straight.slope ?? 0));
+    expect(Math.abs(clone.rotation.x)).toBe(0); // clone() may yield -0; both are flat
+    expect(clone.position.y).toBe(0);
   });
 
   it("uses each model's authored yaw alignment", () => {
