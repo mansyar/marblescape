@@ -6,8 +6,8 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 
 ## Phase 1 — Frame pacing meter & quality policy core (pure, TDD)
 
-- [ ] Task: Write failing unit tests for the new pure modules (`src/render/perf-meter.ts`, `src/render/quality.ts`, `src/render/quality-config.ts`): EMA + rolling p95 math with injected timestamps (no rAF, deterministic); downgrade requires sustained breach windows (single spikes ignored); upgrade requires sustained healthy window + cooldown (no thrash); tier ladder monotonic with hard Tier 2 floor; full tier budgets equal today's constants (drift guard)
-- [ ] Task: Implement to green — meter, governor state machine, centralized config constants (spec defaults, evidence-tunable); >80% coverage
+- [x] Task: Write failing unit tests for the new pure modules (`src/render/perf-meter.ts`, `src/render/quality.ts`, `src/render/quality-config.ts`): EMA + rolling p95 math with injected timestamps (no rAF, deterministic); downgrade requires sustained breach windows (single spikes ignored); upgrade requires sustained healthy window + cooldown (no thrash); tier ladder monotonic with hard Tier 2 floor; full tier budgets equal today's constants (drift guard) [8dbdf08]
+- [x] Task: Implement to green — meter, governor state machine, centralized config constants (spec defaults, evidence-tunable); >80% coverage [8dbdf08]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Renderer & effects integration + hidden dev readout (TDD)
