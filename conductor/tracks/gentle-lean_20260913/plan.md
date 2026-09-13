@@ -20,12 +20,12 @@ Workflow discipline: strict TDD (failing tests → green → refactor → covera
 - [x] Task: Implement to green — remove `slope` from `PieceDef`/straight, simplify `posePiece` + `createThumbnailClone`; palette tiles and level previews inherit automatically; >80% coverage [b706a5a]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [b706a5a]
 
-## Phase 3 — Flow verification & tuning (gates + e2e)
+## Phase 3 — Flow verification & tuning (gates + e2e) [checkpoint: 2546b87]
 
 - [x] Task: Add lean-sensitive flow coverage (`tests/reliability.spec.ts` or focused spec): a marble on a flat straight chain accelerates and reaches a downstream cup under the 6° lean; zero rescues; generous time bound [2546b87]
 - [x] Task: Run both reliability gates + full 4-viewport production e2e matrix; if stalls appear, re-tune only `physics-config.ts` (damping/restitution/spawn height) with failing-test/gate evidence, then re-run [2546b87]
 - [x] Task: Regression check settle/rescue behavior at slower speeds (no false settles, no new stuck marbles) [2546b87]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [2546b87]
 
 ## Phase 4 — Docs, manual pass & completion
 
